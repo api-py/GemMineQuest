@@ -1,0 +1,37 @@
+name: Build & Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install xcodegen
+        run: brew install xcodegen
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode.app
+
+      - name: Build
+        run: |
+          xcodebuild -project GemMineQuest.xcodeproj \
+            -scheme GemMineQuest \
+            -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
+            -configuration Debug \
+            build
+
+      - name: Test
+        run: |
+          xcodebuild -project GemMineQuest.xcodeproj \
+            -scheme GemMineQuest \
+            -destination 'platform=iOS Simulator,name=iPhone 16 Pro' \
+            test
