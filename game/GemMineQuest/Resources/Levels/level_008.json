@@ -1,0 +1,19 @@
+{
+    "number": 8,
+    "maxMoves": 22,
+    "objectives": [{ "type": "dropTreasures", "count": 2 }],
+    "targetScores": [2500, 5000, 8000],
+    "tileLayout": [
+        [1, 1, 1, 4, 4, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1]
+    ],
+    "blockerLayout": null,
+    "treasureColumns": [3, 4],
+    "numColors": 5
+}

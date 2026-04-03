@@ -1,0 +1,19 @@
+{
+    "number": 1,
+    "maxMoves": 25,
+    "objectives": [{ "type": "reachScore", "target": 1000 }],
+    "targetScores": [1000, 2000, 3500],
+    "tileLayout": [
+        [1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1],
+        [1, 1, 1, 1, 1, 1, 1, 1]
+    ],
+    "blockerLayout": null,
+    "treasureColumns": null,
+    "numColors": 4
+}
