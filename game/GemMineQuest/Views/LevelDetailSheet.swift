@@ -4,8 +4,11 @@ import MapKit
 struct LevelDetailSheet: View {
     let levelNumber: Int
     @EnvironmentObject var progressManager: ProgressManager
+    @EnvironmentObject var boosterInventory: BoosterInventory
     var onPlay: () -> Void
     var onDismiss: () -> Void
+
+    @State private var selectedBoosters: Set<BoosterType> = []
 
     private var level: Level {
         LevelGenerator.getLevel(number: levelNumber)
@@ -13,6 +16,15 @@ struct LevelDetailSheet: View {
 
     private var isShuffleLevel: Bool {
         levelNumber >= 5 && (levelNumber % 10 == 5)
+    }
+
+    private var difficultyBadge: (text: String, color: UInt32)? {
+        if levelNumber >= 50 {
+            return ("Super Hard", 0xFF4444)
+        } else if levelNumber >= 25 {
+            return ("Hard", 0xFF6347)
+        }
+        return nil
     }
 
     var body: some View {
@@ -47,10 +59,24 @@ struct LevelDetailSheet: View {
                         .font(.system(size: 32, weight: .bold, design: .rounded))
                         .foregroundColor(Color(hex: 0xFFD700))
 
-                    Text(WelshPlaceNames.name(for: levelNumber))
-                        .font(.system(size: 18, weight: .medium, design: .serif))
-                        .foregroundColor(Color(hex: 0xCCBB99))
-                        .italic()
+                    HStack(spacing: 8) {
+                        Text(WelshPlaceNames.name(for: levelNumber))
+                            .font(.system(size: 18, weight: .medium, design: .serif))
+                            .foregroundColor(Color(hex: 0xCCBB99))
+                            .italic()
+
+                        if let badge = difficultyBadge {
+                            Text(badge.text)
+                                .font(.system(size: 11, weight: .bold))
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 3)
+                                .background(
+                                    Capsule()
+                                        .fill(Color(hex: badge.color))
+                                )
+                        }
+                    }
 
                     // Welsh town map
                     let welshPlace = WelshPlaceNames.place(for: levelNumber)
@@ -129,6 +155,64 @@ struct LevelDetailSheet: View {
                         )
                     }
 
+                    // Booster selection panel
+                    VStack(spacing: 10) {
+                        Text("Select Boosters")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundColor(Color(hex: 0xE8A035))
+
+                        HStack(spacing: 12) {
+                            ForEach([BoosterType.pickaxe, .dynamite, .droneStrike, .gemForge], id: \.rawValue) { boosterType in
+                                let count = boosterInventory.count(for: boosterType)
+                                let isSelected = selectedBoosters.contains(boosterType)
+
+                                Button {
+                                    if isSelected {
+                                        selectedBoosters.remove(boosterType)
+                                    } else if count > 0 {
+                                        selectedBoosters.insert(boosterType)
+                                    }
+                                } label: {
+                                    VStack(spacing: 4) {
+                                        ZStack {
+                                            RoundedRectangle(cornerRadius: 10)
+                                                .fill(isSelected
+                                                      ? LinearGradient(colors: [Color(hex: 0xD41818), Color(hex: 0x8B0000)],
+                                                                       startPoint: .top, endPoint: .bottom)
+                                                      : LinearGradient(colors: [Color(hex: 0x2A2218), Color(hex: 0x1A1208)],
+                                                                       startPoint: .top, endPoint: .bottom))
+                                                .frame(width: 52, height: 52)
+
+                                            RoundedRectangle(cornerRadius: 10)
+                                                .stroke(isSelected ? Color(hex: 0xFFD700) : Color(hex: 0x4A3520), lineWidth: 2)
+                                                .frame(width: 52, height: 52)
+
+                                            Image(systemName: boosterIconName(boosterType))
+                                                .font(.system(size: 20))
+                                                .foregroundColor(count > 0 ? Color(hex: 0xFFD700) : Color(hex: 0x4A3520))
+
+                                            // Count badge
+                                            Text("\(count)")
+                                                .font(.system(size: 9, weight: .bold))
+                                                .foregroundColor(.white)
+                                                .padding(.horizontal, 5)
+                                                .padding(.vertical, 1)
+                                                .background(Capsule().fill(count > 0 ? Color(hex: 0xD41818) : Color(hex: 0x4A3520)))
+                                                .offset(x: 18, y: -18)
+                                        }
+
+                                        Text(boosterDisplayName(boosterType))
+                                            .font(.system(size: 9, weight: .medium))
+                                            .foregroundColor(Color(hex: 0x8B7355))
+                                            .lineLimit(1)
+                                    }
+                                }
+                                .disabled(count == 0 && !isSelected)
+                            }
+                        }
+                    }
+                    .padding(.vertical, 8)
+
                     // Play button - prominent at bottom
                     Button(action: onPlay) {
                         HStack {
@@ -163,6 +247,26 @@ struct LevelDetailSheet: View {
         case .dropTreasures: return "shippingbox.fill"
         case .collectGems: return "diamond.fill"
         case .collectSpecials: return "sparkles"
+        }
+    }
+
+    private func boosterIconName(_ type: BoosterType) -> String {
+        switch type {
+        case .pickaxe: return "hammer.fill"
+        case .dynamite: return "flame.fill"
+        case .droneStrike: return "bolt.fill"
+        case .gemForge: return "wand.and.stars"
+        default: return "star.fill"
+        }
+    }
+
+    private func boosterDisplayName(_ type: BoosterType) -> String {
+        switch type {
+        case .pickaxe: return "Pickaxe"
+        case .dynamite: return "Dynamite"
+        case .droneStrike: return "Drone"
+        case .gemForge: return "Forge"
+        default: return type.rawValue
         }
     }
 }

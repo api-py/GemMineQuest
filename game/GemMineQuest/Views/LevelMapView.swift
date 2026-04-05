@@ -39,7 +39,22 @@ struct LevelMapView: View {
 
                 Spacer()
 
-                Color.clear.frame(width: 44, height: 44)
+                // Coin counter
+                HStack(spacing: 4) {
+                    Image(systemName: "dollarsign.circle.fill")
+                        .font(.system(size: 16))
+                        .foregroundColor(Color(hex: 0xFFD700))
+                    Text("\(progressManager.progress.coins)")
+                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                        .foregroundColor(Color(hex: 0xFFD700))
+                }
+                .padding(.horizontal, 10)
+                .padding(.vertical, 5)
+                .background(
+                    Capsule()
+                        .fill(Color.black.opacity(0.4))
+                        .overlay(Capsule().stroke(Color(hex: 0xC9A84C).opacity(0.25), lineWidth: 0.5))
+                )
             }
             .padding(.horizontal, 16)
             .padding(.top, 4)
