@@ -77,7 +77,9 @@ class BoardFiller {
                     holeCount += 1
                 } else if holeCount > 0 {
                     // Drop this gem down by holeCount rows
-                    let targetPos = GridPosition(row: row - holeCount, column: col)
+                    let targetRow = row - holeCount
+                    guard targetRow >= 0 else { continue }
+                    let targetPos = GridPosition(row: targetRow, column: col)
                     if let gem = board[pos] {
                         board.removeGem(at: pos)
                         board.setGem(gem, at: targetPos)

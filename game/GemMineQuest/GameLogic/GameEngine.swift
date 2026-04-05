@@ -185,6 +185,18 @@ class GameEngine {
                 activationRound += 1
             }
 
+            // 5b. Process blockers adjacent to chain-reaction affected positions
+            if !activatedPositions.isEmpty {
+                let chainAffected = allMatchedPositions.subtracting(allMatchedPositions.intersection(
+                    matches.flatMap { $0.positions }
+                ))
+                if !chainAffected.isEmpty {
+                    events.append(contentsOf: blockerManager.processMatchAdjacent(
+                        matchedPositions: chainAffected, on: board
+                    ))
+                }
+            }
+
             // 6. Score the matches
             for match in matches {
                 let delta = scoreCalculator.scoreForMatch(match, chainIndex: chainIndex)
@@ -251,6 +263,9 @@ class GameEngine {
                 events.append(.scoreUpdated(newScore: state.score, delta: delta, at: specialPos))
                 board.removeGem(at: specialPos)
                 for pos in affected { board.removeGem(at: pos) }
+                events.append(contentsOf: blockerManager.processMatchAdjacent(
+                    matchedPositions: Set(affected), on: board
+                ))
             }
         }
 
@@ -283,6 +298,9 @@ class GameEngine {
 
         board.removeGem(at: crystalPos)
         for pos in affected { board.removeGem(at: pos) }
+        events.append(contentsOf: blockerManager.processMatchAdjacent(
+            matchedPositions: Set(affected), on: board
+        ))
 
         let (falls, newGems) = boardFiller.dropAndFill(board: board, numColors: state.level.effectiveNumColors)
         if !falls.isEmpty { events.append(.gemsFell(moves: falls)) }
@@ -338,6 +356,9 @@ class GameEngine {
             }
         }
         for pos in allAffected { board.removeGem(at: pos) }
+        events.append(contentsOf: blockerManager.processMatchAdjacent(
+            matchedPositions: Set(allAffected), on: board
+        ))
 
         let delta = scoreCalculator.scoreForSpecialActivation(.crystalBall) * 3
         state.score += delta

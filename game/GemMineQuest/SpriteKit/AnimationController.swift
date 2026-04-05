@@ -51,7 +51,10 @@ class AnimationController {
         if maxDuration > 0 {
             scene.run(SKAction.sequence([
                 SKAction.wait(forDuration: maxDuration),
-                SKAction.run(completion)
+                SKAction.run { [weak self] in
+                    self?.scene?.syncAllSpriteZPositions()
+                    completion()
+                }
             ]))
         } else {
             completion()
@@ -425,10 +428,11 @@ class AnimationController {
                 let rowDiff = abs(move.from.row - move.to.row)
                 let duration = Constants.fallDurationPerRow * Double(rowDiff)
 
-                sprite.zPosition = 5 + CGFloat(rowDiff) * 0.1  // Above stationary gems during fall
-                sprite.run(SKAction.sequence([
+                let capturedSprite = sprite
+                capturedSprite.zPosition = 5 + CGFloat(rowDiff) * 0.1  // Above stationary gems during fall
+                capturedSprite.run(SKAction.sequence([
                     SKAction.fallWithBounce(to: targetPos, duration: duration),
-                    SKAction.run { sprite.zPosition = 1 }
+                    SKAction.run { capturedSprite.zPosition = 1 }
                 ]))
                 scene.moveGemSprite(from: move.from, to: move.to)
                 maxDuration = max(maxDuration, duration + Constants.fallBounce)
@@ -453,9 +457,10 @@ class AnimationController {
             let targetPos = layout.positionFor(pos)
             let duration = Constants.fallDurationPerRow * Double(rowsToFall)
 
-            sprite.run(SKAction.sequence([
+            let capturedSprite = sprite
+            capturedSprite.run(SKAction.sequence([
                 SKAction.fallWithBounce(to: targetPos, duration: duration),
-                SKAction.run { sprite.zPosition = 1 }
+                SKAction.run { capturedSprite.zPosition = 1 }
             ]))
             maxDuration = max(maxDuration, duration + Constants.fallBounce)
         }
@@ -516,6 +521,8 @@ class AnimationController {
         trail.glowWidth = 3.0
         trail.zPosition = 39
 
+        let targetColor = scene.gameState?.board[to]?.color.primaryColor ?? .cyan
+
         drone.run(SKAction.sequence([
             SKAction.scale(to: 1.0, duration: 0.15),
             flyAction,
@@ -523,7 +530,7 @@ class AnimationController {
                 guard let scene = scene else { return }
                 // Explosion at target
                 let effect = ParticleEffects.gemShatter(at: targetPos,
-                    color: scene.gameState?.board[to]?.color.primaryColor ?? .cyan)
+                    color: targetColor)
                 scene.boardLayer.addChild(effect)
 
                 if let sprite = scene.gemSpriteAt(to) {

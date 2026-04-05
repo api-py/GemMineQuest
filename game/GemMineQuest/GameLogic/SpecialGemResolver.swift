@@ -191,29 +191,45 @@ class SpecialGemResolver {
     /// Get drone target positions (random gems, prioritizing objectives)
     func getDroneTargets(count: Int, on board: Board, prioritizeOre: Bool = true) -> [GridPosition] {
         var candidates: [GridPosition] = []
+        var lavaCandidates: [GridPosition] = []
         var oreCandidates: [GridPosition] = []
 
         for pos in board.allPlayablePositions() {
             guard board[pos] != nil else { continue }
+            // Check if this position or any neighbor has lava
+            if case .lava = board.blockerAt(pos) {
+                lavaCandidates.append(pos)
+            } else {
+                let hasAdjacentLava = pos.neighbors.contains { neighbor in
+                    guard board.isValidPosition(neighbor) else { return false }
+                    if case .lava = board.blockerAt(neighbor) { return true }
+                    return false
+                }
+                if hasAdjacentLava {
+                    lavaCandidates.append(pos)
+                }
+            }
             if board.hasOreVein(at: pos) {
                 oreCandidates.append(pos)
             }
             candidates.append(pos)
         }
 
-        // Prioritize ore positions
         var targets: [GridPosition] = []
-        if prioritizeOre {
-            targets.append(contentsOf: oreCandidates.shuffled().prefix(count))
+        // Priority 1: Lava positions
+        targets.append(contentsOf: lavaCandidates.shuffled().prefix(count))
+        // Priority 2: Ore positions
+        let remaining1 = count - targets.count
+        if remaining1 > 0 && prioritizeOre {
+            let oreFiltered = oreCandidates.filter { !targets.contains($0) }.shuffled()
+            targets.append(contentsOf: oreFiltered.prefix(remaining1))
         }
-
-        // Fill remaining with random positions
-        let remaining = count - targets.count
-        if remaining > 0 {
+        // Priority 3: Random
+        let remaining2 = count - targets.count
+        if remaining2 > 0 {
             let available = candidates.filter { !targets.contains($0) }.shuffled()
-            targets.append(contentsOf: available.prefix(remaining))
+            targets.append(contentsOf: available.prefix(remaining2))
         }
-
         return targets
     }
 }

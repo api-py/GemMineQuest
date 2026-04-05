@@ -4,6 +4,7 @@ import Foundation
 class BoosterManager {
 
     private let specialResolver = SpecialGemResolver()
+    private let blockerManager = BlockerManager()
 
     // MARK: - Pre-Game Boosters
 
@@ -124,6 +125,9 @@ class BoosterManager {
                 events.append(.blockerDestroyed(at: target))
             }
         }
+        events.append(contentsOf: blockerManager.processMatchAdjacent(
+            matchedPositions: affected, on: board
+        ))
 
         let delta = affected.count * 60
         state.score += delta
@@ -143,6 +147,10 @@ class BoosterManager {
             let affected = specialResolver.resolve(special: gem.special, at: pos, on: board)
             if !affected.isEmpty {
                 events.append(.specialActivated(type: gem.special, at: pos, affected: affected))
+                for affectedPos in affected { board.removeGem(at: affectedPos) }
+                events.append(contentsOf: blockerManager.processMatchAdjacent(
+                    matchedPositions: Set(affected), on: board
+                ))
             }
         }
 
@@ -184,15 +192,26 @@ class BoosterManager {
             prioritizeOre: true
         )
 
+        var allTargets = Set<GridPosition>()
         for target in targets {
             let center = board.allPlayablePositions().filter { board[$0] != nil }.randomElement() ?? target
             events.append(.droneDeployed(from: center, to: target))
+
+            if case .lava = board.blockerAt(target) {
+                board.setBlocker(nil, at: target)
+                events.append(.blockerDestroyed(at: target))
+            }
+
             board.removeGem(at: target)
+            allTargets.insert(target)
 
             let delta = 60
             state.score += delta
             events.append(.scoreUpdated(newScore: state.score, delta: delta, at: target))
         }
+        events.append(contentsOf: blockerManager.processMatchAdjacent(
+            matchedPositions: allTargets, on: board
+        ))
 
         return events
     }

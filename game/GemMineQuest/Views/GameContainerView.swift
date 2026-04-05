@@ -189,6 +189,36 @@ struct GameContainerView: View {
                 .padding(.vertical, 4)
                 .background(Color(hex: 0x1A0E05).opacity(0.8))
 
+                // Objective banner on level start
+                if showObjectiveBanner {
+                    let level = LevelGenerator.getLevel(number: levelNumber)
+                    HStack(spacing: 8) {
+                        ForEach(level.objectives.indices, id: \.self) { i in
+                            if i > 0 {
+                                Text("\u{2022}")
+                                    .foregroundColor(Color(hex: 0xC9A84C))
+                                    .font(.system(size: 14, weight: .bold))
+                            }
+                            Text(level.objectives[i].displayText)
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundColor(Color(hex: 0xFFF8E8))
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 12)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color(hex: 0x1A0E05).opacity(0.85))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color(hex: 0xC9A84C).opacity(0.5), lineWidth: 1.5)
+                            )
+                    )
+                    .padding(.top, 8)
+                    .transition(.opacity)
+                    .allowsHitTesting(false)
+                }
+
                 Spacer().allowsHitTesting(false)
 
                 BoosterBarView(
@@ -236,40 +266,6 @@ struct GameContainerView: View {
                         withAnimation { viewModel.showGodModeToast = false }
                     }
                 }
-            }
-
-            // Objective banner on level start
-            if showObjectiveBanner {
-                VStack {
-                    let level = LevelGenerator.getLevel(number: levelNumber)
-                    HStack(spacing: 8) {
-                        ForEach(level.objectives.indices, id: \.self) { i in
-                            if i > 0 {
-                                Text("\u{2022}")
-                                    .foregroundColor(Color(hex: 0xC9A84C))
-                                    .font(.system(size: 14, weight: .bold))
-                            }
-                            Text(level.objectives[i].displayText)
-                                .font(.system(size: 14, weight: .semibold))
-                                .foregroundColor(Color(hex: 0xFFF8E8))
-                        }
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 12)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color(hex: 0x1A0E05).opacity(0.85))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color(hex: 0xC9A84C).opacity(0.5), lineWidth: 1.5)
-                            )
-                    )
-                    Spacer()
-                }
-                .padding(.top, 200)
-                .transition(.opacity)
-                .allowsHitTesting(false)
-                .zIndex(50)
             }
 
             // Game over overlay
