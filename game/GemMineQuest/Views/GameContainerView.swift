@@ -291,6 +291,11 @@ struct GameContainerView: View {
         } message: {
             Text("Progress on this level will be lost.")
         }
+        .fullScreenCover(isPresented: $showShop) {
+            ShopView(onDismiss: { showShop = false })
+                .environmentObject(progressManager)
+                .environmentObject(boosterInventory)
+        }
     }
 
     private func showIntroBanner() {

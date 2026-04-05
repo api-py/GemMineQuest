@@ -166,6 +166,27 @@ class LevelGenerator {
             }
         }
 
+        // For higher difficulty levels, add 2x2 gap blocks to increase strategic difficulty
+        if difficulty >= 0.22 {
+            let playableCount = layout.flatMap { $0 }.filter { $0 != 0 }.count
+            if playableCount > 58 {
+                let gapCount = difficulty >= 0.35 ? 2 : 1
+                var gapsPlaced = 0
+                for _ in 0..<50 {
+                    guard gapsPlaced < gapCount else { break }
+                    let gr = Int.random(in: 1..<(rows - 1), using: &rng)
+                    let gc = Int.random(in: 1..<(cols - 1), using: &rng)
+                    let positions = [(gr, gc), (gr, gc + 1), (gr + 1, gc), (gr + 1, gc + 1)]
+                    if positions.allSatisfy({ r, c in
+                        r < rows && c < cols && layout[r][c] == 1
+                    }) {
+                        for (r, c) in positions { layout[r][c] = 0 }
+                        gapsPlaced += 1
+                    }
+                }
+            }
+        }
+
         return layout
     }
 

@@ -532,6 +532,11 @@ class AnimationController {
                     ]))
                     scene.removeGemSprite(at: to)
                 }
+
+                // Clean up any ore/special highlight tint on the tile
+                if let tileSprite = scene.tileAt(to) {
+                    tileSprite.clearHighlight()
+                }
             },
             SKAction.group([
                 SKAction.scale(to: 2.0, duration: 0.15),

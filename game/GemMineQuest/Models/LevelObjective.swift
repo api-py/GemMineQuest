@@ -12,7 +12,7 @@ enum LevelObjective: Codable, Equatable {
         case .reachScore(let target):
             return "Score \(target) points"
         case .clearAllOre:
-            return "Clear all ore veins"
+            return "Mine all ore tiles"
         case .dropTreasures(let count):
             return "Drop \(count) treasure\(count > 1 ? "s" : "") to mine cart"
         case .collectGems(let color, let count):
@@ -27,7 +27,7 @@ enum LevelObjective: Codable, Equatable {
         case .reachScore(let target):
             return "Score at least \(target) points by matching gems"
         case .clearAllOre:
-            return "Match gems on ore vein tiles to mine them all"
+            return "Match gems on gold ore tiles to mine them. Boosters don't count!"
         case .dropTreasures(let count):
             return "Move \(count) treasure\(count > 1 ? "s" : "") to the mine cart at the bottom"
         case .collectGems(let color, let count):
