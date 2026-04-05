@@ -122,6 +122,24 @@ class ProgressManager: ObservableObject {
         save()
     }
 
+    // MARK: - Achievements
+
+    func checkAchievements() -> [Achievement] {
+        var newlyUnlocked: [Achievement] = []
+        for achievement in Achievement.allCases {
+            if achievement.isUnlocked(progress: progress)
+                && !progress.unlockedAchievements.contains(achievement.rawValue) {
+                progress.unlockedAchievements.append(achievement.rawValue)
+                progress.addCoins(achievement.coinReward)
+                newlyUnlocked.append(achievement)
+            }
+        }
+        if !newlyUnlocked.isEmpty {
+            save()
+        }
+        return newlyUnlocked
+    }
+
     // MARK: - Milestones
 
     func checkMilestones() -> [String] {

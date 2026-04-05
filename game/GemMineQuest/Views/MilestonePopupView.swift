@@ -2,7 +2,7 @@ import SwiftUI
 
 struct MilestonePopupView: View {
     let milestoneId: String
-    var onClaim: () -> Void
+    var onDismiss: () -> Void
 
     @State private var scale: CGFloat = 0.8
     @State private var opacity: Double = 0
@@ -87,7 +87,7 @@ struct MilestonePopupView: View {
                     )
 
                 // Claim button
-                Button(action: onClaim) {
+                Button(action: onDismiss) {
                     Text("AWESOME!")
                         .font(.system(size: 20, weight: .black, design: .rounded))
                         .foregroundColor(.white)
