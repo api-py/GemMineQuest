@@ -59,7 +59,9 @@ class TextureFactory {
 
         let gradColors = [light.cgColor, primary.cgColor, dark.cgColor] as CFArray
         if let grad = CGGradient(colorsSpace: colorSpace, colors: gradColors, locations: [0.0, 0.45, 1.0]) {
-            let gradCenter = CGPoint(x: center.x - radius * 0.15, y: center.y - radius * 0.15)
+            // Smaller offset for round shapes (emerald) to keep symmetry
+            let highlightOffset: CGFloat = (color == .emerald) ? 0.05 : 0.15
+            let gradCenter = CGPoint(x: center.x - radius * highlightOffset, y: center.y - radius * highlightOffset)
             gc.drawRadialGradient(grad,
                                   startCenter: gradCenter, startRadius: 0,
                                   endCenter: center, endRadius: radius * 1.1,
@@ -222,6 +224,92 @@ class TextureFactory {
         case .sapphire: return 5
         case .amethyst: return 6
         }
+    }
+
+    // MARK: - Tile Textures
+
+    func tileTexture(size: CGFloat, isLight: Bool) -> SKTexture {
+        let key = "tile_\(Int(size))_\(isLight ? "L" : "D")"
+        if let cached = miscCache[key] { return cached }
+
+        let scale: CGFloat = 3.0
+        let px = size * scale
+        let inset: CGFloat = scale
+        let cornerR: CGFloat = 5 * scale
+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: px, height: px))
+
+        let image = renderer.image { ctx in
+            let gc = ctx.cgContext
+            let rect = CGRect(x: inset, y: inset, width: px - inset * 2, height: px - inset * 2)
+            let path = UIBezierPath(roundedRect: rect, cornerRadius: cornerR).cgPath
+            let colorSpace = CGColorSpaceCreateDeviceRGB()
+
+            // Base fill with vertical gradient
+            gc.saveGState()
+            gc.addPath(path)
+            gc.clip()
+
+            let topColor: UIColor
+            let botColor: UIColor
+            if isLight {
+                topColor = UIColor(red: 0.58, green: 0.48, blue: 0.36, alpha: 1.0)  // Warm amber
+                botColor = UIColor(red: 0.50, green: 0.42, blue: 0.30, alpha: 1.0)  // Slightly darker
+            } else {
+                topColor = UIColor(red: 0.46, green: 0.38, blue: 0.28, alpha: 1.0)  // Walnut
+                botColor = UIColor(red: 0.38, green: 0.32, blue: 0.22, alpha: 1.0)  // Deeper
+            }
+
+            let tileColors = [topColor.cgColor, botColor.cgColor] as CFArray
+            if let tileGrad = CGGradient(colorsSpace: colorSpace, colors: tileColors, locations: [0.0, 1.0]) {
+                gc.drawLinearGradient(tileGrad,
+                                      start: CGPoint(x: px / 2, y: inset),
+                                      end: CGPoint(x: px / 2, y: px - inset),
+                                      options: [])
+            }
+
+            // Subtle stone noise speckles
+            for _ in 0..<15 {
+                let sx = CGFloat.random(in: inset * 2...(px - inset * 2))
+                let sy = CGFloat.random(in: inset * 2...(px - inset * 2))
+                let sr = CGFloat.random(in: 1.0...2.5) * scale / 3
+                let alpha = CGFloat.random(in: 0.04...0.12)
+                let bright = Bool.random()
+                gc.setFillColor(UIColor(white: bright ? 1.0 : 0.0, alpha: alpha).cgColor)
+                gc.fillEllipse(in: CGRect(x: sx - sr, y: sy - sr, width: sr * 2, height: sr * 2))
+            }
+            gc.restoreGState()
+
+            // Top bevel highlight (3px)
+            gc.saveGState()
+            gc.addPath(path)
+            gc.clip()
+            gc.setFillColor(UIColor(white: 1.0, alpha: 0.18).cgColor)
+            gc.fill(CGRect(x: rect.minX, y: rect.minY, width: rect.width, height: 3 * scale))
+            // Left bevel highlight
+            gc.fill(CGRect(x: rect.minX, y: rect.minY, width: 2.5 * scale, height: rect.height))
+            gc.restoreGState()
+
+            // Bottom bevel shadow (3px)
+            gc.saveGState()
+            gc.addPath(path)
+            gc.clip()
+            gc.setFillColor(UIColor(white: 0.0, alpha: 0.2).cgColor)
+            gc.fill(CGRect(x: rect.minX, y: rect.maxY - 3 * scale, width: rect.width, height: 3 * scale))
+            // Right bevel shadow
+            gc.fill(CGRect(x: rect.maxX - 2.5 * scale, y: rect.minY, width: 2.5 * scale, height: rect.height))
+            gc.restoreGState()
+
+            // Outer border
+            gc.setStrokeColor(UIColor(white: 0.25, alpha: 0.35).cgColor)
+            gc.setLineWidth(1.0 * scale / 3)
+            gc.addPath(path)
+            gc.strokePath()
+        }
+
+        let texture = SKTexture(image: image)
+        texture.filteringMode = .linear
+        miscCache[key] = texture
+        return texture
     }
 
     // MARK: - Soft Glow Texture (particles + halos)

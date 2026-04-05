@@ -148,15 +148,18 @@ struct MainMenuView: View {
                         Text("Settings")
                             .font(.body.weight(.semibold))
                     }
-                    .foregroundColor(Color(hex: 0xCCDDCC))
+                    .foregroundColor(Color(hex: 0xCCBB99))
                     .frame(maxWidth: 200)
                     .padding(.vertical, 14)
                     .background(
-                        Color(hex: 0x1A2E18)
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Color(hex: 0x3A5A38).opacity(0.4), lineWidth: 0.5)
-                            )
+                        LinearGradient(
+                            colors: [Color(hex: 0x2A1E10), Color(hex: 0x1A1208)],
+                            startPoint: .top, endPoint: .bottom
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color(hex: 0xC9A84C).opacity(0.3), lineWidth: 1)
+                        )
                     )
                     .clipShape(RoundedRectangle(cornerRadius: 12))
                 }

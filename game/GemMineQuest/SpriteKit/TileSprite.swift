@@ -5,7 +5,7 @@ class TileSprite: SKNode {
     let gridPosition: GridPosition
     let tileSize: CGFloat
     let isLightTile: Bool
-    private var backgroundNode: SKShapeNode?
+    private var backgroundNode: SKNode?
     private var overlayNode: SKNode?
 
     init(position: GridPosition, tileType: TileType, blocker: BlockerType?, size: CGFloat) {
@@ -26,32 +26,20 @@ class TileSprite: SKNode {
 
         guard tileType != .empty else { return }
 
-        let inset: CGFloat = 1.0
-        let rect = CGSize(width: tileSize - inset * 2, height: tileSize - inset * 2)
-        let cornerR: CGFloat = 3
-
-        // Checkerboard: alternate between two warm tile shades
+        // Texture-based tile with CoreGraphics bevel and gradient
         let isLight = (gridPosition.row + gridPosition.column) % 2 == 0
-        let tileColor = isLight ? ColorPalette.tileNormal : ColorPalette.tileAlternate
-
-        let bg = SKShapeNode(rectOf: rect, cornerRadius: cornerR)
-        bg.fillColor = tileColor
-        bg.strokeColor = SKColor(white: 0.35, alpha: 0.30)
-        bg.lineWidth = 1.0
+        let tileTex = TextureFactory.shared.tileTexture(size: tileSize, isLight: isLight)
+        let bg = SKSpriteNode(texture: tileTex, size: CGSize(width: tileSize, height: tileSize))
         backgroundNode = bg
         addChild(bg)
 
-        // Beveled edges for inset look
-        addBevelEffect(rect: rect, cornerRadius: cornerR)
-
-        // Ore vein overlay - changes the entire tile background
+        // Ore vein overlay
         if tileType == .oreVein || tileType == .doubleOre {
-            // Override tile background to gold-tinted
-            backgroundNode?.fillColor = tileType == .doubleOre
-                ? SKColor(red: 0.55, green: 0.42, blue: 0.15, alpha: 0.90)
-                : SKColor(red: 0.50, green: 0.38, blue: 0.12, alpha: 0.85)
-            backgroundNode?.strokeColor = SKColor(hex: 0xFFD700, alpha: 0.8)
-            backgroundNode?.lineWidth = 2.0
+            // Tint tile gold for ore
+            if let sprite = backgroundNode as? SKSpriteNode {
+                sprite.color = SKColor(hex: 0xDAA520)
+                sprite.colorBlendFactor = tileType == .doubleOre ? 0.4 : 0.25
+            }
 
             let overlay = createOreOverlay(double: tileType == .doubleOre)
             overlay.zPosition = -0.5
@@ -74,61 +62,26 @@ class TileSprite: SKNode {
         }
     }
 
-    /// Adds beveled edges: bright top/left, dark bottom/right for depth.
-    private func addBevelEffect(rect: CGSize, cornerRadius: CGFloat) {
-        let halfW = rect.width / 2
-        let halfH = rect.height / 2
-
-        // Top edge highlight
-        let topEdge = SKShapeNode(rectOf: CGSize(width: rect.width - 4, height: 1.5), cornerRadius: 0.5)
-        topEdge.fillColor = ColorPalette.tileBevelLight
-        topEdge.strokeColor = .clear
-        topEdge.position = CGPoint(x: 0, y: halfH - 2)
-        addChild(topEdge)
-
-        // Left edge highlight
-        let leftEdge = SKShapeNode(rectOf: CGSize(width: 1.5, height: rect.height - 4), cornerRadius: 0.5)
-        leftEdge.fillColor = ColorPalette.tileBevelLight
-        leftEdge.strokeColor = .clear
-        leftEdge.position = CGPoint(x: -halfW + 2, y: 0)
-        addChild(leftEdge)
-
-        // Bottom edge shadow
-        let bottomEdge = SKShapeNode(rectOf: CGSize(width: rect.width - 4, height: 1.5), cornerRadius: 0.5)
-        bottomEdge.fillColor = ColorPalette.tileBevelDark
-        bottomEdge.strokeColor = .clear
-        bottomEdge.position = CGPoint(x: 0, y: -halfH + 2)
-        addChild(bottomEdge)
-
-        // Right edge shadow
-        let rightEdge = SKShapeNode(rectOf: CGSize(width: 1.5, height: rect.height - 4), cornerRadius: 0.5)
-        rightEdge.fillColor = ColorPalette.tileBevelDark
-        rightEdge.strokeColor = .clear
-        rightEdge.position = CGPoint(x: halfW - 2, y: 0)
-        addChild(rightEdge)
-    }
-
     func updateOre(tileType: TileType) {
         overlayNode?.removeFromParent()
         overlayNode = nil
 
         if tileType == .oreVein || tileType == .doubleOre {
-            // Gold-tinted tile background for ore
-            backgroundNode?.fillColor = tileType == .doubleOre
-                ? SKColor(red: 0.55, green: 0.42, blue: 0.15, alpha: 0.90)
-                : SKColor(red: 0.50, green: 0.38, blue: 0.12, alpha: 0.85)
-            backgroundNode?.strokeColor = SKColor(hex: 0xFFD700, alpha: 0.8)
-            backgroundNode?.lineWidth = 2.0
+            // Tint tile gold for ore
+            if let sprite = backgroundNode as? SKSpriteNode {
+                sprite.color = SKColor(hex: 0xDAA520)
+                sprite.colorBlendFactor = tileType == .doubleOre ? 0.4 : 0.25
+            }
 
             let overlay = createOreOverlay(double: tileType == .doubleOre)
             overlay.zPosition = -0.5
             overlayNode = overlay
             addChild(overlay)
         } else {
-            // Restore normal tile background
-            backgroundNode?.fillColor = isLightTile ? ColorPalette.tileNormal : ColorPalette.tileAlternate
-            backgroundNode?.strokeColor = SKColor(white: 0.35, alpha: 0.30)
-            backgroundNode?.lineWidth = 1.0
+            // Restore normal tile (no tint)
+            if let sprite = backgroundNode as? SKSpriteNode {
+                sprite.colorBlendFactor = 0.0
+            }
         }
     }
 

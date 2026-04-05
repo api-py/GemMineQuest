@@ -10,9 +10,9 @@ enum ColorPalette {
     static let background = SKColor(red: 0.10, green: 0.06, blue: 0.03, alpha: 1.0)       // Warm dark brown
     static let backgroundGradientTop = SKColor(red: 0.15, green: 0.10, blue: 0.05, alpha: 1.0)
     static let backgroundGradientBottom = SKColor(red: 0.06, green: 0.04, blue: 0.02, alpha: 1.0)
-    static let boardBackground = SKColor(red: 0.22, green: 0.18, blue: 0.12, alpha: 0.85)  // Warm brown, brighter
-    static let tileNormal = SKColor(red: 0.48, green: 0.42, blue: 0.32, alpha: 0.82)       // Warm tan, much brighter
-    static let tileAlternate = SKColor(red: 0.40, green: 0.35, blue: 0.26, alpha: 0.78)    // Warm complement
+    static let boardBackground = SKColor(red: 0.18, green: 0.14, blue: 0.08, alpha: 1.0)   // Solid dark brown
+    static let tileNormal = SKColor(red: 0.55, green: 0.46, blue: 0.34, alpha: 1.0)       // Warm amber (full opacity)
+    static let tileAlternate = SKColor(red: 0.44, green: 0.37, blue: 0.27, alpha: 1.0)    // Walnut (full opacity)
     static let tileHighlight = SKColor(red: 0.55, green: 0.48, blue: 0.36, alpha: 0.70)
 
     // MARK: - Board Frame
