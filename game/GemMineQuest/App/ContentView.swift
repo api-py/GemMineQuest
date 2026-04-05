@@ -11,8 +11,8 @@ enum AppScreen: Hashable {
 struct ContentView: View {
     @EnvironmentObject var progressManager: ProgressManager
     @EnvironmentObject var settingsManager: SettingsManager
+    @EnvironmentObject var boosterInventory: BoosterInventory
     @State private var currentScreen: AppScreen = .menu
-    @State private var selectedLevel: Int?
 
     // Engagement overlay states
     @State private var showDailyReward = false
@@ -23,60 +23,31 @@ struct ContentView: View {
 
     var body: some View {
         ZStack {
-            // Main navigation
             switch currentScreen {
             case .menu:
                 MainMenuView(
-                    onPlay: {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            currentScreen = .levelMap
-                        }
-                    },
-                    onSettings: {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            currentScreen = .settings
-                        }
-                    }
+                    onPlay: { withAnimation(.easeInOut(duration: 0.3)) { currentScreen = .levelMap } },
+                    onSettings: { withAnimation(.easeInOut(duration: 0.3)) { currentScreen = .settings } }
                 )
                 .transition(.opacity)
 
             case .levelMap:
-                let vm = LevelMapViewModel(progressManager: progressManager)
                 LevelMapView(
-                    viewModel: vm,
+                    viewModel: LevelMapViewModel(progressManager: progressManager, godMode: settingsManager.godModeEnabled),
                     onSelectLevel: { level in
-                        selectedLevel = level
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            currentScreen = .levelDetail(level)
-                        }
+                        withAnimation(.easeInOut(duration: 0.3)) { currentScreen = .levelDetail(level) }
                     },
-                    onBack: {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            currentScreen = .menu
-                        }
-                    },
-                    onSpinWheel: {
-                        showSpinWheel = true
-                    }
+                    onBack: { withAnimation(.easeInOut(duration: 0.3)) { currentScreen = .menu } },
+                    onSpinWheel: { showSpinWheel = true }
                 )
                 .transition(.move(edge: .trailing))
-                .onAppear {
-                    checkMilestones()
-                }
+                .onAppear { checkMilestones() }
 
             case .levelDetail(let level):
                 LevelDetailSheet(
                     levelNumber: level,
-                    onPlay: {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            currentScreen = .game(level)
-                        }
-                    },
-                    onDismiss: {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            currentScreen = .levelMap
-                        }
-                    }
+                    onPlay: { withAnimation(.easeInOut(duration: 0.3)) { currentScreen = .game(level) } },
+                    onDismiss: { withAnimation(.easeInOut(duration: 0.3)) { currentScreen = .levelMap } }
                 )
                 .transition(.move(edge: .bottom))
 
@@ -85,125 +56,75 @@ struct ContentView: View {
                     levelNumber: level,
                     onDismiss: {
                         checkPostGameAchievements()
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            currentScreen = .levelMap
-                        }
+                        withAnimation(.easeInOut(duration: 0.3)) { currentScreen = .levelMap }
                     },
                     onNextLevel: { nextLevel in
                         checkPostGameAchievements()
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            currentScreen = .game(nextLevel)
-                        }
+                        withAnimation(.easeInOut(duration: 0.3)) { currentScreen = .levelDetail(nextLevel) }
                     }
                 )
-                .transition(.opacity)
+                .id(level)
 
             case .settings:
                 SettingsView(
-                    onDismiss: {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            currentScreen = .menu
-                        }
-                    }
+                    onDismiss: { withAnimation(.easeInOut(duration: 0.3)) { currentScreen = .menu } }
                 )
                 .transition(.move(edge: .trailing))
             }
 
-            // MARK: - Engagement Overlays (ZStack on top of everything)
+            // MARK: - Engagement Overlays
 
-            // Daily reward popup
             if showDailyReward {
                 DailyRewardView(onDismiss: {
-                    withAnimation {
-                        showDailyReward = false
-                        // Show event banner after daily reward
-                        showEventBanner = true
-                    }
-                })
-                .transition(.opacity)
-                .zIndex(100)
+                    withAnimation { showDailyReward = false; showEventBanner = true }
+                }).transition(.opacity).zIndex(100)
             }
 
-            // Spin wheel
             if showSpinWheel {
                 SpinWheelView(onDismiss: {
-                    withAnimation {
-                        showSpinWheel = false
-                    }
-                })
-                .transition(.opacity)
-                .zIndex(100)
+                    withAnimation { showSpinWheel = false }
+                }).transition(.opacity).zIndex(100)
             }
 
-            // Milestone popup
             if let milestone = showMilestone {
                 MilestonePopupView(milestoneId: milestone, onDismiss: {
                     progressManager.claimMilestone(milestone)
-                    withAnimation {
-                        showMilestone = nil
-                    }
-                    // Check for more milestones
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
-                        checkMilestones()
-                    }
-                })
-                .transition(.opacity)
-                .zIndex(100)
+                    withAnimation { showMilestone = nil }
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { checkMilestones() }
+                }).transition(.opacity).zIndex(100)
             }
 
-            // Achievement toast
             if let achievement = showAchievementToast {
                 AchievementToastView(achievement: achievement, onDismiss: {
-                    withAnimation {
-                        showAchievementToast = nil
-                    }
-                })
-                .zIndex(200)
+                    withAnimation { showAchievementToast = nil }
+                }).zIndex(200)
             }
 
-            // Event banner (shown at top of level map)
-            if showEventBanner && currentScreen == .levelMap {
+            if showEventBanner {
                 VStack {
                     EventBannerView(
-                        onStart: {
-                            withAnimation { showEventBanner = false }
-                        },
-                        onDismiss: {
-                            withAnimation { showEventBanner = false }
-                        }
-                    )
-                    .padding(.top, 80)
-
+                        onStart: { withAnimation { showEventBanner = false } },
+                        onDismiss: { withAnimation { showEventBanner = false } }
+                    ).padding(.top, 80)
                     Spacer()
-                }
-                .transition(.move(edge: .top).combined(with: .opacity))
-                .zIndex(50)
+                }.transition(.move(edge: .top).combined(with: .opacity)).zIndex(50)
             }
         }
         .animation(.easeInOut(duration: 0.3), value: currentScreen)
         .onAppear {
-            // Request notification permission on first launch
             NotificationManager.shared.requestPermission()
-
-            // Check daily reward
             if progressManager.hasDailyReward() {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                    withAnimation {
-                        showDailyReward = true
-                    }
+                    withAnimation { showDailyReward = true }
                 }
             }
         }
     }
 
-    // MARK: - Engagement Checks
-
     private func checkMilestones() {
         let milestones = progressManager.checkMilestones()
         if let first = milestones.first {
-            withAnimation {
-                showMilestone = first
-            }
+            withAnimation { showMilestone = first }
         }
     }
 
@@ -211,9 +132,7 @@ struct ContentView: View {
         let newAchievements = progressManager.checkAchievements()
         if let first = newAchievements.first {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                withAnimation {
-                    showAchievementToast = first
-                }
+                withAnimation { showAchievementToast = first }
             }
         }
     }

@@ -3,12 +3,13 @@ import SwiftUI
 struct SettingsView: View {
     @EnvironmentObject var settingsManager: SettingsManager
     @EnvironmentObject var progressManager: ProgressManager
+    @EnvironmentObject var boosterInventory: BoosterInventory
     @State private var showResetConfirmation = false
     var onDismiss: () -> Void
 
     var body: some View {
         ZStack {
-            Color(hex: 0x1A0F0A).ignoresSafeArea()
+            Color(hex: 0x061206).ignoresSafeArea()
 
             VStack(spacing: 0) {
                 // Header
@@ -48,7 +49,7 @@ struct SettingsView: View {
                         Text("Gameplay")
                             .foregroundColor(Color(hex: 0xE8A035))
                     }
-                    .listRowBackground(Color(hex: 0x2D1B12))
+                    .listRowBackground(Color(hex: 0x0D1A0C))
 
                     Section {
                         HStack {
@@ -62,7 +63,17 @@ struct SettingsView: View {
                         Text("Feedback")
                             .foregroundColor(Color(hex: 0xE8A035))
                     }
-                    .listRowBackground(Color(hex: 0x2D1B12))
+                    .listRowBackground(Color(hex: 0x0D1A0C))
+
+                    Section {
+                        ForEach(BoosterInventory.allInGameBoosters, id: \.self) { booster in
+                            BoosterSettingsRow(booster: booster, inventory: boosterInventory)
+                        }
+                        Text("+1 of each every 25 levels").font(.caption).foregroundColor(Color(hex: 0x8B7355))
+                    } header: {
+                        Text("Boosters").foregroundColor(Color(hex: 0xE8A035))
+                    }
+                    .listRowBackground(Color(hex: 0x0D1A0C))
 
                     Section {
                         // Progress info
@@ -94,7 +105,7 @@ struct SettingsView: View {
                         Text("Progress")
                             .foregroundColor(Color(hex: 0xE8A035))
                     }
-                    .listRowBackground(Color(hex: 0x2D1B12))
+                    .listRowBackground(Color(hex: 0x0D1A0C))
 
                     Section {
                         Button(action: { showResetConfirmation = true }) {
@@ -105,7 +116,7 @@ struct SettingsView: View {
                             .foregroundColor(.red)
                         }
                     }
-                    .listRowBackground(Color(hex: 0x2D1B12))
+                    .listRowBackground(Color(hex: 0x0D1A0C))
                 }
                 .scrollContentBackground(.hidden)
                 .listStyle(.insetGrouped)
@@ -115,9 +126,81 @@ struct SettingsView: View {
             Button("Cancel", role: .cancel) {}
             Button("Reset", role: .destructive) {
                 progressManager.resetProgress()
+                boosterInventory.reset()
             }
         } message: {
             Text("This will erase all your level progress and scores. This cannot be undone.")
+        }
+    }
+}
+
+// MARK: - Booster Settings Row
+
+struct BoosterSettingsRow: View {
+    let booster: BoosterType
+    @ObservedObject var inventory: BoosterInventory
+
+    private var icon: String {
+        switch booster {
+        case .pickaxe: return "hammer.fill"
+        case .dynamite: return "flame.fill"
+        case .gemForge: return "wand.and.stars"
+        case .swapCharge: return "arrow.left.arrow.right"
+        case .droneStrike: return "scope"
+        case .mineCartRush: return "bolt.horizontal.fill"
+        default: return "questionmark"
+        }
+    }
+
+    private var label: String {
+        switch booster {
+        case .pickaxe: return "Pickaxe"
+        case .dynamite: return "Dynamite"
+        case .gemForge: return "Gem Forge"
+        case .swapCharge: return "Swap Charge"
+        case .droneStrike: return "Drone Strike"
+        case .mineCartRush: return "Mine Cart Rush"
+        default: return booster.rawValue
+        }
+    }
+
+    var body: some View {
+        HStack {
+            Image(systemName: icon)
+                .foregroundColor(Color(hex: 0xE8A035))
+                .frame(width: 24)
+            Text(label).foregroundColor(.white)
+            Spacer()
+            HStack(spacing: 12) {
+                Button {
+                    inventory.decrement(booster)
+                } label: {
+                    Image(systemName: "minus.circle.fill")
+                        .foregroundColor(inventory.count(for: booster) > 0 ? Color(hex: 0xE8A035) : Color(hex: 0x5A4530))
+                }
+                .disabled(inventory.count(for: booster) <= 0)
+                .buttonStyle(.plain)
+
+                Text("\(inventory.count(for: booster))")
+                    .foregroundColor(Color(hex: 0xCCBB99))
+                    .frame(minWidth: 20)
+                    .monospacedDigit()
+
+                Button {
+                    if inventory.count(for: booster) < 5 {
+                        inventory.increment(booster)
+                    }
+                } label: {
+                    Image(systemName: "plus.circle.fill")
+                        .foregroundColor(inventory.count(for: booster) >= 5 ? Color(hex: 0x5A4530) : Color(hex: 0xE8A035))
+                }
+                .disabled(inventory.count(for: booster) >= 5)
+                .buttonStyle(.plain)
+
+                Text("Max: 5")
+                    .font(.system(size: 9, weight: .medium))
+                    .foregroundColor(Color(hex: 0x8B7355))
+            }
         }
     }
 }

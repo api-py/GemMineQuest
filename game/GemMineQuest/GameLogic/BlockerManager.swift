@@ -2,6 +2,12 @@ import Foundation
 
 class BlockerManager {
 
+    private var lavaCooldownTurns: Int = 0
+
+    func notifyLavaDestroyed() {
+        lavaCooldownTurns = 1
+    }
+
     /// Process blockers adjacent to matched positions.
     /// Returns events for blocker damage/destruction.
     func processMatchAdjacent(matchedPositions: Set<GridPosition>,
@@ -45,6 +51,7 @@ class BlockerManager {
                 case .lava:
                     board.setBlocker(nil, at: neighbor)
                     events.append(.blockerDestroyed(at: neighbor))
+                    notifyLavaDestroyed()
 
                 case .tnt:
                     // TNT is cleared by adjacent match
@@ -110,32 +117,59 @@ class BlockerManager {
     /// Spread lava to adjacent empty tiles
     private func processLavaSpread(on board: Board) -> [GameEvent] {
         var events: [GameEvent] = []
-        var newLavaPositions: [(from: GridPosition, to: GridPosition)] = []
 
+        // Cooldown: skip spreading if lava was recently destroyed
+        if lavaCooldownTurns > 0 {
+            lavaCooldownTurns -= 1
+            return events
+        }
+
+        // Collect all lava positions
+        var lavaPositions: [GridPosition] = []
         for row in 0..<board.numRows {
             for col in 0..<board.numColumns {
                 let pos = GridPosition(row: row, column: col)
-                guard case .lava = board.blockerAt(pos) else { continue }
-
-                // Try to spread to a random adjacent position
-                let shuffledNeighbors = pos.neighbors.shuffled()
-                for neighbor in shuffledNeighbors {
-                    if board.isValidPosition(neighbor) &&
-                       board.isPlayable(neighbor) &&
-                       board.blockerAt(neighbor) == nil &&
-                       board[neighbor] != nil {
-                        newLavaPositions.append((from: pos, to: neighbor))
-                        break // Only spread to one neighbor per lava tile
-                    }
+                if case .lava = board.blockerAt(pos) {
+                    lavaPositions.append(pos)
                 }
             }
         }
 
-        // Apply lava spread
-        for spread in newLavaPositions {
-            board.setBlocker(.lava, at: spread.to)
-            board.removeGem(at: spread.to)
-            events.append(.lavaSpread(from: spread.from, to: spread.to))
+        guard !lavaPositions.isEmpty else { return events }
+
+        // Only ONE lava tile spreads per turn (randomly selected)
+        lavaPositions.shuffle()
+
+        for lavaPos in lavaPositions {
+            // Priority: down first, then sideways (shuffled), then up
+            let down = GridPosition(row: lavaPos.row - 1, column: lavaPos.column)
+            let left = GridPosition(row: lavaPos.row, column: lavaPos.column - 1)
+            let right = GridPosition(row: lavaPos.row, column: lavaPos.column + 1)
+            let up = GridPosition(row: lavaPos.row + 1, column: lavaPos.column)
+
+            var prioritized: [GridPosition] = []
+            // 1. Down (gravity)
+            prioritized.append(down)
+            // 2. Sideways (shuffled)
+            if Bool.random() {
+                prioritized.append(contentsOf: [left, right])
+            } else {
+                prioritized.append(contentsOf: [right, left])
+            }
+            // 3. Up (last resort)
+            prioritized.append(up)
+
+            for neighbor in prioritized {
+                if board.isValidPosition(neighbor) &&
+                   board.isPlayable(neighbor) &&
+                   board.blockerAt(neighbor) == nil &&
+                   board[neighbor] != nil {
+                    board.setBlocker(.lava, at: neighbor)
+                    board.removeGem(at: neighbor)
+                    events.append(.lavaSpread(from: lavaPos, to: neighbor))
+                    return events  // Only ONE spread per turn total
+                }
+            }
         }
 
         return events

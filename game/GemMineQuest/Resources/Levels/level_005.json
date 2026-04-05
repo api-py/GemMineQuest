@@ -1,19 +1,186 @@
 {
-    "number": 5,
-    "maxMoves": 20,
-    "objectives": [{ "type": "clearAllOre" }],
-    "targetScores": [2000, 4000, 6500],
-    "tileLayout": [
-        [1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 2, 1, 1, 2, 1, 1],
-        [1, 2, 1, 1, 1, 1, 2, 1],
-        [1, 2, 1, 1, 1, 1, 2, 1],
-        [1, 1, 2, 1, 1, 2, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1]
+  "number": 5,
+  "maxMoves": 11,
+  "objectives": [
+    {
+      "type": "clearAllOre"
+    }
+  ],
+  "targetScores": [
+    3000,
+    4800,
+    7200
+  ],
+  "tileLayout": [
+    [
+      1,
+      1,
+      1,
+      2,
+      2,
+      1,
+      1,
+      1
     ],
-    "blockerLayout": null,
-    "treasureColumns": null,
-    "numColors": 5
+    [
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1
+    ],
+    [
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      2,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      2,
+      2,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1
+    ],
+    [
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      2,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ]
+  ],
+  "blockerLayout": [
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      {
+        "type": "granite",
+        "value": 2
+      },
+      null,
+      {
+        "type": "granite",
+        "value": 2
+      },
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ]
+  ],
+  "treasureColumns": null,
+  "numColors": 6
 }

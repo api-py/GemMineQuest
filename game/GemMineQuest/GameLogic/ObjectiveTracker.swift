@@ -1,5 +1,6 @@
 import Foundation
 
+@MainActor
 class ObjectiveTracker {
 
     /// Process a match and update game state objectives
@@ -28,32 +29,52 @@ class ObjectiveTracker {
             }
         }
 
-        // Report objective progress
+        // Report objective progress and encouragement
         for objective in state.level.objectives {
             switch objective {
             case .reachScore(let target):
                 events.append(.objectiveProgress(
                     text: "Score", current: state.score, target: target
                 ))
+                if state.score >= Int(Double(target) * 0.85) && state.score < target {
+                    events.append(.encouragement(text: "Almost there!"))
+                }
             case .clearAllOre:
                 events.append(.objectiveProgress(
                     text: "Ore cleared", current: state.oreCleared, target: state.totalOre
                 ))
+                if state.totalOre > 0 && state.oreCleared == state.totalOre - 1 {
+                    events.append(.encouragement(text: "Last ore vein!"))
+                }
             case .dropTreasures(let count):
                 events.append(.objectiveProgress(
                     text: "Treasures", current: state.treasuresDropped, target: count
                 ))
+                if state.treasuresDropped == count - 1 {
+                    events.append(.encouragement(text: "One more treasure!"))
+                }
             case .collectGems(let color, let count):
                 let current = state.gemsCollected[color] ?? 0
                 events.append(.objectiveProgress(
                     text: color.displayName, current: current, target: count
                 ))
+                if current >= count - 2 && current < count {
+                    events.append(.encouragement(text: "\(count - current) \(color.displayName) left!"))
+                }
             case .collectSpecials(let type, let count):
                 let current = state.specialsCollected[type] ?? 0
                 events.append(.objectiveProgress(
                     text: type.displayName, current: current, target: count
                 ))
+                if current == count - 1 {
+                    events.append(.encouragement(text: "One more \(type.displayName)!"))
+                }
             }
+        }
+
+        // Low moves warning
+        if state.movesRemaining <= 3 && state.movesRemaining > 0 && !state.godModeEnabled {
+            events.append(.encouragement(text: "\(state.movesRemaining) moves left!"))
         }
 
         return events

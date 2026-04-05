@@ -52,9 +52,9 @@ class SpecialGemResolver {
             return hPositions.union(vPositions)
         }
 
-        // Volatile + Volatile = 5x5 area
+        // Volatile + Volatile = CLEAR ENTIRE BOARD
         if typeA == .volatile && typeB == .volatile {
-            return resolveArea(center: posA, radius: 2, on: board)
+            return Set(board.allPlayablePositions().filter { board[$0] != nil })
         }
 
         // Laser + Volatile = 3-wide cross
@@ -63,10 +63,34 @@ class SpecialGemResolver {
             return resolveThickCross(at: center, on: board)
         }
 
-        // Drone combos
+        // Volatile + Drone = volatile teleports to random location and explodes there
+        if (typeA == .volatile && typeB == .miningDrone) || (typeA == .miningDrone && typeB == .volatile) {
+            let allPositions = board.allPlayablePositions().filter { board[$0] != nil }
+            guard let randomPos = allPositions.randomElement() else { return [] }
+            return resolveArea(center: randomPos, radius: 1, on: board)
+        }
+
+        // Drone + Drone = double explosion: two large 3x3 blasts at random locations
+        if typeA == .miningDrone && typeB == .miningDrone {
+            var affected = Set<GridPosition>()
+            let allGemPositions = board.allPlayablePositions().filter { board[$0] != nil }
+            // Two random explosion centers
+            let centers = allGemPositions.shuffled().prefix(2)
+            for center in centers {
+                let area = resolveArea(center: center, radius: 2, on: board) // 5x5 area
+                affected.formUnion(area)
+            }
+            // Also include positions A and B
+            affected.insert(posA)
+            affected.insert(posB)
+            return affected
+        }
+
+        // Drone + Laser: drones carry the laser effect
         if typeA == .miningDrone || typeB == .miningDrone {
-            // Drones carry the other special's effect - handled in GameEngine
-            return []
+            let otherType = typeA == .miningDrone ? typeB : typeA
+            let otherPos = typeA == .miningDrone ? posB : posA
+            return resolve(special: otherType, at: otherPos, on: board)
         }
 
         return []

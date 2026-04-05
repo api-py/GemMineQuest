@@ -3,6 +3,7 @@ import Foundation
 /// Handles the end-of-level bonus (Sugar Crush equivalent).
 /// When a level is completed with remaining moves, those moves convert to laser gems
 /// and all specials on the board activate in sequence.
+@MainActor
 class MineBlast {
 
     private let scoreCalculator = ScoreCalculator()
@@ -15,7 +16,10 @@ class MineBlast {
 
         // 1. Convert remaining moves to laser gems
         let movesToConvert = Int(Double(state.movesRemaining) * Constants.mineBlastMovesToStriped)
-        let emptyPlayable = board.allPlayablePositions().filter { board[$0] != nil && board[$0]?.special == SpecialType.none }
+        let emptyPlayable = board.allPlayablePositions().filter { pos in
+            guard let gem = board[pos] else { return false }
+            return gem.special == .none
+        }
         let convertPositions = emptyPlayable.shuffled().prefix(movesToConvert)
 
         for pos in convertPositions {

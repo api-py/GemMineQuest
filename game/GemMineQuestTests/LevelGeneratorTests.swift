@@ -35,7 +35,7 @@ final class LevelGeneratorTests: XCTestCase {
         XCTAssertGreaterThanOrEqual(easyLevel.maxMoves, hardLevel.maxMoves)
     }
 
-    func testCreateGameState() {
+    @MainActor func testCreateGameState() {
         let state = LevelGenerator.createGameState(levelNumber: 1)
 
         XCTAssertEqual(state.level.number, 1)

@@ -46,11 +46,16 @@ struct Level: Codable {
     func buildBoard() -> Board {
         let numRows = tileLayout.count
         let numCols = tileLayout.first?.count ?? 8
+        guard numRows > 0 && numCols > 0 else {
+            return Board(numRows: 8, numColumns: 8)
+        }
         let board = Board(numRows: numRows, numColumns: numCols)
 
         for row in 0..<numRows {
+            let rowData = tileLayout[row]
             for col in 0..<numCols {
-                let tileValue = tileLayout[row][col]
+                guard col < rowData.count else { continue }
+                let tileValue = rowData[col]
                 board.tiles[row][col] = TileType(rawValue: tileValue) ?? .normal
 
                 if let blockerLayout = blockerLayout,
@@ -64,7 +69,7 @@ struct Level: Codable {
         // Set mine cart exits
         if let columns = treasureColumns {
             for col in columns {
-                if col < numCols {
+                if col >= 0 && col < numCols {
                     board.tiles[0][col] = .mineCart
                 }
             }

@@ -48,6 +48,9 @@ enum GameEvent: Equatable {
     case boardShuffled
     case droneDeployed(from: GridPosition, to: GridPosition)
 
+    // Encouragement popup
+    case encouragement(text: String)
+
     // Custom equality for associated values with tuples
     static func == (lhs: GameEvent, rhs: GameEvent) -> Bool {
         switch (lhs, rhs) {
@@ -75,6 +78,8 @@ enum GameEvent: Equatable {
 
 enum BoosterType: String {
     case pickaxe
+    case dynamite       // 3x3 blast radius
+    case gemForge       // Places a Crystal Ball + Volatile on the board
     case swapCharge
     case droneStrike
     case mineCartRush

@@ -3,7 +3,9 @@ import SpriteKit
 class HUDNode: SKNode {
 
     private var scoreLabel: SKLabelNode!
+    private var scoreShadowLabel: SKLabelNode!
     private var movesLabel: SKLabelNode!
+    private var movesShadowLabel: SKLabelNode!
     private var objectiveLabel: SKLabelNode!
     private var movesIcon: SKLabelNode!
     private let hudWidth: CGFloat
@@ -19,49 +21,87 @@ class HUDNode: SKNode {
     }
 
     private func setupHUD() {
-        // Textured panel background with golden border
-        let panelSize = CGSize(width: hudWidth - 20, height: 90)
-        let panelTex = TextureFactory.shared.hudPanelTexture(size: panelSize)
-        let bg = SKSpriteNode(texture: panelTex, size: panelSize)
+        // Background
+        let bg = SKShapeNode(rectOf: CGSize(width: hudWidth - 20, height: 90), cornerRadius: 12)
+        bg.fillColor = ColorPalette.hudBackground
+        bg.strokeColor = SKColor(hex: 0x6B4F3A, alpha: 0.5)
+        bg.lineWidth = 1
         addChild(bg)
 
-        // Score section (left) - with shadow for outline effect
-        addOutlinedLabel(
-            text: "SCORE",
-            fontName: "AvenirNext-Heavy",
-            fontSize: 12,
-            color: ColorPalette.textSecondary,
-            position: CGPoint(x: -hudWidth * 0.3, y: 15)
-        )
+        // Score section (left)
+        let scoreTitleShadow = SKLabelNode(text: "SCORE")
+        scoreTitleShadow.fontName = "AvenirNext-Heavy"
+        scoreTitleShadow.fontSize = 11
+        scoreTitleShadow.fontColor = SKColor(white: 0, alpha: 0.6)
+        scoreTitleShadow.position = CGPoint(x: -hudWidth * 0.3 + 1, y: 15 - 1)
+        addChild(scoreTitleShadow)
+
+        let scoreTitleLabel = SKLabelNode(text: "SCORE")
+        scoreTitleLabel.fontName = "AvenirNext-Heavy"
+        scoreTitleLabel.fontSize = 11
+        scoreTitleLabel.fontColor = ColorPalette.textSecondary
+        scoreTitleLabel.position = CGPoint(x: -hudWidth * 0.3, y: 15)
+        addChild(scoreTitleLabel)
+
+        scoreShadowLabel = SKLabelNode(text: "0")
+        let scoreShadow = scoreShadowLabel!
+        scoreShadow.fontName = "AvenirNext-Heavy"
+        scoreShadow.fontSize = 26
+        scoreShadow.fontColor = SKColor(white: 0, alpha: 0.6)
+        scoreShadow.position = CGPoint(x: -hudWidth * 0.3 + 1, y: -10 - 1)
+        addChild(scoreShadow)
 
         scoreLabel = SKLabelNode(text: "0")
         scoreLabel.fontName = "AvenirNext-Heavy"
         scoreLabel.fontSize = 26
         scoreLabel.fontColor = ColorPalette.textGold
-        scoreLabel.position = CGPoint(x: -hudWidth * 0.3, y: -12)
+        scoreLabel.position = CGPoint(x: -hudWidth * 0.3, y: -10)
         addChild(scoreLabel)
-        addShadowLabel(for: scoreLabel)
 
         // Moves section (center)
-        addOutlinedLabel(
-            text: "MOVES",
-            fontName: "AvenirNext-Heavy",
-            fontSize: 12,
-            color: ColorPalette.textSecondary,
-            position: CGPoint(x: 0, y: 15)
-        )
+        let movesTitleShadow = SKLabelNode(text: "MOVES")
+        movesTitleShadow.fontName = "AvenirNext-Heavy"
+        movesTitleShadow.fontSize = 11
+        movesTitleShadow.fontColor = SKColor(white: 0, alpha: 0.6)
+        movesTitleShadow.position = CGPoint(x: 1, y: 15 - 1)
+        addChild(movesTitleShadow)
+
+        let movesTitleLabel = SKLabelNode(text: "MOVES")
+        movesTitleLabel.fontName = "AvenirNext-Heavy"
+        movesTitleLabel.fontSize = 11
+        movesTitleLabel.fontColor = ColorPalette.textSecondary
+        movesTitleLabel.position = CGPoint(x: 0, y: 15)
+        addChild(movesTitleLabel)
+
+        movesShadowLabel = SKLabelNode(text: "20")
+        let movesShadow = movesShadowLabel!
+        movesShadow.fontName = "AvenirNext-Heavy"
+        movesShadow.fontSize = 28
+        movesShadow.fontColor = SKColor(white: 0, alpha: 0.6)
+        movesShadow.position = CGPoint(x: 1, y: -12 - 1)
+        addChild(movesShadow)
 
         movesLabel = SKLabelNode(text: "20")
         movesLabel.fontName = "AvenirNext-Heavy"
-        movesLabel.fontSize = 30
+        movesLabel.fontSize = 28
         movesLabel.fontColor = ColorPalette.textPrimary
-        movesLabel.position = CGPoint(x: 0, y: -14)
+        movesLabel.position = CGPoint(x: 0, y: -12)
         addChild(movesLabel)
-        addShadowLabel(for: movesLabel)
 
         // Objective section (right)
+        let objectiveShadow = SKLabelNode(text: "")
+        objectiveShadow.fontName = "AvenirNext-Heavy"
+        objectiveShadow.fontSize = 13
+        objectiveShadow.fontColor = SKColor(white: 0, alpha: 0.6)
+        objectiveShadow.position = CGPoint(x: hudWidth * 0.3 + 1, y: 2 - 1)
+        objectiveShadow.preferredMaxLayoutWidth = hudWidth * 0.35
+        objectiveShadow.numberOfLines = 2
+        objectiveShadow.verticalAlignmentMode = .center
+        objectiveShadow.name = "objectiveShadow"
+        addChild(objectiveShadow)
+
         objectiveLabel = SKLabelNode(text: "")
-        objectiveLabel.fontName = "AvenirNext-DemiBold"
+        objectiveLabel.fontName = "AvenirNext-Heavy"
         objectiveLabel.fontSize = 13
         objectiveLabel.fontColor = ColorPalette.textSecondary
         objectiveLabel.position = CGPoint(x: hudWidth * 0.3, y: 2)
@@ -71,64 +111,36 @@ class HUDNode: SKNode {
         addChild(objectiveLabel)
     }
 
-    /// Add a shadow/outline behind a label for depth
-    private func addShadowLabel(for label: SKLabelNode) {
-        let shadow = SKLabelNode(text: label.text)
-        shadow.fontName = label.fontName
-        shadow.fontSize = label.fontSize
-        shadow.fontColor = SKColor(white: 0.0, alpha: 0.7)
-        shadow.position = CGPoint(x: label.position.x + 1, y: label.position.y - 1)
-        shadow.zPosition = label.zPosition - 1
-        insertChild(shadow, at: 0)
-    }
-
-    /// Create a label with built-in shadow outline
-    @discardableResult
-    private func addOutlinedLabel(text: String, fontName: String, fontSize: CGFloat, color: SKColor, position: CGPoint) -> SKLabelNode {
-        // Shadow
-        let shadow = SKLabelNode(text: text)
-        shadow.fontName = fontName
-        shadow.fontSize = fontSize
-        shadow.fontColor = SKColor(white: 0.0, alpha: 0.6)
-        shadow.position = CGPoint(x: position.x + 1, y: position.y - 1)
-        addChild(shadow)
-
-        // Main label
-        let label = SKLabelNode(text: text)
-        label.fontName = fontName
-        label.fontSize = fontSize
-        label.fontColor = color
-        label.position = position
-        addChild(label)
-
-        return label
-    }
-
     func updateScore(_ score: Int) {
-        scoreLabel.text = "\(score)"
-        // Spring pop animation
-        let overshoot = SKAction.scale(to: 1.25, duration: 0.08)
-        overshoot.timingMode = .easeOut
-        let settle = SKAction.scale(to: 1.0, duration: 0.12)
-        settle.timingMode = .easeInEaseOut
-        scoreLabel.run(SKAction.sequence([overshoot, settle]))
+        let text = "\(score)"
+        scoreLabel.text = text
+        scoreShadowLabel?.text = text
+        // Pop animation
+        scoreLabel.run(SKAction.sequence([
+            SKAction.scale(to: 1.2, duration: 0.1),
+            SKAction.scale(to: 1.0, duration: 0.1)
+        ]))
     }
 
     func updateMoves(_ moves: Int, godMode: Bool) {
-        movesLabel.text = godMode ? "\u{221E}" : "\(moves)"  // ∞ symbol
+        let text = godMode ? "\u{221E}" : "\(moves)"  // ∞ symbol
+        movesLabel.text = text
+        movesShadowLabel?.text = text
         movesLabel.fontColor = moves <= 3 && !godMode ? SKColor.red : ColorPalette.textPrimary
 
         if moves <= 3 && !godMode {
-            let overshoot = SKAction.scale(to: 1.35, duration: 0.1)
-            overshoot.timingMode = .easeOut
-            let settle = SKAction.scale(to: 1.0, duration: 0.15)
-            settle.timingMode = .easeInEaseOut
-            movesLabel.run(SKAction.sequence([overshoot, settle]))
+            movesLabel.run(SKAction.sequence([
+                SKAction.scale(to: 1.3, duration: 0.15),
+                SKAction.scale(to: 1.0, duration: 0.15)
+            ]))
         }
     }
 
     func updateObjective(_ text: String) {
         objectiveLabel.text = text
+        if let shadow = childNode(withName: "objectiveShadow") as? SKLabelNode {
+            shadow.text = text
+        }
     }
 
     func showScorePopup(delta: Int, at position: CGPoint) {

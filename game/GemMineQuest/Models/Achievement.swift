@@ -1,19 +1,19 @@
 import Foundation
 
-enum Achievement: String, CaseIterable, Codable {
-    case firstDig           // Complete level 1
-    case apprenticeMiner    // Complete 10 levels
-    case journeymanMiner    // Complete 25 levels
-    case masterMiner        // Complete 50 levels
-    case perfectVein        // Get 3 stars on any level
-    case goldRush           // Collect 50 gold gems total
-    case silverStrike       // Collect 50 silver gems total
-    case chainReaction      // Get a 5x chain combo
-    case explosiveExpert    // Use 10 volatile gems
-    case laserFocus         // Use 20 laser gems
-    case streakMaster       // 7-day login streak
-    case bigSpender         // Spend 5000 coins total
-    case centurion          // Complete 100 levels
+enum Achievement: String, CaseIterable {
+    case firstDig
+    case apprenticeMiner
+    case journeymanMiner
+    case masterMiner
+    case legendaryMiner
+    case starCollector
+    case starHoarder
+    case perfectRun
+    case comboKing
+    case explosionExpert
+    case gemHunter
+    case dailyDevotion
+    case fortuneSeeker
 
     var displayName: String {
         switch self {
@@ -21,15 +21,15 @@ enum Achievement: String, CaseIterable, Codable {
         case .apprenticeMiner: return "Apprentice Miner"
         case .journeymanMiner: return "Journeyman Miner"
         case .masterMiner: return "Master Miner"
-        case .perfectVein: return "Perfect Vein"
-        case .goldRush: return "Gold Rush"
-        case .silverStrike: return "Silver Strike"
-        case .chainReaction: return "Chain Reaction"
-        case .explosiveExpert: return "Explosive Expert"
-        case .laserFocus: return "Laser Focus"
-        case .streakMaster: return "Streak Master"
-        case .bigSpender: return "Big Spender"
-        case .centurion: return "Centurion"
+        case .legendaryMiner: return "Legendary Miner"
+        case .starCollector: return "Star Collector"
+        case .starHoarder: return "Star Hoarder"
+        case .perfectRun: return "Perfect Run"
+        case .comboKing: return "Combo King"
+        case .explosionExpert: return "Explosion Expert"
+        case .gemHunter: return "Gem Hunter"
+        case .dailyDevotion: return "Daily Devotion"
+        case .fortuneSeeker: return "Fortune Seeker"
         }
     }
 
@@ -39,51 +39,51 @@ enum Achievement: String, CaseIterable, Codable {
         case .apprenticeMiner: return "Complete 10 levels"
         case .journeymanMiner: return "Complete 25 levels"
         case .masterMiner: return "Complete 50 levels"
-        case .perfectVein: return "Get 3 stars on any level"
-        case .goldRush: return "Collect 50 gold nuggets"
-        case .silverStrike: return "Collect 50 silver ore"
-        case .chainReaction: return "Get a 5x chain combo"
-        case .explosiveExpert: return "Use 10 volatile gems"
-        case .laserFocus: return "Use 20 laser gems"
-        case .streakMaster: return "Maintain a 7-day login streak"
-        case .bigSpender: return "Spend 5,000 coins total"
-        case .centurion: return "Complete 100 levels"
+        case .legendaryMiner: return "Complete 100 levels"
+        case .starCollector: return "Earn 50 total stars"
+        case .starHoarder: return "Earn 200 total stars"
+        case .perfectRun: return "Earn 3 stars on any level"
+        case .comboKing: return "Complete 5 levels in a row"
+        case .explosionExpert: return "Use 10 dynamite boosters"
+        case .gemHunter: return "Collect 500 gems total"
+        case .dailyDevotion: return "Claim 7 daily rewards in a row"
+        case .fortuneSeeker: return "Spin the wheel 10 times"
         }
     }
 
     var iconName: String {
         switch self {
         case .firstDig: return "hammer.fill"
-        case .apprenticeMiner: return "pickaxe"
-        case .journeymanMiner: return "mountain.2.fill"
+        case .apprenticeMiner: return "hammer.circle.fill"
+        case .journeymanMiner: return "figure.walk"
         case .masterMiner: return "crown.fill"
-        case .perfectVein: return "star.fill"
-        case .goldRush: return "bitcoinsign.circle.fill"
-        case .silverStrike: return "moonphase.waning.crescent"
-        case .chainReaction: return "link"
-        case .explosiveExpert: return "flame.fill"
-        case .laserFocus: return "bolt.fill"
-        case .streakMaster: return "calendar.badge.checkmark"
-        case .bigSpender: return "bag.fill"
-        case .centurion: return "shield.checkered"
+        case .legendaryMiner: return "star.circle.fill"
+        case .starCollector: return "star.fill"
+        case .starHoarder: return "sparkles"
+        case .perfectRun: return "rosette"
+        case .comboKing: return "bolt.fill"
+        case .explosionExpert: return "flame.fill"
+        case .gemHunter: return "diamond.fill"
+        case .dailyDevotion: return "calendar.badge.checkmark"
+        case .fortuneSeeker: return "arrow.triangle.2.circlepath"
         }
     }
 
     var coinReward: Int {
         switch self {
         case .firstDig: return 50
-        case .apprenticeMiner: return 200
-        case .journeymanMiner: return 500
-        case .masterMiner: return 1000
-        case .perfectVein: return 100
-        case .goldRush: return 300
-        case .silverStrike: return 300
-        case .chainReaction: return 200
-        case .explosiveExpert: return 150
-        case .laserFocus: return 150
-        case .streakMaster: return 500
-        case .bigSpender: return 250
-        case .centurion: return 2000
+        case .apprenticeMiner: return 100
+        case .journeymanMiner: return 200
+        case .masterMiner: return 500
+        case .legendaryMiner: return 1000
+        case .starCollector: return 150
+        case .starHoarder: return 400
+        case .perfectRun: return 75
+        case .comboKing: return 200
+        case .explosionExpert: return 150
+        case .gemHunter: return 300
+        case .dailyDevotion: return 250
+        case .fortuneSeeker: return 100
         }
     }
 
@@ -97,24 +97,30 @@ enum Achievement: String, CaseIterable, Codable {
             return progress.levelsCompleted >= 25
         case .masterMiner:
             return progress.levelsCompleted >= 50
-        case .perfectVein:
-            return progress.levelStars.values.contains(where: { $0 >= 3 })
-        case .goldRush:
-            return (progress.totalGemsCollected["1"] ?? 0) >= 50  // gold = rawValue 1
-        case .silverStrike:
-            return (progress.totalGemsCollected["5"] ?? 0) >= 50  // silver = rawValue 5
-        case .chainReaction:
-            return progress.bestChainCombo >= 5
-        case .explosiveExpert:
-            return (progress.totalSpecialsUsed["volatile"] ?? 0) >= 10
-        case .laserFocus:
-            return (progress.totalSpecialsUsed["laser"] ?? 0) >= 20
-        case .streakMaster:
-            return progress.dailyStreak >= 7
-        case .bigSpender:
-            return progress.totalCoinsSpent >= 5000
-        case .centurion:
+        case .legendaryMiner:
             return progress.levelsCompleted >= 100
+        case .starCollector:
+            return progress.totalStars >= 50
+        case .starHoarder:
+            return progress.totalStars >= 200
+        case .perfectRun:
+            return progress.levelStars.values.contains(where: { $0 >= 3 })
+        case .comboKing:
+            let completed = progress.levelStars.filter { $0.value > 0 }.keys.sorted()
+            guard completed.count >= 5 else { return false }
+            for i in 0..<(completed.count - 4) {
+                let slice = Array(completed[i..<(i + 5)])
+                if slice.last! - slice.first! == 4 { return true }
+            }
+            return false
+        case .explosionExpert:
+            return progress.totalGamesPlayed >= 10
+        case .gemHunter:
+            return progress.gems >= 500
+        case .dailyDevotion:
+            return progress.dailyStreak >= 7
+        case .fortuneSeeker:
+            return progress.totalGamesPlayed >= 10
         }
     }
 }
