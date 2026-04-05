@@ -49,7 +49,7 @@ struct ShopView: View {
                     Image(systemName: "star.circle.fill")
                         .font(.system(size: 22))
                         .foregroundColor(Color(hex: 0xFFD700))
-                    Text("\(progressManager.progress.coins)")
+                    Text(isGodMode ? "\u{221E}" : "\(progressManager.progress.coins)")
                         .font(.system(size: 24, weight: .bold, design: .rounded))
                         .foregroundColor(Color(hex: 0xFFD700))
                 }
