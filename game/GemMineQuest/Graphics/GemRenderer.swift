@@ -170,32 +170,81 @@ class GemRenderer {
 
     static func createDroneNode(size: CGFloat) -> SKNode {
         let container = SKNode()
-        let radius = size * 0.40
+        let radius = size * 0.30
 
-        let shadow = SKShapeNode(circleOfRadius: radius * 1.05)
+        // Shadow
+        let shadow = SKShapeNode(circleOfRadius: radius * 1.1)
         shadow.fillColor = SKColor(white: 0.0, alpha: 0.35)
         shadow.strokeColor = .clear
         shadow.position = CGPoint(x: 1.5, y: -2.5)
         container.addChild(shadow)
 
-        let orb = SKShapeNode(circleOfRadius: radius)
-        orb.fillColor = SKColor(red: 0.0, green: 0.7, blue: 0.7, alpha: 1.0)
-        orb.strokeColor = SKColor(red: 0.0, green: 0.9, blue: 0.9, alpha: 1.0)
-        orb.lineWidth = 1.5
-        orb.glowWidth = 3.0
-        container.addChild(orb)
+        // Hexagonal body
+        let hexPath = CGMutablePath()
+        for i in 0..<6 {
+            let angle = CGFloat(i) / 6.0 * .pi * 2 - .pi / 6
+            let pt = CGPoint(x: cos(angle) * radius, y: sin(angle) * radius)
+            if i == 0 { hexPath.move(to: pt) } else { hexPath.addLine(to: pt) }
+        }
+        hexPath.closeSubpath()
+        let body = SKShapeNode(path: hexPath)
+        body.fillColor = SKColor(hex: 0x4A5568)
+        body.strokeColor = SKColor(hex: 0x2D3748)
+        body.lineWidth = 1.5
+        container.addChild(body)
 
-        let center = SKShapeNode(circleOfRadius: size * 0.05)
-        center.fillColor = .white
-        center.strokeColor = .clear
-        center.glowWidth = 1.5
-        container.addChild(center)
+        // Wing/arm lines extending horizontally
+        for sign: CGFloat in [-1, 1] {
+            let wing = SKShapeNode(rectOf: CGSize(width: size * 0.22, height: size * 0.04), cornerRadius: 1)
+            wing.fillColor = SKColor(hex: 0x718096)
+            wing.strokeColor = SKColor(hex: 0x4A5568)
+            wing.lineWidth = 0.5
+            wing.position = CGPoint(x: sign * (radius + size * 0.09), y: 0)
+            container.addChild(wing)
+        }
 
+        // Glowing cyan eye in center
+        let eye = SKShapeNode(circleOfRadius: size * 0.06)
+        eye.fillColor = SKColor(red: 0.0, green: 0.9, blue: 0.95, alpha: 1.0)
+        eye.strokeColor = .clear
+        eye.glowWidth = 4.0
+        container.addChild(eye)
+
+        // Pulsing ring around eye
+        let ring = SKShapeNode(circleOfRadius: size * 0.10)
+        ring.fillColor = .clear
+        ring.strokeColor = SKColor(red: 0.0, green: 0.9, blue: 0.95, alpha: 0.6)
+        ring.lineWidth = 1.0
+        ring.glowWidth = 2.0
+        container.addChild(ring)
+        let ringPulse = SKAction.sequence([
+            SKAction.group([SKAction.scale(to: 1.3, duration: 0.6), SKAction.fadeAlpha(to: 0.3, duration: 0.6)]),
+            SKAction.group([SKAction.scale(to: 1.0, duration: 0.6), SKAction.fadeAlpha(to: 1.0, duration: 0.6)])
+        ])
+        ring.run(SKAction.repeatForever(ringPulse))
+
+        // Small antenna dot on top
+        let antenna = SKShapeNode(circleOfRadius: size * 0.025)
+        antenna.fillColor = SKColor(red: 0.0, green: 0.9, blue: 0.95, alpha: 0.8)
+        antenna.strokeColor = .clear
+        antenna.glowWidth = 1.5
+        antenna.position = CGPoint(x: 0, y: radius + size * 0.06)
+        container.addChild(antenna)
+
+        // Hover animation
         let hover = SKAction.sequence([
             SKAction.moveBy(x: 0, y: 2, duration: 0.4),
             SKAction.moveBy(x: 0, y: -2, duration: 0.4)
         ])
         container.run(SKAction.repeatForever(hover))
+
+        // Slight wobble rotation
+        let wobble = SKAction.sequence([
+            SKAction.rotate(toAngle: 0.06, duration: 0.7),
+            SKAction.rotate(toAngle: -0.06, duration: 0.7)
+        ])
+        wobble.timingMode = .easeInEaseOut
+        container.run(SKAction.repeatForever(wobble))
 
         return container
     }

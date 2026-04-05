@@ -45,6 +45,18 @@ class ProgressManager: ObservableObject {
         save()
     }
 
+    // MARK: - Shop
+
+    func purchaseShopItem(_ item: ShopItem, boosterInventory: BoosterInventory) -> Bool {
+        guard progress.coins >= item.price else { return false }
+        progress.addCoins(-item.price)
+        for _ in 0..<item.quantity {
+            boosterInventory.increment(item.boosterType)
+        }
+        save()
+        return true
+    }
+
     // MARK: - Daily Reward
 
     struct DailyReward {

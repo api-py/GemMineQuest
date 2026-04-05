@@ -243,7 +243,7 @@ class MatchDetector {
         let sorted = results.sorted { priorityScore($0) > priorityScore($1) }
         var covered = Set<GridPosition>()
         for result in sorted {
-            if !result.positions.isSubset(of: covered) {
+            if result.specialType != nil || !result.positions.isSubset(of: covered) {
                 finalResults.append(result)
                 covered.formUnion(result.positions)
             }

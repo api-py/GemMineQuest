@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MainMenuView: View {
     @EnvironmentObject var progressManager: ProgressManager
+    @EnvironmentObject var boosterInventory: BoosterInventory
 
     var onPlay: () -> Void
     var onSettings: () -> Void
@@ -9,6 +10,7 @@ struct MainMenuView: View {
     @State private var titleScale: CGFloat = 0.9
     @State private var titleOpacity: Double = 0
     @State private var gemRotation: Double = 0
+    @State private var showShop = false
 
     var body: some View {
         ZStack {
@@ -57,6 +59,8 @@ struct MainMenuView: View {
                             .aspectRatio(contentMode: .fit)
                             .frame(height: 120)
                             .shadow(color: Color(hex: 0xFFD700).opacity(0.4), radius: 12)
+                            .shadow(color: .black, radius: 3)
+                            .compositingGroup()
                     } else {
                         Image(systemName: "diamond.fill")
                             .font(.system(size: 44))
@@ -94,8 +98,9 @@ struct MainMenuView: View {
                 }
 
                 Text("Mine precious gems deep underground")
-                    .font(.subheadline)
-                    .foregroundColor(Color(hex: 0xCCBB99))
+                    .font(.callout)
+                    .foregroundColor(Color(hex: 0xFFE8C0))
+                    .shadow(color: .black.opacity(0.8), radius: 4, x: 0, y: 2)
                     .scaleEffect(titleScale)
                     .opacity(titleOpacity)
                     .padding(.bottom, 50)
@@ -140,6 +145,30 @@ struct MainMenuView: View {
                     .shadow(color: Color(hex: 0xC71414).opacity(0.5), radius: 12, y: 6)
                 }
                 .padding(.bottom, 16)
+
+                // Shop button
+                Button(action: { showShop = true }) {
+                    HStack(spacing: 10) {
+                        Image(systemName: "cart.fill")
+                        Text("Shop")
+                            .font(.body.weight(.semibold))
+                    }
+                    .foregroundColor(Color(hex: 0xFFD700))
+                    .frame(maxWidth: 200)
+                    .padding(.vertical, 14)
+                    .background(
+                        LinearGradient(
+                            colors: [Color(hex: 0x2A1E10), Color(hex: 0x1A1208)],
+                            startPoint: .top, endPoint: .bottom
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(Color(hex: 0xC9A84C).opacity(0.4), lineWidth: 1)
+                        )
+                    )
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                }
+                .padding(.bottom, 8)
 
                 // Settings button
                 Button(action: onSettings) {
@@ -247,7 +276,11 @@ struct MainMenuView: View {
                         Text("Exit")
                             .font(.subheadline.weight(.medium))
                     }
-                    .foregroundColor(Color(hex: 0x6B4F3A))
+                    .foregroundColor(Color(hex: 0xBBA88A))
+                    .shadow(color: .black.opacity(0.6), radius: 2, x: 0, y: 1)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(Capsule().fill(Color.white.opacity(0.08)))
                 }
                 .padding(.bottom, 30)
             }
@@ -260,6 +293,11 @@ struct MainMenuView: View {
             withAnimation(.linear(duration: 20).repeatForever(autoreverses: false)) {
                 gemRotation = 360
             }
+        }
+        .fullScreenCover(isPresented: $showShop) {
+            ShopView(onDismiss: { showShop = false })
+                .environmentObject(progressManager)
+                .environmentObject(boosterInventory)
         }
     }
 }

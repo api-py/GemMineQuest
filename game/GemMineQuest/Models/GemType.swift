@@ -34,7 +34,7 @@ enum GemColor: Int, CaseIterable, Codable {
     var primaryColor: SKColor {
         switch self {
         case .ruby: return SKColor(red: 0.95, green: 0.08, blue: 0.12, alpha: 1.0)       // Vivid red
-        case .gold: return SKColor(hex: 0xFFD700)
+        case .gold: return SKColor(red: 1.0, green: 0.88, blue: 0.05, alpha: 1.0)
         case .silver: return SKColor(hex: 0xC0C0C0)
         case .emerald: return SKColor(red: 0.05, green: 0.75, blue: 0.28, alpha: 1.0)     // Vivid green
         case .sapphire: return SKColor(red: 0.10, green: 0.25, blue: 0.90, alpha: 1.0)    // Vivid blue
@@ -45,7 +45,7 @@ enum GemColor: Int, CaseIterable, Codable {
     var lightColor: SKColor {
         switch self {
         case .ruby: return SKColor(red: 1.0, green: 0.45, blue: 0.48, alpha: 1.0)
-        case .gold: return SKColor(hex: 0xFFF8DC)
+        case .gold: return SKColor(red: 1.0, green: 1.0, blue: 0.55, alpha: 1.0)
         case .silver: return SKColor(hex: 0xE8E8E8)
         case .emerald: return SKColor(red: 0.30, green: 0.95, blue: 0.55, alpha: 1.0)
         case .sapphire: return SKColor(red: 0.40, green: 0.58, blue: 1.0, alpha: 1.0)
@@ -56,7 +56,7 @@ enum GemColor: Int, CaseIterable, Codable {
     var darkColor: SKColor {
         switch self {
         case .ruby: return SKColor(red: 0.50, green: 0.0, blue: 0.04, alpha: 1.0)
-        case .gold: return SKColor(hex: 0xB8860B)
+        case .gold: return SKColor(red: 0.80, green: 0.58, blue: 0.0, alpha: 1.0)
         case .silver: return SKColor(hex: 0x708090)
         case .emerald: return SKColor(red: 0.0, green: 0.35, blue: 0.10, alpha: 1.0)
         case .sapphire: return SKColor(red: 0.03, green: 0.10, blue: 0.45, alpha: 1.0)

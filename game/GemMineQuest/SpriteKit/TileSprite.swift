@@ -85,6 +85,13 @@ class TileSprite: SKNode {
         }
     }
 
+    func clearHighlight() {
+        if let sprite = backgroundNode as? SKSpriteNode {
+            sprite.colorBlendFactor = 0.0
+            sprite.color = .white
+        }
+    }
+
     func updateBlocker(_ blocker: BlockerType?) {
         children.filter { ($0.name ?? "").hasPrefix("blocker") }.forEach { $0.removeFromParent() }
 
@@ -211,10 +218,15 @@ class TileSprite: SKNode {
 
         switch blocker {
         case .granite(let layers):
-            let rect = CGSize(width: tileSize * 0.9, height: tileSize * 0.9)
+            let rect = CGSize(width: tileSize * 0.95, height: tileSize * 0.95)
             let stone = SKShapeNode(rectOf: rect, cornerRadius: 3)
-            let alpha = 0.45 + Double(layers) * 0.18
-            stone.fillColor = ColorPalette.granite.withAlphaComponent(alpha)
+            let graniteColor: SKColor
+            switch layers {
+            case 3: graniteColor = SKColor(hex: 0x606060)
+            case 2: graniteColor = SKColor(hex: 0x787878)
+            default: graniteColor = SKColor(hex: 0x909090)
+            }
+            stone.fillColor = graniteColor
             stone.strokeColor = ColorPalette.graniteDark
             stone.lineWidth = CGFloat(layers) + 0.5
             container.addChild(stone)
@@ -227,7 +239,7 @@ class TileSprite: SKNode {
             ]
             for (pos, r) in spotData {
                 let spot = SKShapeNode(circleOfRadius: r)
-                spot.fillColor = ColorPalette.graniteDark.withAlphaComponent(0.3)
+                spot.fillColor = ColorPalette.graniteDark
                 spot.strokeColor = .clear
                 spot.position = pos
                 container.addChild(spot)
@@ -235,7 +247,7 @@ class TileSprite: SKNode {
 
             // Top highlight
             let highlight = SKShapeNode(rectOf: CGSize(width: rect.width * 0.7, height: rect.height * 0.15), cornerRadius: 2)
-            highlight.fillColor = ColorPalette.graniteLight.withAlphaComponent(0.15)
+            highlight.fillColor = ColorPalette.graniteLight
             highlight.strokeColor = .clear
             highlight.position = CGPoint(x: -tileSize * 0.05, y: tileSize * 0.25)
             container.addChild(highlight)
@@ -449,23 +461,40 @@ class TileSprite: SKNode {
             spark.run(SKAction.repeatForever(sparkPulse))
 
         case .amber:
-            let amberRect = SKShapeNode(rectOf: CGSize(width: tileSize * 0.85, height: tileSize * 0.85), cornerRadius: 8)
-            amberRect.fillColor = ColorPalette.amber.withAlphaComponent(0.35)
-            amberRect.strokeColor = ColorPalette.amber.withAlphaComponent(0.7)
-            amberRect.lineWidth = 2.0
-            container.addChild(amberRect)
-
-            let innerGlow = SKShapeNode(rectOf: CGSize(width: tileSize * 0.6, height: tileSize * 0.6), cornerRadius: 6)
-            innerGlow.fillColor = ColorPalette.amberLight.withAlphaComponent(0.15)
-            innerGlow.strokeColor = .clear
-            container.addChild(innerGlow)
-
-            let refraction = SKShapeNode(ellipseOf: CGSize(width: tileSize * 0.25, height: tileSize * 0.12))
-            refraction.fillColor = SKColor(white: 1.0, alpha: 0.2)
-            refraction.strokeColor = .clear
-            refraction.position = CGPoint(x: -tileSize * 0.1, y: tileSize * 0.15)
-            refraction.zRotation = -0.3
-            container.addChild(refraction)
+            // Crosshatch net/mesh overlay — gem visible through gaps
+            let netPath = CGMutablePath()
+            let halfSize = tileSize * 0.42
+            let spacing = tileSize * 0.14
+            // Diagonal lines ↘
+            var offset = -halfSize * 2
+            while offset <= halfSize * 2 {
+                netPath.move(to: CGPoint(x: -halfSize, y: offset - halfSize))
+                netPath.addLine(to: CGPoint(x: halfSize, y: offset + halfSize))
+                offset += spacing
+            }
+            // Diagonal lines ↙
+            offset = -halfSize * 2
+            while offset <= halfSize * 2 {
+                netPath.move(to: CGPoint(x: -halfSize, y: offset + halfSize))
+                netPath.addLine(to: CGPoint(x: halfSize, y: offset - halfSize))
+                offset += spacing
+            }
+            let net = SKShapeNode(path: netPath)
+            net.strokeColor = ColorPalette.amber.withAlphaComponent(0.75)
+            net.lineWidth = 1.5
+            // Crop to tile bounds
+            let mask = SKShapeNode(rectOf: CGSize(width: tileSize * 0.85, height: tileSize * 0.85), cornerRadius: 6)
+            mask.fillColor = .white
+            let cropNode = SKCropNode()
+            cropNode.maskNode = mask
+            cropNode.addChild(net)
+            container.addChild(cropNode)
+            // Amber border
+            let border = SKShapeNode(rectOf: CGSize(width: tileSize * 0.85, height: tileSize * 0.85), cornerRadius: 6)
+            border.fillColor = .clear
+            border.strokeColor = ColorPalette.amber.withAlphaComponent(0.6)
+            border.lineWidth = 2.0
+            container.addChild(border)
         }
 
         return container

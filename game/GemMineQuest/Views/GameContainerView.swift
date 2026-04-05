@@ -14,6 +14,7 @@ struct GameContainerView: View {
     @State private var showTransition = false
     @State private var transitionLevel = 0
     @State private var showExitConfirmation = false
+    @State private var showShop = false
 
     init(levelNumber: Int, onDismiss: @escaping () -> Void, onNextLevel: @escaping (Int) -> Void) {
         self.levelNumber = levelNumber
@@ -148,6 +149,13 @@ struct GameContainerView: View {
                     )
 
                     Spacer()
+
+                    // Shop button
+                    Button { showShop = true } label: {
+                        Image(systemName: "dollarsign.circle.fill")
+                            .font(.system(size: 22))
+                            .foregroundColor(Color(hex: 0xFFD700))
+                    }
 
                     // Exit button
                     Button { showExitConfirmation = true } label: {

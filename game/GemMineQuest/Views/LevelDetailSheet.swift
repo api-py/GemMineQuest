@@ -169,7 +169,7 @@ struct LevelDetailSheet: View {
                                 Button {
                                     if isSelected {
                                         selectedBoosters.remove(boosterType)
-                                    } else if count > 0 {
+                                    } else if count > 0 && selectedBoosters.count < 5 {
                                         selectedBoosters.insert(boosterType)
                                     }
                                 } label: {
@@ -210,6 +210,10 @@ struct LevelDetailSheet: View {
                                 .disabled(count == 0 && !isSelected)
                             }
                         }
+
+                        Text("Selected: \(selectedBoosters.count)/5")
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundColor(Color(hex: 0x8B7355))
                     }
                     .padding(.vertical, 8)
 

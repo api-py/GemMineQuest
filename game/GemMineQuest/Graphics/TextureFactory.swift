@@ -83,30 +83,21 @@ class TextureFactory {
         gc.fillPath()
         gc.restoreGState()
 
-        // 5) Large glossy highlight (top portion — glass-like shine)
+        // 5) Glossy highlight (radial gradient — no hard edges)
         gc.saveGState()
-        // Clip to gem shape first
         gc.addPath(gemShapePath(for: color, center: center, radius: radius))
         gc.clip()
-        // Then clip to an ellipse in the upper part
-        let shineEllipse = CGRect(
-            x: center.x - radius * 0.75,
-            y: center.y - radius * 1.1,
-            width: radius * 1.5,
-            height: radius * 1.1
-        )
-        gc.addEllipse(in: shineEllipse)
-        gc.clip()
 
+        let shineCenter = CGPoint(x: center.x - radius * 0.15, y: center.y - radius * 0.35)
         let shineColors = [
-            UIColor(white: 1.0, alpha: 0.6).cgColor,
+            UIColor(white: 1.0, alpha: 0.5).cgColor,
             UIColor(white: 1.0, alpha: 0.15).cgColor,
             UIColor(white: 1.0, alpha: 0.0).cgColor
         ] as CFArray
-        if let shineGrad = CGGradient(colorsSpace: colorSpace, colors: shineColors, locations: [0.0, 0.5, 1.0]) {
-            gc.drawLinearGradient(shineGrad,
-                                  start: CGPoint(x: center.x, y: center.y - radius * 1.0),
-                                  end: CGPoint(x: center.x, y: center.y + radius * 0.15),
+        if let shineGrad = CGGradient(colorsSpace: colorSpace, colors: shineColors, locations: [0.0, 0.4, 1.0]) {
+            gc.drawRadialGradient(shineGrad,
+                                  startCenter: shineCenter, startRadius: 0,
+                                  endCenter: shineCenter, endRadius: radius * 0.85,
                                   options: [])
         }
         gc.restoreGState()
@@ -156,67 +147,71 @@ class TextureFactory {
 
     private func gemShapePath(for color: GemColor, center: CGPoint, radius: CGFloat) -> CGPath {
         let path = CGMutablePath()
+        let r = radius
         switch color {
         case .ruby:
-            // Rounded diamond (4 points with curved edges)
-            let s = radius * 0.92
-            let curve = s * 0.35
-            path.move(to: CGPoint(x: center.x, y: center.y - s))
-            path.addQuadCurve(to: CGPoint(x: center.x + s, y: center.y),
-                              control: CGPoint(x: center.x + curve, y: center.y - curve))
-            path.addQuadCurve(to: CGPoint(x: center.x, y: center.y + s),
-                              control: CGPoint(x: center.x + curve, y: center.y + curve))
-            path.addQuadCurve(to: CGPoint(x: center.x - s, y: center.y),
-                              control: CGPoint(x: center.x - curve, y: center.y + curve))
-            path.addQuadCurve(to: CGPoint(x: center.x, y: center.y - s),
-                              control: CGPoint(x: center.x - curve, y: center.y - curve))
+            // 6-point tall shield (straight lines only)
+            path.move(to: CGPoint(x: center.x - r * 0.3, y: center.y - r * 0.85))
+            path.addLine(to: CGPoint(x: center.x + r * 0.3, y: center.y - r * 0.85))
+            path.addLine(to: CGPoint(x: center.x + r * 0.85, y: center.y - r * 0.2))
+            path.addLine(to: CGPoint(x: center.x + r * 0.35, y: center.y + r * 0.55))
+            path.addLine(to: CGPoint(x: center.x, y: center.y + r * 0.92))
+            path.addLine(to: CGPoint(x: center.x - r * 0.35, y: center.y + r * 0.55))
+            path.addLine(to: CGPoint(x: center.x - r * 0.85, y: center.y - r * 0.2))
             path.closeSubpath()
 
         case .gold:
-            // Rounded square (like a cushion-cut gem)
-            let s = radius * 0.82
-            let cr = radius * 0.35
+            // Rounded square (cushion-cut gem) — slightly larger
+            let s = r * 0.85
+            let cr = r * 0.35
             path.addRoundedRect(in: CGRect(x: center.x - s, y: center.y - s, width: s * 2, height: s * 2),
                                 cornerWidth: cr, cornerHeight: cr)
 
         case .silver:
-            // Circle (clean, simple, distinctive as the metal type)
-            path.addEllipse(in: CGRect(x: center.x - radius * 0.9, y: center.y - radius * 0.9,
-                                       width: radius * 1.8, height: radius * 1.8))
+            // Circle — slightly larger
+            path.addEllipse(in: CGRect(x: center.x - r * 0.92, y: center.y - r * 0.92,
+                                       width: r * 1.84, height: r * 1.84))
 
         case .emerald:
-            // Oval (wider than tall — classic emerald cut look)
-            let w = radius * 0.95
-            let h = radius * 0.78
-            path.addEllipse(in: CGRect(x: center.x - w, y: center.y - h,
-                                       width: w * 2, height: h * 2))
+            // Tall emerald-cut octagon (taller than wide, clipped corners)
+            let w = r * 0.72
+            let h = r * 0.92
+            let bevel = r * 0.22
+            path.move(to: CGPoint(x: center.x - w + bevel, y: center.y - h))
+            path.addLine(to: CGPoint(x: center.x + w - bevel, y: center.y - h))
+            path.addLine(to: CGPoint(x: center.x + w, y: center.y - h + bevel))
+            path.addLine(to: CGPoint(x: center.x + w, y: center.y + h - bevel))
+            path.addLine(to: CGPoint(x: center.x + w - bevel, y: center.y + h))
+            path.addLine(to: CGPoint(x: center.x - w + bevel, y: center.y + h))
+            path.addLine(to: CGPoint(x: center.x - w, y: center.y + h - bevel))
+            path.addLine(to: CGPoint(x: center.x - w, y: center.y - h + bevel))
+            path.closeSubpath()
 
         case .sapphire:
-            // Rounded octagon (8 sides with smooth corners)
-            let r = radius * 0.9
-            let cut = r * 0.38  // How much to cut corners
-            // Start from top
-            path.move(to: CGPoint(x: center.x - cut, y: center.y - r))
-            path.addLine(to: CGPoint(x: center.x + cut, y: center.y - r))
-            path.addQuadCurve(to: CGPoint(x: center.x + r, y: center.y - cut),
-                              control: CGPoint(x: center.x + r * 0.7, y: center.y - r * 0.7))
-            path.addLine(to: CGPoint(x: center.x + r, y: center.y + cut))
-            path.addQuadCurve(to: CGPoint(x: center.x + cut, y: center.y + r),
-                              control: CGPoint(x: center.x + r * 0.7, y: center.y + r * 0.7))
-            path.addLine(to: CGPoint(x: center.x - cut, y: center.y + r))
-            path.addQuadCurve(to: CGPoint(x: center.x - r, y: center.y + cut),
-                              control: CGPoint(x: center.x - r * 0.7, y: center.y + r * 0.7))
-            path.addLine(to: CGPoint(x: center.x - r, y: center.y - cut))
-            path.addQuadCurve(to: CGPoint(x: center.x - cut, y: center.y - r),
-                              control: CGPoint(x: center.x - r * 0.7, y: center.y - r * 0.7))
+            // Tighter rounded octagon
+            let sr = r * 0.9
+            let cut = sr * 0.42
+            path.move(to: CGPoint(x: center.x - cut, y: center.y - sr))
+            path.addLine(to: CGPoint(x: center.x + cut, y: center.y - sr))
+            path.addQuadCurve(to: CGPoint(x: center.x + sr, y: center.y - cut),
+                              control: CGPoint(x: center.x + sr * 0.85, y: center.y - sr * 0.85))
+            path.addLine(to: CGPoint(x: center.x + sr, y: center.y + cut))
+            path.addQuadCurve(to: CGPoint(x: center.x + cut, y: center.y + sr),
+                              control: CGPoint(x: center.x + sr * 0.85, y: center.y + sr * 0.85))
+            path.addLine(to: CGPoint(x: center.x - cut, y: center.y + sr))
+            path.addQuadCurve(to: CGPoint(x: center.x - sr, y: center.y + cut),
+                              control: CGPoint(x: center.x - sr * 0.85, y: center.y + sr * 0.85))
+            path.addLine(to: CGPoint(x: center.x - sr, y: center.y - cut))
+            path.addQuadCurve(to: CGPoint(x: center.x - cut, y: center.y - sr),
+                              control: CGPoint(x: center.x - sr * 0.85, y: center.y - sr * 0.85))
             path.closeSubpath()
 
         case .amethyst:
             // Rounded triangle / pear (smooth teardrop — wider at top, pointed at bottom)
-            let topW = radius * 0.85
-            let topY = center.y - radius * 0.5
-            let bottomY = center.y + radius * 0.9
-            let peakY = center.y - radius * 0.85
+            let topW = r * 0.85
+            let topY = center.y - r * 0.5
+            let bottomY = center.y + r * 0.9
+            let peakY = center.y - r * 0.85
 
             path.move(to: CGPoint(x: center.x, y: peakY))
             // Right side curve

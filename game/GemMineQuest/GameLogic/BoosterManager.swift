@@ -65,18 +65,34 @@ class BoosterManager {
             return gem.special == .none
         }.shuffled()
 
+        // Filter out positions adjacent to existing specials (least priority for crystal ball)
+        let filteredCandidates = candidates.filter { pos in
+            let neighbors = [
+                GridPosition(row: pos.row-1, column: pos.column),
+                GridPosition(row: pos.row+1, column: pos.column),
+                GridPosition(row: pos.row, column: pos.column-1),
+                GridPosition(row: pos.row, column: pos.column+1)
+            ]
+            return !neighbors.contains { neighbor in
+                guard let gem = board[neighbor] else { return false }
+                return gem.special == .crystalBall || gem.special == .volatile ||
+                       gem.special == .laserHorizontal || gem.special == .laserVertical
+            }
+        }
+        let finalCandidates = filteredCandidates.isEmpty ? candidates : filteredCandidates
+
         // Place Crystal Ball on the first candidate
-        if let pos = candidates.first, var gem = board[pos] {
+        if let pos = finalCandidates.first, var gem = board[pos] {
             gem.special = .crystalBall
             board.setGem(gem, at: pos)
             events.append(.specialCreated(type: .crystalBall, color: gem.color, at: pos))
         }
 
         // Place Volatile on the second candidate
-        if candidates.count > 1, var gem = board[candidates[1]] {
+        if finalCandidates.count > 1, var gem = board[finalCandidates[1]] {
             gem.special = .volatile
-            board.setGem(gem, at: candidates[1])
-            events.append(.specialCreated(type: .volatile, color: gem.color, at: candidates[1]))
+            board.setGem(gem, at: finalCandidates[1])
+            events.append(.specialCreated(type: .volatile, color: gem.color, at: finalCandidates[1]))
         }
 
         return events

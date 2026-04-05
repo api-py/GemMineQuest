@@ -28,6 +28,11 @@ class GameScene: SKScene {
     private var touchStartPos: GridPosition?
     private var swipeHandled = false
 
+    // Long-press gem identification
+    private var longPressTimer: Timer?
+    private var longPressPosition: GridPosition?
+    private var tooltipNode: SKNode?
+
     // Booster mode
     var activeBooster: BoosterType?
 
@@ -488,11 +493,22 @@ class GameScene: SKScene {
                 showSpecialGemHint(gem.special, at: pos)
             }
             gemSpriteAt(pos)?.setHighlighted(true)
+
+            // Start long-press timer for gem identification
+            longPressTimer?.invalidate()
+            longPressPosition = pos
+            longPressTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { [weak self] _ in
+                DispatchQueue.main.async {
+                    self?.showGemTooltip(at: pos)
+                }
+            }
         }
     }
 
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard !isAnimating, !swipeHandled, let touch = touches.first, let startPos = touchStartPos else { return }
+        longPressTimer?.invalidate()
+        longPressTimer = nil
         let point = touch.location(in: boardLayer)
         let startPoint = layout.positionFor(startPos)
         let delta = point - startPoint
@@ -515,6 +531,9 @@ class GameScene: SKScene {
     }
 
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        longPressTimer?.invalidate()
+        longPressTimer = nil
+        dismissGemTooltip()
         if let pos = touchStartPos {
             gemSpriteAt(pos)?.setHighlighted(false)
         }
@@ -611,6 +630,54 @@ class GameScene: SKScene {
             return
         }
         showHintTooltip(text, at: pos)
+    }
+
+    // MARK: - Long-Press Gem Tooltip
+
+    private func showGemTooltip(at position: GridPosition) {
+        dismissGemTooltip()
+        guard let gem = gameState?.board[position] else { return }
+
+        let container = SKNode()
+        container.zPosition = 200
+        container.name = "gemTooltip"
+
+        var text = gem.color.displayName
+        if gem.special != .none {
+            text += " (\(gem.special.displayName))"
+        }
+
+        let bg = SKShapeNode(rectOf: CGSize(width: 120, height: 30), cornerRadius: 8)
+        bg.fillColor = SKColor(white: 0.0, alpha: 0.85)
+        bg.strokeColor = SKColor(hex: 0xC9A84C, alpha: 0.5)
+        bg.lineWidth = 1
+        container.addChild(bg)
+
+        let label = SKLabelNode(text: text)
+        label.fontName = "AvenirNext-Bold"
+        label.fontSize = 12
+        label.fontColor = .white
+        label.verticalAlignmentMode = .center
+        container.addChild(label)
+
+        // Position above the gem
+        let gemPos = layout.positionFor(position)
+        container.position = CGPoint(x: gemPos.x, y: gemPos.y + layout.tileSize * 0.7)
+
+        boardLayer.addChild(container)
+        tooltipNode = container
+
+        // Auto-dismiss after 2s
+        container.run(SKAction.sequence([
+            SKAction.wait(forDuration: 2.0),
+            SKAction.fadeOut(withDuration: 0.3),
+            SKAction.removeFromParent()
+        ]))
+    }
+
+    private func dismissGemTooltip() {
+        tooltipNode?.removeFromParent()
+        tooltipNode = nil
     }
 
     // MARK: - Idle Hint System
