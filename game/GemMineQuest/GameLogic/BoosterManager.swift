@@ -198,9 +198,20 @@ class BoosterManager {
             let center = board.allPlayablePositions().filter { board[$0] != nil }.randomElement() ?? target
             events.append(.droneDeployed(from: center, to: target))
 
-            if case .lava = board.blockerAt(target) {
-                board.setBlocker(nil, at: target)
-                events.append(.blockerDestroyed(at: target))
+            if let blocker = board.blockerAt(target) {
+                switch blocker {
+                case .granite(let layers):
+                    if layers > 1 {
+                        board.setBlocker(.granite(layers: layers - 1), at: target)
+                        events.append(.blockerDamaged(at: target, type: blocker))
+                    } else {
+                        board.setBlocker(nil, at: target)
+                        events.append(.blockerDestroyed(at: target))
+                    }
+                default:
+                    board.setBlocker(nil, at: target)
+                    events.append(.blockerDestroyed(at: target))
+                }
             }
 
             board.removeGem(at: target)

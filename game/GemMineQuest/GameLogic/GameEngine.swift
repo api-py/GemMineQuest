@@ -31,14 +31,14 @@ class GameEngine {
 
         if let blockerA = board.blockerAt(posA) {
             switch blockerA {
-            case .cage, .amber, .granite, .boulder, .lava:
+            case .cage, .amber, .granite, .boulder, .lava, .tnt:
                 return [.invalidSwap(from: posA, to: posB)]
             default: break
             }
         }
         if let blockerB = board.blockerAt(posB) {
             switch blockerB {
-            case .cage, .amber, .granite, .boulder, .lava:
+            case .cage, .amber, .granite, .boulder, .lava, .tnt:
                 return [.invalidSwap(from: posA, to: posB)]
             default: break
             }
@@ -262,6 +262,21 @@ class GameEngine {
             let targets = specialResolver.getDroneTargets(count: 3, on: board, prioritizeOre: true)
             for target in targets {
                 events.append(.droneDeployed(from: specialPos, to: target))
+                if let blocker = board.blockerAt(target) {
+                    switch blocker {
+                    case .granite(let layers):
+                        if layers > 1 {
+                            board.setBlocker(.granite(layers: layers - 1), at: target)
+                            events.append(.blockerDamaged(at: target, type: blocker))
+                        } else {
+                            board.setBlocker(nil, at: target)
+                            events.append(.blockerDestroyed(at: target))
+                        }
+                    default:
+                        board.setBlocker(nil, at: target)
+                        events.append(.blockerDestroyed(at: target))
+                    }
+                }
                 board.removeGem(at: target)
                 state.score += 60
             }

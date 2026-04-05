@@ -57,7 +57,12 @@ class TileSprite: SKNode {
         // Blocker overlay
         if let blocker = blocker {
             let blockerNode = createBlockerOverlay(blocker)
-            blockerNode.zPosition = 2
+            switch blocker {
+            case .lava:
+                blockerNode.zPosition = 0.5  // Between tile (0) and gem (1.0+)
+            default:
+                blockerNode.zPosition = 2    // Above gem for cage, granite, etc.
+            }
             addChild(blockerNode)
         }
     }
@@ -340,14 +345,16 @@ class TileSprite: SKNode {
             }
 
         case .boulder:
-            let boulder = SKShapeNode(circleOfRadius: tileSize * 0.38)
-            boulder.fillColor = SKColor(hex: 0x787878)
-            boulder.strokeColor = SKColor(hex: 0x4A4A4A)
-            boulder.lineWidth = 2.0
+            // Dark brown-gray rocky boulder
+            let boulder = SKShapeNode(circleOfRadius: tileSize * 0.40)
+            boulder.fillColor = SKColor(hex: 0x5C4033)  // Earth brown (was 0x787878 gray)
+            boulder.strokeColor = SKColor(hex: 0x3B2716)  // Dark brown edge
+            boulder.lineWidth = 2.5
             container.addChild(boulder)
 
-            let bottomBoulder = SKShapeNode(circleOfRadius: tileSize * 0.37)
-            bottomBoulder.fillColor = SKColor(hex: 0x5A5A5A, alpha: 0.4)
+            // Bottom shadow for 3D depth
+            let bottomBoulder = SKShapeNode(circleOfRadius: tileSize * 0.39)
+            bottomBoulder.fillColor = SKColor(hex: 0x3B2716, alpha: 0.4)
             bottomBoulder.strokeColor = .clear
             let bMask = SKShapeNode(rectOf: CGSize(width: tileSize, height: tileSize / 2))
             bMask.fillColor = .white
@@ -358,10 +365,35 @@ class TileSprite: SKNode {
             bCrop.addChild(bottomBoulder)
             container.addChild(bCrop)
 
-            let bHighlight = SKShapeNode(ellipseOf: CGSize(width: tileSize * 0.24, height: tileSize * 0.14))
-            bHighlight.fillColor = SKColor(white: 1.0, alpha: 0.22)
+            // Crack lines for rocky texture
+            let crackPath = CGMutablePath()
+            crackPath.move(to: CGPoint(x: -tileSize * 0.15, y: tileSize * 0.2))
+            crackPath.addLine(to: CGPoint(x: tileSize * 0.05, y: -tileSize * 0.05))
+            crackPath.addLine(to: CGPoint(x: tileSize * 0.2, y: -tileSize * 0.18))
+            crackPath.move(to: CGPoint(x: tileSize * 0.05, y: -tileSize * 0.05))
+            crackPath.addLine(to: CGPoint(x: -tileSize * 0.1, y: -tileSize * 0.22))
+            let crack = SKShapeNode(path: crackPath)
+            crack.strokeColor = SKColor(hex: 0x2A1A0A, alpha: 0.6)
+            crack.lineWidth = 1.5
+            crack.fillColor = .clear
+            container.addChild(crack)
+
+            // Small rock texture spots
+            for _ in 0..<5 {
+                let spot = SKShapeNode(circleOfRadius: tileSize * CGFloat.random(in: 0.02...0.04))
+                spot.fillColor = SKColor(hex: 0x4A3020, alpha: 0.5)
+                spot.strokeColor = .clear
+                let angle = CGFloat.random(in: 0...(2 * .pi))
+                let radius = CGFloat.random(in: 0...(tileSize * 0.28))
+                spot.position = CGPoint(x: cos(angle) * radius, y: sin(angle) * radius)
+                container.addChild(spot)
+            }
+
+            // Subtle highlight
+            let bHighlight = SKShapeNode(ellipseOf: CGSize(width: tileSize * 0.22, height: tileSize * 0.12))
+            bHighlight.fillColor = SKColor(white: 1.0, alpha: 0.15)
             bHighlight.strokeColor = .clear
-            bHighlight.position = CGPoint(x: -tileSize * 0.06, y: tileSize * 0.1)
+            bHighlight.position = CGPoint(x: -tileSize * 0.06, y: tileSize * 0.12)
             container.addChild(bHighlight)
 
         case .cage:
@@ -403,13 +435,13 @@ class TileSprite: SKNode {
             lava.strokeColor = ColorPalette.lavaGlow
             lava.lineWidth = 2
             lava.glowWidth = 2
-            lava.zPosition = -1
+            lava.zPosition = 0
             container.addChild(lava)
 
             let core = SKShapeNode(rectOf: CGSize(width: tileSize * 0.5, height: tileSize * 0.5), cornerRadius: 8)
             core.fillColor = ColorPalette.lavaYellow.withAlphaComponent(0.25)
             core.strokeColor = .clear
-            core.zPosition = -1
+            core.zPosition = 0
             container.addChild(core)
 
             // Animated lava bubbles
@@ -457,8 +489,8 @@ class TileSprite: SKNode {
             container.run(SKAction.repeatForever(pulse))
 
         case .tnt(let countdown):
-            let barrelW = tileSize * 0.7
-            let barrelH = tileSize * 0.75
+            let barrelW = tileSize * 0.9
+            let barrelH = tileSize * 0.9
             let tntBody = SKShapeNode(rectOf: CGSize(width: barrelW, height: barrelH), cornerRadius: barrelW * 0.3)
             tntBody.fillColor = ColorPalette.tnt
             tntBody.strokeColor = SKColor(hex: 0x8B0000)

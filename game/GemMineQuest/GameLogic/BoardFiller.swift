@@ -165,7 +165,7 @@ class BoardFiller {
     private func isImmovableBlocker(board: Board, pos: GridPosition) -> Bool {
         guard let blocker = board.blockerAt(pos) else { return false }
         switch blocker {
-        case .boulder, .granite: return true
+        case .boulder, .granite, .tnt: return true
         default: return false
         }
     }
@@ -173,7 +173,7 @@ class BoardFiller {
     private func isBlockedPosition(board: Board, pos: GridPosition) -> Bool {
         guard let blocker = board.blockerAt(pos) else { return false }
         switch blocker {
-        case .boulder, .granite: return true
+        case .boulder, .granite, .tnt: return true
         default: return false
         }
     }
@@ -202,6 +202,16 @@ class BoardFiller {
                 board.setGem(gem, at: pos)
             }
         }
+
+        // Remove gems at TNT positions (TNT is a pure blocker)
+        for row in 0..<board.numRows {
+            for col in 0..<board.numColumns {
+                let pos = GridPosition(row: row, column: col)
+                if case .tnt = board.blockerAt(pos) {
+                    board.removeGem(at: pos)
+                }
+            }
+        }
     }
 
     /// Fill with seeded RNG for deterministic procedural levels
@@ -225,6 +235,16 @@ class BoardFiller {
 
                 let gem = Gem(color: color, row: row, column: col)
                 board.setGem(gem, at: pos)
+            }
+        }
+
+        // Remove gems at TNT positions (TNT is a pure blocker)
+        for row in 0..<board.numRows {
+            for col in 0..<board.numColumns {
+                let pos = GridPosition(row: row, column: col)
+                if case .tnt = board.blockerAt(pos) {
+                    board.removeGem(at: pos)
+                }
             }
         }
     }

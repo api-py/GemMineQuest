@@ -190,45 +190,52 @@ class SpecialGemResolver {
 
     /// Get drone target positions (random gems, prioritizing objectives)
     func getDroneTargets(count: Int, on board: Board, prioritizeOre: Bool = true) -> [GridPosition] {
-        var candidates: [GridPosition] = []
         var lavaCandidates: [GridPosition] = []
+        var boulderCandidates: [GridPosition] = []
+        var cageCandidates: [GridPosition] = []
+        var tntCandidates: [GridPosition] = []
         var oreCandidates: [GridPosition] = []
+        var gemCandidates: [GridPosition] = []
 
         for pos in board.allPlayablePositions() {
-            guard board[pos] != nil else { continue }
-            // Check if this position or any neighbor has lava
-            if case .lava = board.blockerAt(pos) {
-                lavaCandidates.append(pos)
-            } else {
-                let hasAdjacentLava = pos.neighbors.contains { neighbor in
-                    guard board.isValidPosition(neighbor) else { return false }
-                    if case .lava = board.blockerAt(neighbor) { return true }
-                    return false
-                }
-                if hasAdjacentLava {
-                    lavaCandidates.append(pos)
+            if let blocker = board.blockerAt(pos) {
+                switch blocker {
+                case .lava: lavaCandidates.append(pos)
+                case .boulder: boulderCandidates.append(pos)
+                case .cage: cageCandidates.append(pos)
+                case .tnt: tntCandidates.append(pos)
+                default: break
                 }
             }
-            if board.hasOreVein(at: pos) {
-                oreCandidates.append(pos)
+            if board[pos] != nil {
+                // Lava-adjacent gem positions (no blocker on the gem itself)
+                if board.blockerAt(pos) == nil {
+                    let hasAdjacentLava = pos.neighbors.contains { n in
+                        guard board.isValidPosition(n) else { return false }
+                        if case .lava = board.blockerAt(n) { return true }
+                        return false
+                    }
+                    if hasAdjacentLava {
+                        lavaCandidates.append(pos)
+                    }
+                }
+                if board.hasOreVein(at: pos) {
+                    oreCandidates.append(pos)
+                }
+                gemCandidates.append(pos)
             }
-            candidates.append(pos)
         }
 
         var targets: [GridPosition] = []
-        // Priority 1: Lava positions
-        targets.append(contentsOf: lavaCandidates.shuffled().prefix(count))
-        // Priority 2: Ore positions
-        let remaining1 = count - targets.count
-        if remaining1 > 0 && prioritizeOre {
-            let oreFiltered = oreCandidates.filter { !targets.contains($0) }.shuffled()
-            targets.append(contentsOf: oreFiltered.prefix(remaining1))
-        }
-        // Priority 3: Random
-        let remaining2 = count - targets.count
-        if remaining2 > 0 {
-            let available = candidates.filter { !targets.contains($0) }.shuffled()
-            targets.append(contentsOf: available.prefix(remaining2))
+        let priorityLists = [
+            lavaCandidates, boulderCandidates, cageCandidates,
+            tntCandidates, oreCandidates, gemCandidates
+        ]
+        for list in priorityLists {
+            let remaining = count - targets.count
+            guard remaining > 0 else { break }
+            let filtered = list.filter { !targets.contains($0) }.shuffled()
+            targets.append(contentsOf: filtered.prefix(remaining))
         }
         return targets
     }
