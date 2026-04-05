@@ -11,84 +11,52 @@ enum AppScreen: Hashable {
 struct ContentView: View {
     @EnvironmentObject var progressManager: ProgressManager
     @EnvironmentObject var settingsManager: SettingsManager
+    @EnvironmentObject var boosterInventory: BoosterInventory
     @State private var currentScreen: AppScreen = .menu
-    @State private var selectedLevel: Int?
 
     var body: some View {
         ZStack {
             switch currentScreen {
             case .menu:
                 MainMenuView(
-                    onPlay: {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            currentScreen = .levelMap
-                        }
-                    },
-                    onSettings: {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            currentScreen = .settings
-                        }
-                    }
+                    onPlay: { withAnimation(.easeInOut(duration: 0.3)) { currentScreen = .levelMap } },
+                    onSettings: { withAnimation(.easeInOut(duration: 0.3)) { currentScreen = .settings } }
                 )
                 .transition(.opacity)
 
             case .levelMap:
-                let vm = LevelMapViewModel(progressManager: progressManager)
                 LevelMapView(
-                    viewModel: vm,
+                    viewModel: LevelMapViewModel(progressManager: progressManager, godMode: settingsManager.godModeEnabled),
                     onSelectLevel: { level in
-                        selectedLevel = level
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            currentScreen = .levelDetail(level)
-                        }
+                        withAnimation(.easeInOut(duration: 0.3)) { currentScreen = .levelDetail(level) }
                     },
-                    onBack: {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            currentScreen = .menu
-                        }
-                    }
+                    onBack: { withAnimation(.easeInOut(duration: 0.3)) { currentScreen = .menu } }
                 )
                 .transition(.move(edge: .trailing))
 
             case .levelDetail(let level):
                 LevelDetailSheet(
                     levelNumber: level,
-                    onPlay: {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            currentScreen = .game(level)
-                        }
-                    },
-                    onDismiss: {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            currentScreen = .levelMap
-                        }
-                    }
+                    onPlay: { withAnimation(.easeInOut(duration: 0.3)) { currentScreen = .game(level) } },
+                    onDismiss: { withAnimation(.easeInOut(duration: 0.3)) { currentScreen = .levelMap } }
                 )
                 .transition(.move(edge: .bottom))
 
             case .game(let level):
                 GameContainerView(
                     levelNumber: level,
-                    onDismiss: {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            currentScreen = .levelMap
-                        }
-                    },
+                    onDismiss: { withAnimation(.easeInOut(duration: 0.3)) { currentScreen = .levelMap } },
                     onNextLevel: { nextLevel in
                         withAnimation(.easeInOut(duration: 0.3)) {
-                            currentScreen = .game(nextLevel)
+                            currentScreen = .levelDetail(nextLevel)
                         }
                     }
                 )
-                .transition(.opacity)
+                .id(level) // Forces complete recreation for new levels
 
             case .settings:
                 SettingsView(
-                    onDismiss: {
-                        withAnimation(.easeInOut(duration: 0.3)) {
-                            currentScreen = .menu
-                        }
-                    }
+                    onDismiss: { withAnimation(.easeInOut(duration: 0.3)) { currentScreen = .menu } }
                 )
                 .transition(.move(edge: .trailing))
             }
