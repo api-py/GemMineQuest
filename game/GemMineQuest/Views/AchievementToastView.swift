@@ -34,7 +34,7 @@ struct AchievementToastView: View {
                         .font(.system(size: 16, weight: .heavy, design: .rounded))
                         .foregroundColor(.white)
 
-                    Text("+\(achievement.coinReward) coins")
+                    Text("+\(achievement.coinReward) Gold")
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundColor(Color(hex: 0xCCBB99))
                 }

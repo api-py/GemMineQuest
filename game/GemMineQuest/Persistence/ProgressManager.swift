@@ -48,6 +48,14 @@ class ProgressManager: ObservableObject {
     // MARK: - Shop
 
     func purchaseShopItem(_ item: ShopItem, boosterInventory: BoosterInventory) -> Bool {
+        // God Mode: free purchases
+        if UserDefaults.standard.bool(forKey: "godModeEnabled") {
+            for _ in 0..<item.quantity {
+                boosterInventory.increment(item.boosterType)
+            }
+            save()
+            return true
+        }
         guard progress.coins >= item.price else { return false }
         progress.addCoins(-item.price)
         for _ in 0..<item.quantity {
@@ -121,15 +129,13 @@ class ProgressManager: ObservableObject {
 
     func hasFreeSpin() -> Bool {
         guard let lastSpinStr = progress.lastSpinDate else { return true }
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
+        let formatter = ISO8601DateFormatter()
         guard let lastDate = formatter.date(from: lastSpinStr) else { return true }
-        return !Calendar.current.isDateInToday(lastDate)
+        return Date().timeIntervalSince(lastDate) >= 4 * 3600  // 4 hours
     }
 
     func recordSpin() {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
+        let formatter = ISO8601DateFormatter()
         progress.lastSpinDate = formatter.string(from: Date())
         save()
     }

@@ -18,8 +18,18 @@ class LevelGenerator {
     static func generateLevel(number: Int) -> Level {
         var rng = SeededRandomNumberGenerator(seed: UInt64(number) &* 2654435761)
 
-        // Gradual difficulty: 0.25 at level 50, 0.5 at level 150, 0.75 at level 300, ~0.95 at level 500
-        let difficulty = min(1.0 - exp(-Double(number) / 200.0), 0.98)
+        // Floor bumps every 20 levels for step difficulty increases
+        let levelFloor: Double
+        switch number {
+        case 30..<50: levelFloor = 0.25
+        case 50..<70: levelFloor = 0.40
+        case 70..<90: levelFloor = 0.55
+        case 90..<110: levelFloor = 0.65
+        case 110..<130: levelFloor = 0.75
+        case 130...: levelFloor = 0.82
+        default: levelFloor = 0.0
+        }
+        let difficulty = max(levelFloor, min(1.0 - exp(-Double(number) / 80.0), 0.98))
 
         let levelType = determineLevelType(number: number, rng: &rng)
         let moves = determineMoves(difficulty: difficulty, rng: &rng)
@@ -63,7 +73,7 @@ class LevelGenerator {
 
     private static func determineMoves(difficulty: Double, rng: inout SeededRandomNumberGenerator) -> Int {
         let base = Constants.baseMoves
-        let reduction = Int(Double(base - Constants.minMoves) * difficulty)
+        let reduction = Int(Double(base - Constants.minMoves) * pow(difficulty, 0.8))
         let jitter = Int.random(in: -1...1, using: &rng)
         return max(Constants.minMoves, base - reduction + jitter)
     }
@@ -242,7 +252,7 @@ class LevelGenerator {
         var layout: [[Level.BlockerData?]] = Array(repeating: Array(repeating: nil, count: cols), count: rows)
 
         // Gradual blocker increase: 1-2 at easy, up to 15 at hardest
-        let blockerCount = max(1, Int(difficulty * 16))
+        let blockerCount = max(2, Int(difficulty * 24))
         var placed = 0
         for _ in 0..<200 {
             guard placed < blockerCount else { break }

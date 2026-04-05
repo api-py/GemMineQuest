@@ -402,6 +402,20 @@ class GameScene: SKScene {
         gemSprites[pos.row][pos.column] = sprite
     }
 
+    // MARK: - Z-Position Sync
+
+    func syncAllSpriteZPositions() {
+        guard let board = gameState?.board else { return }
+        for row in 0..<board.numRows {
+            for col in 0..<board.numColumns {
+                let pos = GridPosition(row: row, column: col)
+                if let sprite = gemSpriteAt(pos) {
+                    sprite.zPosition = 1
+                }
+            }
+        }
+    }
+
     // MARK: - Sprite Access (for AnimationController)
 
     func gemSpriteAt(_ pos: GridPosition) -> GemSprite? {
@@ -708,11 +722,15 @@ class GameScene: SKScene {
         // Pulse both gems
         for pos in [posA, posB] {
             if let sprite = gemSpriteAt(pos) {
-                let glow = SKShapeNode(circleOfRadius: layout.gemSize * 0.55)
+                let glow = SKShapeNode(rectOf: CGSize(width: layout.gemSize * 0.9, height: layout.gemSize * 0.9), cornerRadius: 8)
                 glow.fillColor = .clear
-                glow.strokeColor = SKColor.white.withAlphaComponent(0.6)
+                glow.strokeColor = SKColor(hex: 0xC9A84C).withAlphaComponent(0.8)
                 glow.lineWidth = 2.5
-                glow.glowWidth = 8.0
+                glow.glowWidth = 6.0
+                // Dashed stroke
+                let pattern: [CGFloat] = [4, 4]
+                let dashedPath = glow.path?.copy(dashingWithPhase: 0, lengths: pattern)
+                glow.path = dashedPath
                 glow.position = sprite.position
                 glow.zPosition = 15
                 boardLayer.addChild(glow)

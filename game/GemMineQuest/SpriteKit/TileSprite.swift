@@ -219,65 +219,106 @@ class TileSprite: SKNode {
         switch blocker {
         case .granite(let layers):
             let rect = CGSize(width: tileSize * 0.95, height: tileSize * 0.95)
-            let stone = SKShapeNode(rectOf: rect, cornerRadius: 3)
+
+            // Base shadow layer (bottom-right offset)
+            let shadow = SKShapeNode(rectOf: rect, cornerRadius: 4)
+            shadow.fillColor = SKColor(hex: 0x3A3A3A)
+            shadow.strokeColor = .clear
+            shadow.position = CGPoint(x: 1.5, y: -1.5)
+            container.addChild(shadow)
+
+            // Main stone face
             let graniteColor: SKColor
+            let grainColors: [SKColor]
             switch layers {
-            case 3: graniteColor = SKColor(hex: 0x606060)
-            case 2: graniteColor = SKColor(hex: 0x787878)
-            default: graniteColor = SKColor(hex: 0x909090)
+            case 3:
+                graniteColor = SKColor(hex: 0x555555)
+                grainColors = [SKColor(hex: 0x4A4A4A), SKColor(hex: 0x606060), SKColor(hex: 0x505050)]
+            case 2:
+                graniteColor = SKColor(hex: 0x707070)
+                grainColors = [SKColor(hex: 0x656565), SKColor(hex: 0x7B7B7B), SKColor(hex: 0x6A6A6A)]
+            default:
+                graniteColor = SKColor(hex: 0x8A8A8A)
+                grainColors = [SKColor(hex: 0x808080), SKColor(hex: 0x959595), SKColor(hex: 0x888888)]
             }
+
+            let stone = SKShapeNode(rectOf: rect, cornerRadius: 4)
             stone.fillColor = graniteColor
-            stone.strokeColor = ColorPalette.graniteDark
-            stone.lineWidth = CGFloat(layers) + 0.5
+            stone.strokeColor = SKColor(hex: 0x404040)
+            stone.lineWidth = 1.5
             container.addChild(stone)
 
-            // Texture spots
-            let spotData: [(CGPoint, CGFloat)] = [
-                (CGPoint(x: -tileSize * 0.15, y: tileSize * 0.12), tileSize * 0.08),
-                (CGPoint(x: tileSize * 0.18, y: -tileSize * 0.08), tileSize * 0.06),
-                (CGPoint(x: -tileSize * 0.05, y: -tileSize * 0.18), tileSize * 0.07),
-            ]
-            for (pos, r) in spotData {
-                let spot = SKShapeNode(circleOfRadius: r)
-                spot.fillColor = ColorPalette.graniteDark
-                spot.strokeColor = .clear
-                spot.position = pos
-                container.addChild(spot)
-            }
-
-            // Top highlight
-            let highlight = SKShapeNode(rectOf: CGSize(width: rect.width * 0.7, height: rect.height * 0.15), cornerRadius: 2)
-            highlight.fillColor = ColorPalette.graniteLight
+            // Specular highlight bar across top 20%
+            let highlightRect = CGSize(width: rect.width * 0.8, height: rect.height * 0.12)
+            let highlight = SKShapeNode(rectOf: highlightRect, cornerRadius: 2)
+            highlight.fillColor = SKColor(white: 1.0, alpha: 0.15)
             highlight.strokeColor = .clear
-            highlight.position = CGPoint(x: -tileSize * 0.05, y: tileSize * 0.25)
+            highlight.position = CGPoint(x: 0, y: tileSize * 0.3)
             container.addChild(highlight)
 
-            // Layer indicator dots
-            let dotSpacing: CGFloat = 8
-            let startX = -dotSpacing * CGFloat(layers - 1) / 2
-            for i in 0..<layers {
-                let dot = SKShapeNode(circleOfRadius: 3)
-                dot.fillColor = .white
-                dot.strokeColor = SKColor(white: 0.0, alpha: 0.3)
-                dot.lineWidth = 0.5
-                dot.position = CGPoint(x: startX + CGFloat(i) * dotSpacing, y: -tileSize * 0.34)
-                container.addChild(dot)
+            // Shadow strip along bottom 15%
+            let shadowStrip = SKShapeNode(rectOf: CGSize(width: rect.width * 0.9, height: rect.height * 0.1), cornerRadius: 2)
+            shadowStrip.fillColor = SKColor(white: 0.0, alpha: 0.2)
+            shadowStrip.strokeColor = .clear
+            shadowStrip.position = CGPoint(x: 0, y: -tileSize * 0.33)
+            container.addChild(shadowStrip)
+
+            // Stone grain texture — small elliptical spots
+            let grainData: [(CGPoint, CGSize)] = [
+                (CGPoint(x: -tileSize * 0.2, y: tileSize * 0.15), CGSize(width: tileSize * 0.12, height: tileSize * 0.06)),
+                (CGPoint(x: tileSize * 0.15, y: -tileSize * 0.1), CGSize(width: tileSize * 0.1, height: tileSize * 0.05)),
+                (CGPoint(x: -tileSize * 0.08, y: -tileSize * 0.2), CGSize(width: tileSize * 0.08, height: tileSize * 0.06)),
+                (CGPoint(x: tileSize * 0.22, y: tileSize * 0.08), CGSize(width: tileSize * 0.07, height: tileSize * 0.04)),
+                (CGPoint(x: -tileSize * 0.25, y: -tileSize * 0.05), CGSize(width: tileSize * 0.09, height: tileSize * 0.05)),
+                (CGPoint(x: tileSize * 0.05, y: tileSize * 0.25), CGSize(width: tileSize * 0.06, height: tileSize * 0.04)),
+            ]
+            for (i, (pos, size)) in grainData.enumerated() {
+                let grain = SKShapeNode(ellipseOf: size)
+                grain.fillColor = grainColors[i % grainColors.count]
+                grain.strokeColor = .clear
+                grain.position = pos
+                container.addChild(grain)
             }
 
-            // Crack lines for damaged granite
+            // Crack lines for damaged granite (jagged zigzag)
             if layers < 3 {
                 let crack = SKShapeNode()
                 let path = CGMutablePath()
-                path.move(to: CGPoint(x: -tileSize * 0.22, y: tileSize * 0.22))
-                path.addLine(to: CGPoint(x: -tileSize * 0.05, y: tileSize * 0.05))
-                path.addLine(to: CGPoint(x: tileSize * 0.1, y: -tileSize * 0.1))
+                path.move(to: CGPoint(x: -tileSize * 0.3, y: tileSize * 0.3))
+                path.addLine(to: CGPoint(x: -tileSize * 0.15, y: tileSize * 0.15))
+                path.addLine(to: CGPoint(x: -tileSize * 0.05, y: tileSize * 0.2))
+                path.addLine(to: CGPoint(x: tileSize * 0.05, y: tileSize * 0.0))
+                path.addLine(to: CGPoint(x: tileSize * 0.1, y: -tileSize * 0.12))
                 if layers == 1 {
-                    path.addLine(to: CGPoint(x: tileSize * 0.22, y: -tileSize * 0.28))
+                    path.addLine(to: CGPoint(x: tileSize * 0.15, y: -tileSize * 0.05))
+                    path.addLine(to: CGPoint(x: tileSize * 0.25, y: -tileSize * 0.25))
+                    // Second crack branch
+                    let path2 = CGMutablePath()
+                    path2.move(to: CGPoint(x: tileSize * 0.2, y: tileSize * 0.25))
+                    path2.addLine(to: CGPoint(x: tileSize * 0.08, y: tileSize * 0.1))
+                    path2.addLine(to: CGPoint(x: tileSize * 0.12, y: -tileSize * 0.05))
+                    path2.addLine(to: CGPoint(x: -tileSize * 0.05, y: -tileSize * 0.2))
+                    let crack2 = SKShapeNode(path: path2)
+                    crack2.strokeColor = SKColor(white: 0.9, alpha: 0.5)
+                    crack2.lineWidth = 1.0
+                    container.addChild(crack2)
                 }
                 crack.path = path
                 crack.strokeColor = SKColor(white: 0.85, alpha: 0.6)
                 crack.lineWidth = 1.5
                 container.addChild(crack)
+            }
+
+            // Layer indicator dots (slightly larger)
+            let dotSpacing: CGFloat = 9
+            let startX = -dotSpacing * CGFloat(layers - 1) / 2
+            for i in 0..<layers {
+                let dot = SKShapeNode(circleOfRadius: 3.5)
+                dot.fillColor = SKColor(white: 1.0, alpha: 0.9)
+                dot.strokeColor = SKColor(white: 0.0, alpha: 0.3)
+                dot.lineWidth = 0.5
+                dot.position = CGPoint(x: startX + CGFloat(i) * dotSpacing, y: -tileSize * 0.34)
+                container.addChild(dot)
             }
 
         case .boulder:

@@ -22,6 +22,7 @@ class AnimationController {
 
     private func animatePhases(_ phases: [[GameEvent]], index: Int, completion: @escaping () -> Void) {
         guard index < phases.count else {
+            scene?.syncAllSpriteZPositions()
             completion()
             return
         }
@@ -424,7 +425,7 @@ class AnimationController {
                 let rowDiff = abs(move.from.row - move.to.row)
                 let duration = Constants.fallDurationPerRow * Double(rowDiff)
 
-                sprite.zPosition = 5  // Above stationary gems during fall
+                sprite.zPosition = 5 + CGFloat(rowDiff) * 0.1  // Above stationary gems during fall
                 sprite.run(SKAction.sequence([
                     SKAction.fallWithBounce(to: targetPos, duration: duration),
                     SKAction.run { sprite.zPosition = 1 }
@@ -444,12 +445,12 @@ class AnimationController {
         for (gem, pos) in gems {
             let sprite = GemSprite(gem: gem, size: layout.gemSize)
             sprite.position = layout.entryPositionFor(column: pos.column)
-            sprite.zPosition = 10
+            let rowsToFall = CGFloat(scene.gameState?.board.numRows ?? 8) - CGFloat(pos.row)
+            sprite.zPosition = 10 + rowsToFall * 0.1
             scene.boardLayer.addChild(sprite)
             scene.setGemSprite(sprite, at: pos)
 
             let targetPos = layout.positionFor(pos)
-            let rowsToFall = CGFloat(scene.gameState?.board.numRows ?? 8) - CGFloat(pos.row)
             let duration = Constants.fallDurationPerRow * Double(rowsToFall)
 
             sprite.run(SKAction.sequence([

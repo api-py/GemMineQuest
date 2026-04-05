@@ -37,7 +37,7 @@ class BoardFiller {
                 // Anti-match spawning: avoid creating instant 3-in-a-rows
                 var color = colors.randomElement() ?? .ruby
                 var attempts = 0
-                while attempts < 15 && createsMatchAt(board: board, row: row, col: col, color: color) {
+                while attempts < 30 && createsMatchAt(board: board, row: row, col: col, color: color) {
                     color = colors.randomElement() ?? .ruby
                     attempts += 1
                 }
@@ -187,7 +187,7 @@ class BoardFiller {
 
                 var color = colors.randomElement() ?? .ruby
                 var attempts = 0
-                while attempts < 20 {
+                while attempts < 30 {
                     if !createsMatchAt(board: board, row: row, col: col, color: color) { break }
                     color = colors.randomElement() ?? .ruby
                     attempts += 1
@@ -212,7 +212,7 @@ class BoardFiller {
 
                 var color = colors.randomElement(using: &rng) ?? .ruby
                 var attempts = 0
-                while attempts < 20 {
+                while attempts < 30 {
                     if !createsMatchAt(board: board, row: row, col: col, color: color) { break }
                     color = colors.randomElement(using: &rng) ?? .ruby
                     attempts += 1
@@ -225,11 +225,21 @@ class BoardFiller {
     }
 
     private func createsMatchAt(board: Board, row: Int, col: Int, color: GemColor) -> Bool {
+        // Existing horizontal check
         if col >= 2 {
             if board[row, col - 1]?.color == color && board[row, col - 2]?.color == color { return true }
         }
+        // Existing vertical check
         if row >= 2 {
             if board[row - 1, col]?.color == color && board[row - 2, col]?.color == color { return true }
+        }
+        // Gap pattern check — [color, ?, color] vertically
+        if row >= 1 && row + 1 < board.numRows {
+            if board[row - 1, col]?.color == color && board[row + 1, col]?.color == color { return true }
+        }
+        // Gap pattern check — [color, ?, color] horizontally
+        if col >= 1 && col + 1 < board.numColumns {
+            if board[row, col - 1]?.color == color && board[row, col + 1]?.color == color { return true }
         }
         return false
     }

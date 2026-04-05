@@ -81,6 +81,18 @@ class GemRenderer {
         let lineWidth: CGFloat = size * 0.10
         let lineLength: CGFloat = size * 0.82
 
+        // Color-matched glow line (behind main line)
+        let glowLine = SKShapeNode(rectOf: CGSize(
+            width: isHorizontal ? lineLength * 1.1 : lineWidth * 2.5,
+            height: isHorizontal ? lineWidth * 2.5 : lineLength * 1.1
+        ), cornerRadius: lineWidth)
+        glowLine.fillColor = color.primaryColor.withAlphaComponent(0.3)
+        glowLine.strokeColor = color.primaryColor.withAlphaComponent(0.2)
+        glowLine.lineWidth = 0
+        glowLine.glowWidth = 8.0
+        glowLine.zPosition = -1
+        container.addChild(glowLine)
+
         let line = SKShapeNode(rectOf: CGSize(
             width: isHorizontal ? lineLength : lineWidth,
             height: isHorizontal ? lineWidth : lineLength
@@ -102,9 +114,17 @@ class GemRenderer {
             container.addChild(arrow)
         }
 
+        // Oscillate ±10 degrees (0.1745 radians)
+        let oscillate = SKAction.sequence([
+            SKAction.rotate(toAngle: 0.1745, duration: 0.8, shortestUnitArc: true),
+            SKAction.rotate(toAngle: -0.1745, duration: 0.8, shortestUnitArc: true)
+        ])
+        container.run(SKAction.repeatForever(oscillate))
+
+        // Keep subtle pulse on the line itself
         let pulse = SKAction.sequence([
-            SKAction.fadeAlpha(to: 0.6, duration: 0.5),
-            SKAction.fadeAlpha(to: 1.0, duration: 0.5)
+            SKAction.fadeAlpha(to: 0.7, duration: 0.6),
+            SKAction.fadeAlpha(to: 1.0, duration: 0.6)
         ])
         line.run(SKAction.repeatForever(pulse))
         return container
@@ -115,7 +135,7 @@ class GemRenderer {
 
         let ring1 = SKShapeNode(circleOfRadius: size * 0.48)
         ring1.fillColor = .clear
-        ring1.strokeColor = color.lightColor.withAlphaComponent(0.7)
+        ring1.strokeColor = color.primaryColor.withAlphaComponent(0.7)
         ring1.lineWidth = 2.0
         ring1.glowWidth = 5.0
         container.addChild(ring1)
@@ -125,6 +145,20 @@ class GemRenderer {
             SKAction.group([SKAction.scale(to: 1.0, duration: 0.45), SKAction.fadeAlpha(to: 1.0, duration: 0.45)])
         ])
         ring1.run(SKAction.repeatForever(pulse))
+
+        let ring2 = SKShapeNode(circleOfRadius: size * 0.35)
+        ring2.fillColor = .clear
+        ring2.strokeColor = SKColor(red: 0.8, green: 0.6, blue: 1.0, alpha: 0.5)
+        ring2.lineWidth = 1.5
+        ring2.glowWidth = 3.0
+        container.addChild(ring2)
+
+        // Inner ring pulses opposite to outer
+        let pulse2 = SKAction.sequence([
+            SKAction.group([SKAction.scale(to: 1.0, duration: 0.45), SKAction.fadeAlpha(to: 1.0, duration: 0.45)]),
+            SKAction.group([SKAction.scale(to: 1.15, duration: 0.45), SKAction.fadeAlpha(to: 0.5, duration: 0.45)])
+        ])
+        ring2.run(SKAction.repeatForever(pulse2))
         return container
     }
 

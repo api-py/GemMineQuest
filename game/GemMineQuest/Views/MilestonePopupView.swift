@@ -26,7 +26,7 @@ struct MilestonePopupView: View {
     }
 
     private var rewardText: String {
-        "+200 coins & 3 gems"
+        "+200 Gold & 3 gems"
     }
 
     var body: some View {

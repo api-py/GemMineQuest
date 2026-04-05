@@ -7,7 +7,7 @@ class BoosterInventory: ObservableObject {
     private static let storageKey = "boosterInventory"
     private static let checksumKey = "boosterInventoryChecksum"
     private static let lastDailyRewardKey = "lastDailyRewardDate"
-    private static let initialCount = 3
+    private static let initialCount = 4
     private static let maxBoosterCount = 999
 
     init() {

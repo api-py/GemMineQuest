@@ -187,12 +187,19 @@ struct BoosterSettingsRow: View {
                     .monospacedDigit()
 
                 Button {
-                    inventory.increment(booster)
+                    if inventory.count(for: booster) < 5 {
+                        inventory.increment(booster)
+                    }
                 } label: {
                     Image(systemName: "plus.circle.fill")
-                        .foregroundColor(Color(hex: 0xE8A035))
+                        .foregroundColor(inventory.count(for: booster) >= 5 ? Color(hex: 0x5A4530) : Color(hex: 0xE8A035))
                 }
+                .disabled(inventory.count(for: booster) >= 5)
                 .buttonStyle(.plain)
+
+                Text("Max: 5")
+                    .font(.system(size: 9, weight: .medium))
+                    .foregroundColor(Color(hex: 0x8B7355))
             }
         }
     }

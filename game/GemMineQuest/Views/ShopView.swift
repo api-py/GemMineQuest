@@ -5,6 +5,7 @@ struct ShopView: View {
     @EnvironmentObject var boosterInventory: BoosterInventory
     var onDismiss: () -> Void
 
+    @AppStorage("godModeEnabled") private var isGodMode = false
     @State private var purchasedItemId: String?
     @State private var showPurchaseFlash = false
 
@@ -45,7 +46,7 @@ struct ShopView: View {
 
                 // Coin balance
                 HStack(spacing: 6) {
-                    Image(systemName: "dollarsign.circle.fill")
+                    Image(systemName: "star.circle.fill")
                         .font(.system(size: 22))
                         .foregroundColor(Color(hex: 0xFFD700))
                     Text("\(progressManager.progress.coins)")
@@ -113,8 +114,9 @@ struct ShopView: View {
             // Price + BUY button
             Button(action: { purchaseItem(item) }) {
                 HStack(spacing: 4) {
-                    Image(systemName: "dollarsign.circle.fill")
+                    Image(systemName: "star.circle.fill")
                         .font(.system(size: 12))
+                        .foregroundColor(Color(hex: 0xFFD700))
                     Text("\(item.price)")
                         .font(.system(size: 14, weight: .bold, design: .rounded))
                 }

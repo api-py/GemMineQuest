@@ -132,7 +132,7 @@ struct GameOverView: View {
                                 )
 
                             HStack(spacing: 16) {
-                                Label("+\(coinReward)", systemImage: "dollarsign.circle.fill")
+                                Label("+\(coinReward)", systemImage: "star.circle.fill")
                                     .font(.system(size: 16, weight: .bold))
                                     .foregroundColor(Color(hex: 0xFFD700))
                             }
@@ -166,7 +166,7 @@ struct GameOverView: View {
                             HStack(spacing: 6) {
                                 Image(systemName: "plus.circle.fill")
                                     .foregroundColor(Color(hex: 0xFFD700))
-                                Text("+5 moves for 50 coins")
+                                Text("+5 moves for 50 Gold")
                                     .font(.system(size: 14, weight: .semibold))
                                     .foregroundColor(Color(hex: 0xCCBB99))
                             }

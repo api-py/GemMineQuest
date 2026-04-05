@@ -15,6 +15,7 @@ struct GameContainerView: View {
     @State private var transitionLevel = 0
     @State private var showExitConfirmation = false
     @State private var showShop = false
+    @State private var showObjectiveBanner = false
 
     init(levelNumber: Int, onDismiss: @escaping () -> Void, onNextLevel: @escaping (Int) -> Void) {
         self.levelNumber = levelNumber
@@ -152,7 +153,7 @@ struct GameContainerView: View {
 
                     // Shop button
                     Button { showShop = true } label: {
-                        Image(systemName: "dollarsign.circle.fill")
+                        Image(systemName: "star.circle.fill")
                             .font(.system(size: 22))
                             .foregroundColor(Color(hex: 0xFFD700))
                     }
@@ -237,6 +238,40 @@ struct GameContainerView: View {
                 }
             }
 
+            // Objective banner on level start
+            if showObjectiveBanner {
+                VStack {
+                    Spacer()
+                    let level = LevelGenerator.getLevel(number: levelNumber)
+                    HStack(spacing: 8) {
+                        ForEach(level.objectives.indices, id: \.self) { i in
+                            if i > 0 {
+                                Text("\u{2022}")
+                                    .foregroundColor(Color(hex: 0xC9A84C))
+                                    .font(.system(size: 14, weight: .bold))
+                            }
+                            Text(level.objectives[i].displayText)
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundColor(Color(hex: 0xFFF8E8))
+                        }
+                    }
+                    .padding(.horizontal, 20)
+                    .padding(.vertical, 12)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12)
+                            .fill(Color(hex: 0x1A0E05).opacity(0.85))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12)
+                                    .stroke(Color(hex: 0xC9A84C).opacity(0.5), lineWidth: 1.5)
+                            )
+                    )
+                    Spacer()
+                }
+                .transition(.opacity)
+                .allowsHitTesting(false)
+                .zIndex(50)
+            }
+
             // Game over overlay
             if viewModel.showGameOver && !showTransition {
                 GameOverView(
@@ -309,6 +344,16 @@ struct GameContainerView: View {
                 showTransition = false
             }
             viewModel.scene?.setBoardVisible(true, animated: true)
+
+            // Show objective banner over the board
+            withAnimation(.easeIn(duration: 0.3)) {
+                showObjectiveBanner = true
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                withAnimation(.easeOut(duration: 0.3)) {
+                    showObjectiveBanner = false
+                }
+            }
         }
     }
 
@@ -479,6 +524,8 @@ struct ObjectiveIconView: View {
     let current: Int
     let target: Int
 
+    @State private var showDescription = false
+
     private var isComplete: Bool { current >= target }
 
     private var iconName: String {
@@ -561,6 +608,39 @@ struct ObjectiveIconView: View {
                 .minimumScaleFactor(0.7)
         }
         .frame(width: 48)
+        .onLongPressGesture(minimumDuration: 0.4) {
+            showDescription = true
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                showDescription = false
+            }
+        }
+        .overlay(
+            Group {
+                if showDescription {
+                    Text(objective.descriptionText)
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(Color(hex: 0xFFF8E8))
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(Color(hex: 0x1A0E05).opacity(0.92))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(Color(hex: 0xC9A84C), lineWidth: 1.5)
+                                )
+                        )
+                        .fixedSize(horizontal: false, vertical: true)
+                        .frame(width: 180)
+                        .offset(y: 60)
+                        .transition(.opacity)
+                        .onTapGesture { showDescription = false }
+                        .zIndex(100)
+                }
+            }
+            , alignment: .top
+        )
+        .animation(.easeInOut(duration: 0.2), value: showDescription)
     }
 }
 

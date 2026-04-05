@@ -100,7 +100,7 @@ struct DailyRewardView: View {
 
                         HStack(spacing: 16) {
                             if reward.coinAmount > 0 {
-                                Label("+\(reward.coinAmount)", systemImage: "dollarsign.circle.fill")
+                                Label("+\(reward.coinAmount)", systemImage: "star.circle.fill")
                                     .foregroundColor(Color(hex: 0xFFD700))
                             }
                             if reward.gemAmount > 0 {
@@ -159,14 +159,14 @@ struct DailyRewardView: View {
 
     private func dayRewardIcon(_ day: Int) -> String {
         switch day {
-        case 1: return "dollarsign.circle"
+        case 1: return "star.circle"
         case 2: return "hammer.fill"
         case 3: return "diamond.fill"
         case 4: return "flame.fill"
         case 5: return "diamond.fill"
         case 6: return "bolt.fill"
         case 7: return "gift.fill"
-        default: return "dollarsign.circle"
+        default: return "star.circle"
         }
     }
 

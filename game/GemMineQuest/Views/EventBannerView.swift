@@ -12,7 +12,7 @@ struct EventBannerView: View {
     }
 
     private var eventDescription: String {
-        "Double coins on all levels!"
+        "Double Gold on all levels!"
     }
 
     // Event ends at midnight Sunday

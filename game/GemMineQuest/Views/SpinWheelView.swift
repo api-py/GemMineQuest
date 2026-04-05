@@ -11,19 +11,19 @@ struct SpinWheelView: View {
     @State private var wonPrize: SpinPrize?
 
     private let segments: [SpinPrize] = [
-        SpinPrize(label: "50 Coins", coins: 50, gems: 0, booster: nil),
+        SpinPrize(label: "100 Gold", coins: 100, gems: 0, booster: nil),
         SpinPrize(label: "Pickaxe", coins: 0, gems: 0, booster: .pickaxe),
-        SpinPrize(label: "100 Coins", coins: 100, gems: 0, booster: nil),
+        SpinPrize(label: "100 Gold", coins: 100, gems: 0, booster: nil),
         SpinPrize(label: "Dynamite", coins: 0, gems: 0, booster: .dynamite),
         SpinPrize(label: "2 Gems", coins: 0, gems: 2, booster: nil),
         SpinPrize(label: "Drone", coins: 0, gems: 0, booster: .droneStrike),
-        SpinPrize(label: "200 Coins", coins: 200, gems: 0, booster: nil),
+        SpinPrize(label: "500 Gold", coins: 500, gems: 0, booster: nil),
         SpinPrize(label: "Gem Forge", coins: 0, gems: 0, booster: .gemForge)
     ]
 
     private let segmentColors: [UInt32] = [
-        0xD41818, 0xC9A84C, 0x8B0000, 0xE8A035,
-        0xD41818, 0xC9A84C, 0x8B0000, 0xE8A035
+        0xFF3B30, 0xFF9500, 0xFFCC00, 0x34C759,
+        0x00C7BE, 0x007AFF, 0xAF52DE, 0xFF2D55
     ]
 
     var body: some View {

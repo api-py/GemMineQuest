@@ -6,6 +6,7 @@ struct LevelMapView: View {
     var onSelectLevel: (Int) -> Void
     var onBack: () -> Void
     var onSpinWheel: (() -> Void)? = nil
+    @AppStorage("godModeEnabled") private var isGodMode = false
     @State private var showLockedAlert = false
     @State private var spinPulse: CGFloat = 1.0
     @Environment(\.horizontalSizeClass) var sizeClass
@@ -41,10 +42,10 @@ struct LevelMapView: View {
 
                 // Coin counter
                 HStack(spacing: 4) {
-                    Image(systemName: "dollarsign.circle.fill")
+                    Image(systemName: "star.circle.fill")
                         .font(.system(size: 16))
                         .foregroundColor(Color(hex: 0xFFD700))
-                    Text("\(progressManager.progress.coins)")
+                    Text(isGodMode ? "\u{221E}" : "\(progressManager.progress.coins)")
                         .font(.system(size: 14, weight: .bold, design: .rounded))
                         .foregroundColor(Color(hex: 0xFFD700))
                 }

@@ -27,7 +27,7 @@ class NotificationManager {
 
         let content = UNMutableNotificationContent()
         content.title = "Daily Mining Bonus Ready!"
-        content.body = "Your daily reward is waiting. Come back to claim free coins and boosters!"
+        content.body = "Your daily reward is waiting. Come back to claim free Gold and boosters!"
         content.sound = .default
 
         // Trigger at 9 AM daily
