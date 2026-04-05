@@ -2,9 +2,12 @@ import SwiftUI
 
 struct LevelMapView: View {
     @ObservedObject var viewModel: LevelMapViewModel
+    @EnvironmentObject var progressManager: ProgressManager
     var onSelectLevel: (Int) -> Void
     var onBack: () -> Void
+    var onSpinWheel: (() -> Void)? = nil
     @State private var showLockedAlert = false
+    @State private var spinPulse: CGFloat = 1.0
     @Environment(\.horizontalSizeClass) var sizeClass
 
     private var nodeSize: CGFloat { sizeClass == .regular ? 90 : 76 }
@@ -88,6 +91,32 @@ struct LevelMapView: View {
                         }
                     }
                 }
+            }
+        }
+        .overlay(alignment: .bottomTrailing) {
+            if let spinAction = onSpinWheel {
+                Button(action: spinAction) {
+                    ZStack {
+                        Circle()
+                            .fill(LinearGradient(colors: [Color(hex: 0xE8A035), Color(hex: 0xC68020)], startPoint: .top, endPoint: .bottom))
+                            .frame(width: 60, height: 60)
+                            .overlay(Circle().stroke(Color(hex: 0xFFD700), lineWidth: 2))
+                            .shadow(color: Color(hex: 0xE8A035).opacity(0.4), radius: 8)
+                        Image(systemName: "arrow.trianglehead.2.clockwise.rotate.90")
+                            .font(.system(size: 22, weight: .bold)).foregroundColor(.white)
+                        if progressManager.hasFreeSpin() {
+                            Text("FREE").font(.system(size: 8, weight: .black)).foregroundColor(.white)
+                                .padding(.horizontal, 6).padding(.vertical, 2)
+                                .background(Capsule().fill(Color.green))
+                                .offset(x: 18, y: -22)
+                        }
+                    }.scaleEffect(spinPulse)
+                }.padding(.trailing, 20).padding(.bottom, 20)
+            }
+        }
+        .onAppear {
+            if progressManager.hasFreeSpin() {
+                withAnimation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) { spinPulse = 1.1 }
             }
         }
         .background(MineShaftBackground().ignoresSafeArea())

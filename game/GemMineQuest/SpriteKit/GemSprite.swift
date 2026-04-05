@@ -40,6 +40,15 @@ class GemSprite: SKNode {
             addChild(body)
         }
 
+        // Idle breathing animation (subtle scale pulse)
+        let breatheDuration = Double.random(in: 2.5...3.5)
+        let breathe = SKAction.sequence([
+            SKAction.scale(to: 1.03, duration: breatheDuration / 2),
+            SKAction.scale(to: 1.0, duration: breatheDuration / 2)
+        ])
+        breathe.timingMode = .easeInEaseOut
+        run(SKAction.repeatForever(breathe), withKey: "breathing")
+
         // Add special overlay
         switch gem.special {
         case .laserHorizontal, .laserVertical:
@@ -66,12 +75,18 @@ class GemSprite: SKNode {
         buildVisual()
     }
 
-    /// Highlight when selected
+    /// Highlight when selected (spring scale effect)
     func setHighlighted(_ highlighted: Bool) {
+        removeAction(forKey: "highlight")
         if highlighted {
-            run(SKAction.scale(to: 1.1, duration: 0.1))
+            let spring = SKAction.sequence([
+                SKAction.scale(to: 1.18, duration: 0.08),
+                SKAction.scale(to: 1.08, duration: 0.06),
+                SKAction.scale(to: 1.12, duration: 0.04)
+            ])
+            run(spring, withKey: "highlight")
         } else {
-            run(SKAction.scale(to: 1.0, duration: 0.1))
+            run(SKAction.scale(to: 1.0, duration: 0.1), withKey: "highlight")
         }
     }
 }

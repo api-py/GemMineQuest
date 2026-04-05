@@ -1,0 +1,82 @@
+import SwiftUI
+
+struct AchievementToastView: View {
+    let achievement: Achievement
+    var onDismiss: () -> Void
+
+    @State private var offsetY: CGFloat = -120
+    @State private var opacity: Double = 0
+
+    var body: some View {
+        VStack {
+            HStack(spacing: 12) {
+                // Icon
+                ZStack {
+                    Circle()
+                        .fill(
+                            LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xC9A84C)],
+                                           startPoint: .top, endPoint: .bottom)
+                        )
+                        .frame(width: 44, height: 44)
+
+                    Image(systemName: achievement.iconName)
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(Color(hex: 0x3D2B1F))
+                }
+
+                // Text
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Achievement Unlocked!")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(Color(hex: 0xFFD700))
+
+                    Text(achievement.displayName)
+                        .font(.system(size: 16, weight: .heavy, design: .rounded))
+                        .foregroundColor(.white)
+
+                    Text("+\(achievement.coinReward) coins")
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundColor(Color(hex: 0xCCBB99))
+                }
+
+                Spacer()
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(
+                        LinearGradient(colors: [Color(hex: 0x2A1E10), Color(hex: 0x1A1208)],
+                                       startPoint: .top, endPoint: .bottom)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(Color(hex: 0xC9A84C).opacity(0.4), lineWidth: 1.5)
+                    )
+                    .shadow(color: Color(hex: 0xFFD700).opacity(0.2), radius: 12, y: 4)
+            )
+            .padding(.horizontal, 20)
+            .offset(y: offsetY)
+            .opacity(opacity)
+
+            Spacer()
+        }
+        .allowsHitTesting(false)
+        .onAppear {
+            withAnimation(.spring(response: 0.5, dampingFraction: 0.7)) {
+                offsetY = 60
+                opacity = 1
+            }
+            // Auto-dismiss after 3 seconds
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                withAnimation(.easeIn(duration: 0.3)) {
+                    offsetY = -120
+                    opacity = 0
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                    onDismiss()
+                }
+            }
+        }
+    }
+}

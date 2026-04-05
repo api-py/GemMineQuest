@@ -112,7 +112,9 @@ class HUDNode: SKNode {
     }
 
     func updateScore(_ score: Int) {
-        scoreLabel.text = "\(score)"
+        let text = "\(score)"
+        scoreLabel.text = text
+        scoreShadowLabel?.text = text
         // Pop animation
         scoreLabel.run(SKAction.sequence([
             SKAction.scale(to: 1.2, duration: 0.1),
@@ -121,7 +123,9 @@ class HUDNode: SKNode {
     }
 
     func updateMoves(_ moves: Int, godMode: Bool) {
-        movesLabel.text = godMode ? "\u{221E}" : "\(moves)"  // ∞ symbol
+        let text = godMode ? "\u{221E}" : "\(moves)"  // ∞ symbol
+        movesLabel.text = text
+        movesShadowLabel?.text = text
         movesLabel.fontColor = moves <= 3 && !godMode ? SKColor.red : ColorPalette.textPrimary
 
         if moves <= 3 && !godMode {
@@ -134,6 +138,9 @@ class HUDNode: SKNode {
 
     func updateObjective(_ text: String) {
         objectiveLabel.text = text
+        if let shadow = childNode(withName: "objectiveShadow") as? SKLabelNode {
+            shadow.text = text
+        }
     }
 
     func showScorePopup(delta: Int, at position: CGPoint) {
