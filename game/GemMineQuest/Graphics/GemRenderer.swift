@@ -1,49 +1,25 @@
 import SpriteKit
 
-/// Renders beautiful faceted gem shapes programmatically.
+/// Renders gem and special piece sprites using high-quality cached textures.
 class GemRenderer {
 
     /// Create a gem sprite node for a given color and size
     static func createGemNode(color: GemColor, size: CGFloat) -> SKNode {
         let container = SKNode()
 
-        // Shadow
-        let shadow = SKShapeNode(circleOfRadius: size * 0.42)
-        shadow.fillColor = SKColor(white: 0.0, alpha: 0.3)
-        shadow.strokeColor = .clear
-        shadow.position = CGPoint(x: 2, y: -2)
-        container.addChild(shadow)
+        // Glow halo (additive blended, slightly larger)
+        let glowTex = TextureFactory.shared.softGlowTexture(size: size * 1.6)
+        let glow = SKSpriteNode(texture: glowTex, size: CGSize(width: size * 1.6, height: size * 1.6))
+        glow.color = color.primaryColor
+        glow.colorBlendFactor = 0.8
+        glow.alpha = 0.25
+        glow.blendMode = .add
+        container.addChild(glow)
 
-        // Main gem body - octagonal faceted shape
-        let gemPath = createGemPath(size: size)
-        let body = SKShapeNode(path: gemPath)
-        body.fillColor = color.primaryColor
-        body.strokeColor = color.darkColor
-        body.lineWidth = 1.0
-        container.addChild(body)
-
-        // Inner facet highlight
-        let innerPath = createGemPath(size: size * 0.65)
-        let inner = SKShapeNode(path: innerPath)
-        inner.fillColor = color.lightColor.withAlphaComponent(0.4)
-        inner.strokeColor = .clear
-        inner.position = CGPoint(x: -size * 0.03, y: size * 0.05)
-        container.addChild(inner)
-
-        // Specular highlight (top-left shine)
-        let shine = SKShapeNode(ellipseOf: CGSize(width: size * 0.35, height: size * 0.2))
-        shine.fillColor = SKColor(white: 1.0, alpha: 0.55)
-        shine.strokeColor = .clear
-        shine.position = CGPoint(x: -size * 0.1, y: size * 0.15)
-        shine.zRotation = -0.3
-        container.addChild(shine)
-
-        // Small sparkle dot
-        let sparkle = SKShapeNode(circleOfRadius: size * 0.05)
-        sparkle.fillColor = SKColor(white: 1.0, alpha: 0.8)
-        sparkle.strokeColor = .clear
-        sparkle.position = CGPoint(x: -size * 0.18, y: size * 0.22)
-        container.addChild(sparkle)
+        // Main gem body (texture-based)
+        let gemTex = TextureFactory.shared.gemTexture(for: color, size: size)
+        let gem = SKSpriteNode(texture: gemTex, size: CGSize(width: size, height: size))
+        container.addChild(gem)
 
         return container
     }
@@ -56,7 +32,20 @@ class GemRenderer {
         let lineWidth: CGFloat = size * 0.12
         let lineLength: CGFloat = size * 0.85
 
-        // Laser line
+        // Laser line glow (additive blend)
+        let glowTex = TextureFactory.shared.softGlowTexture(size: 16)
+        let glowLine = SKSpriteNode(texture: glowTex)
+        glowLine.size = CGSize(
+            width: isHorizontal ? lineLength * 1.2 : lineWidth * 4,
+            height: isHorizontal ? lineWidth * 4 : lineLength * 1.2
+        )
+        glowLine.color = color.lightColor
+        glowLine.colorBlendFactor = 1.0
+        glowLine.alpha = 0.5
+        glowLine.blendMode = .add
+        container.addChild(glowLine)
+
+        // Laser line core
         let line = SKShapeNode(rectOf: CGSize(
             width: isHorizontal ? lineLength : lineWidth,
             height: isHorizontal ? lineWidth : lineLength
@@ -96,19 +85,22 @@ class GemRenderer {
     static func createVolatileOverlay(size: CGFloat, color: GemColor) -> SKNode {
         let container = SKNode()
 
-        // Outer glow ring
-        let ring = SKShapeNode(circleOfRadius: size * 0.48)
-        ring.fillColor = .clear
-        ring.strokeColor = color.lightColor.withAlphaComponent(0.8)
-        ring.lineWidth = 2.5
-        ring.glowWidth = 5.0
+        // Outer glow ring (texture-based)
+        let ringTex = TextureFactory.shared.softGlowTexture(size: size)
+        let ring = SKSpriteNode(texture: ringTex, size: CGSize(width: size * 1.1, height: size * 1.1))
+        ring.color = color.lightColor
+        ring.colorBlendFactor = 1.0
+        ring.alpha = 0.6
+        ring.blendMode = .add
         container.addChild(ring)
 
-        // Inner cross pattern
+        // Inner energy dots
         for angle: CGFloat in [0, .pi / 4, .pi / 2, .pi * 3 / 4] {
-            let dot = SKShapeNode(circleOfRadius: size * 0.06)
-            dot.fillColor = SKColor.white.withAlphaComponent(0.8)
-            dot.strokeColor = .clear
+            let dotTex = TextureFactory.shared.softGlowTexture(size: size * 0.15)
+            let dot = SKSpriteNode(texture: dotTex, size: CGSize(width: size * 0.15, height: size * 0.15))
+            dot.color = .white
+            dot.colorBlendFactor = 1.0
+            dot.blendMode = .add
             dot.position = CGPoint(
                 x: cos(angle) * size * 0.32,
                 y: sin(angle) * size * 0.32
@@ -136,12 +128,14 @@ class GemRenderer {
     static func createCrystalBallNode(size: CGFloat) -> SKNode {
         let container = SKNode()
 
-        // Shadow
-        let shadow = SKShapeNode(circleOfRadius: size * 0.42)
-        shadow.fillColor = SKColor(white: 0.0, alpha: 0.3)
-        shadow.strokeColor = .clear
-        shadow.position = CGPoint(x: 2, y: -2)
-        container.addChild(shadow)
+        // Glow backdrop
+        let glowTex = TextureFactory.shared.softGlowTexture(size: size * 1.6)
+        let glow = SKSpriteNode(texture: glowTex, size: CGSize(width: size * 1.6, height: size * 1.6))
+        glow.color = SKColor(hex: 0x8B00FF)
+        glow.colorBlendFactor = 0.8
+        glow.alpha = 0.35
+        glow.blendMode = .add
+        container.addChild(glow)
 
         // Main orb
         let orb = SKShapeNode(circleOfRadius: size * 0.42)
@@ -155,9 +149,12 @@ class GemRenderer {
         let colors: [SKColor] = [.red, .orange, .yellow, .green, .cyan, .blue, .purple]
         for (i, color) in colors.enumerated() {
             let angle = CGFloat(i) / CGFloat(colors.count) * .pi * 2
-            let dot = SKShapeNode(circleOfRadius: size * 0.06)
-            dot.fillColor = color.withAlphaComponent(0.8)
-            dot.strokeColor = .clear
+            let dotTex = TextureFactory.shared.softGlowTexture(size: size * 0.15)
+            let dot = SKSpriteNode(texture: dotTex, size: CGSize(width: size * 0.15, height: size * 0.15))
+            dot.color = color
+            dot.colorBlendFactor = 1.0
+            dot.alpha = 0.85
+            dot.blendMode = .add
             dot.position = CGPoint(
                 x: cos(angle) * size * 0.22,
                 y: sin(angle) * size * 0.22
@@ -172,9 +169,8 @@ class GemRenderer {
         shine.position = CGPoint(x: -size * 0.08, y: size * 0.15)
         container.addChild(shine)
 
-        // Rotating animation
+        // Rotating animation for inner dots
         let rotate = SKAction.rotate(byAngle: .pi * 2, duration: 3.0)
-        // Rotate just the inner dots
         for (i, child) in container.children.enumerated() {
             if i >= 2 && i < 2 + colors.count {
                 child.run(SKAction.repeatForever(rotate))
@@ -196,7 +192,7 @@ class GemRenderer {
         body.lineWidth = 1.0
         container.addChild(body)
 
-        // Propellers (4 dots at corners)
+        // Propellers with glow
         for (dx, dy) in [(-1.0, 1.0), (1.0, 1.0), (-1.0, -1.0), (1.0, -1.0)] as [(CGFloat, CGFloat)] {
             let prop = SKShapeNode(circleOfRadius: size * 0.08)
             prop.fillColor = SKColor(hex: 0x90A4AE)
@@ -204,15 +200,18 @@ class GemRenderer {
             prop.position = CGPoint(x: dx * bodySize * 0.5, y: dy * bodySize * 0.35)
             container.addChild(prop)
 
-            // Spinning blur
-            let blur = SKShapeNode(circleOfRadius: size * 0.12)
-            blur.fillColor = SKColor(white: 0.7, alpha: 0.3)
-            blur.strokeColor = .clear
+            // Spinning blur glow
+            let blurTex = TextureFactory.shared.softGlowTexture(size: size * 0.25)
+            let blur = SKSpriteNode(texture: blurTex, size: CGSize(width: size * 0.25, height: size * 0.25))
+            blur.color = SKColor(hex: 0x90A4AE)
+            blur.colorBlendFactor = 0.8
+            blur.alpha = 0.4
+            blur.blendMode = .add
             blur.position = prop.position
             container.addChild(blur)
         }
 
-        // Eye/sensor light
+        // Eye/sensor light with glow
         let eye = SKShapeNode(circleOfRadius: size * 0.06)
         eye.fillColor = SKColor(hex: 0x00E676)
         eye.strokeColor = .clear
@@ -227,28 +226,5 @@ class GemRenderer {
         container.run(SKAction.repeatForever(hover))
 
         return container
-    }
-
-    // MARK: - Gem Path
-
-    private static func createGemPath(size: CGFloat) -> CGPath {
-        let path = CGMutablePath()
-        let sides = 8
-        let radius = size * 0.42
-        let angleOffset = CGFloat.pi / CGFloat(sides) // Rotate to have flat top
-
-        for i in 0..<sides {
-            let angle = CGFloat(i) / CGFloat(sides) * .pi * 2 + angleOffset
-            let x = cos(angle) * radius
-            let y = sin(angle) * radius
-
-            if i == 0 {
-                path.move(to: CGPoint(x: x, y: y))
-            } else {
-                path.addLine(to: CGPoint(x: x, y: y))
-            }
-        }
-        path.closeSubpath()
-        return path
     }
 }

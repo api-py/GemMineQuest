@@ -8,15 +8,19 @@ enum ParticleEffects {
         container.position = position
         container.zPosition = 50
 
-        let particleCount = 12
+        let particleCount = 20
         for _ in 0..<particleCount {
-            let particle = SKShapeNode(circleOfRadius: CGFloat.random(in: 1.5...4.0))
-            particle.fillColor = color
-            particle.strokeColor = .clear
+            let size = CGFloat.random(in: 4...10)
+            let particle = SKSpriteNode(texture: TextureFactory.shared.softGlowTexture(size: size))
+            particle.size = CGSize(width: size, height: size)
+            particle.color = color
+            particle.colorBlendFactor = 1.0
+            particle.blendMode = .add
             particle.position = .zero
+            particle.zRotation = CGFloat.random(in: 0...(.pi * 2))
 
             let angle = CGFloat.random(in: 0...(.pi * 2))
-            let speed = CGFloat.random(in: 40...100)
+            let speed = CGFloat.random(in: 40...120)
             let endPoint = CGPoint(x: cos(angle) * speed, y: sin(angle) * speed)
             let duration = TimeInterval.random(in: 0.3...0.6)
 
@@ -24,7 +28,8 @@ enum ParticleEffects {
                 SKAction.group([
                     SKAction.move(to: endPoint, duration: duration),
                     SKAction.fadeOut(withDuration: duration),
-                    SKAction.scale(to: 0.1, duration: duration)
+                    SKAction.scale(to: 0.1, duration: duration),
+                    SKAction.rotate(byAngle: CGFloat.random(in: -2...2), duration: duration)
                 ]),
                 SKAction.removeFromParent()
             ])
@@ -32,13 +37,13 @@ enum ParticleEffects {
             container.addChild(particle)
         }
 
-        // White flash
-        let flash = SKShapeNode(circleOfRadius: 15)
-        flash.fillColor = SKColor(white: 1.0, alpha: 0.6)
-        flash.strokeColor = .clear
+        // White flash with glow texture
+        let flashTex = TextureFactory.shared.softGlowTexture(size: 30)
+        let flash = SKSpriteNode(texture: flashTex, size: CGSize(width: 40, height: 40))
+        flash.blendMode = .add
         flash.run(SKAction.sequence([
             SKAction.group([
-                SKAction.scale(to: 2.0, duration: 0.15),
+                SKAction.scale(to: 3.0, duration: 0.15),
                 SKAction.fadeOut(withDuration: 0.15)
             ]),
             SKAction.removeFromParent()
@@ -63,7 +68,7 @@ enum ParticleEffects {
         let length = sqrt(dx * dx + dy * dy)
         let angle = atan2(dy, dx)
 
-        // Main beam
+        // Main beam with glow
         let beam = SKShapeNode(rectOf: CGSize(width: length, height: 6), cornerRadius: 3)
         beam.fillColor = color.withAlphaComponent(0.8)
         beam.strokeColor = .white
@@ -72,6 +77,18 @@ enum ParticleEffects {
         beam.position = CGPoint(x: (start.x + end.x) / 2, y: (start.y + end.y) / 2)
         beam.zRotation = angle
         container.addChild(beam)
+
+        // Additive glow overlay
+        let glowTex = TextureFactory.shared.softGlowTexture(size: 16)
+        let glow = SKSpriteNode(texture: glowTex)
+        glow.size = CGSize(width: length * 1.05, height: 20)
+        glow.color = color
+        glow.colorBlendFactor = 1.0
+        glow.alpha = 0.5
+        glow.blendMode = .add
+        glow.position = beam.position
+        glow.zRotation = angle
+        container.addChild(glow)
 
         // Fade out
         container.run(SKAction.sequence([
@@ -89,7 +106,7 @@ enum ParticleEffects {
         container.position = position
         container.zPosition = 50
 
-        // Expanding ring
+        // Expanding ring with glow
         let ring = SKShapeNode(circleOfRadius: 5)
         ring.fillColor = .clear
         ring.strokeColor = SKColor(hex: 0xFF8C00)
@@ -105,34 +122,39 @@ enum ParticleEffects {
             SKAction.removeFromParent()
         ]))
 
-        // Central flash
-        let flash = SKShapeNode(circleOfRadius: 20)
-        flash.fillColor = SKColor(white: 1.0, alpha: 0.8)
-        flash.strokeColor = .clear
+        // Central flash with glow texture
+        let flashTex = TextureFactory.shared.softGlowTexture(size: 40)
+        let flash = SKSpriteNode(texture: flashTex, size: CGSize(width: 50, height: 50))
+        flash.blendMode = .add
+        flash.alpha = 0.9
         container.addChild(flash)
 
         flash.run(SKAction.sequence([
             SKAction.group([
-                SKAction.scale(to: 3.0, duration: 0.2),
+                SKAction.scale(to: 4.0, duration: 0.2),
                 SKAction.fadeOut(withDuration: 0.2)
             ]),
             SKAction.removeFromParent()
         ]))
 
-        // Debris particles
-        for _ in 0..<16 {
-            let debris = SKShapeNode(circleOfRadius: CGFloat.random(in: 2...5))
-            debris.fillColor = [ColorPalette.mineBlastOrange, ColorPalette.sparkleGold, .white].randomElement()!
-            debris.strokeColor = .clear
+        // Debris particles with glow textures
+        for _ in 0..<20 {
+            let size = CGFloat.random(in: 6...14)
+            let debris = SKSpriteNode(texture: TextureFactory.shared.softGlowTexture(size: size))
+            debris.size = CGSize(width: size, height: size)
+            debris.color = [ColorPalette.mineBlastOrange, ColorPalette.sparkleGold, .white].randomElement()!
+            debris.colorBlendFactor = 1.0
+            debris.blendMode = .add
 
             let angle = CGFloat.random(in: 0...(.pi * 2))
-            let dist = CGFloat.random(in: 50...120)
+            let dist = CGFloat.random(in: 50...140)
             let endPoint = CGPoint(x: cos(angle) * dist, y: sin(angle) * dist)
 
             debris.run(SKAction.sequence([
                 SKAction.group([
                     SKAction.move(to: endPoint, duration: 0.4),
-                    SKAction.fadeOut(withDuration: 0.4)
+                    SKAction.fadeOut(withDuration: 0.4),
+                    SKAction.scale(to: 0.2, duration: 0.4)
                 ]),
                 SKAction.removeFromParent()
             ]))
@@ -155,14 +177,16 @@ enum ParticleEffects {
 
         let colors: [SKColor] = [.red, .orange, .yellow, .green, .cyan, .blue, .purple]
         for (i, color) in colors.enumerated() {
-            let ring = SKShapeNode(circleOfRadius: 3)
-            ring.fillColor = .clear
-            ring.strokeColor = color
-            ring.lineWidth = 2
-            ring.glowWidth = 3
+            // Use sparkle texture for each ring
+            let sparkle = SKSpriteNode(texture: TextureFactory.shared.softGlowTexture(size: 20))
+            sparkle.size = CGSize(width: 20, height: 20)
+            sparkle.color = color
+            sparkle.colorBlendFactor = 1.0
+            sparkle.alpha = 0.8
+            sparkle.blendMode = .add
 
             let delay = Double(i) * 0.05
-            ring.run(SKAction.sequence([
+            sparkle.run(SKAction.sequence([
                 SKAction.wait(forDuration: delay),
                 SKAction.group([
                     SKAction.scale(to: 15.0, duration: 0.6),
@@ -170,7 +194,7 @@ enum ParticleEffects {
                 ]),
                 SKAction.removeFromParent()
             ]))
-            container.addChild(ring)
+            container.addChild(sparkle)
         }
 
         container.run(SKAction.sequence([
@@ -187,13 +211,19 @@ enum ParticleEffects {
         container.position = position
         container.zPosition = 60
 
-        for _ in 0..<30 {
-            let sparkle = SKShapeNode(circleOfRadius: CGFloat.random(in: 2...6))
-            sparkle.fillColor = [ColorPalette.sparkleGold, ColorPalette.sparkleWhite, ColorPalette.mineBlastOrange].randomElement()!
-            sparkle.strokeColor = .clear
+        for _ in 0..<50 {
+            let useSparkle = Bool.random()
+            let size = CGFloat.random(in: 4...14)
+            let tex = useSparkle ? TextureFactory.shared.sparkleTexture(size: size) : TextureFactory.shared.softGlowTexture(size: size)
+            let sparkle = SKSpriteNode(texture: tex)
+            sparkle.size = CGSize(width: size, height: size)
+            sparkle.color = [ColorPalette.sparkleGold, ColorPalette.sparkleWhite, ColorPalette.mineBlastOrange].randomElement()!
+            sparkle.colorBlendFactor = 1.0
+            sparkle.blendMode = .add
+            sparkle.zRotation = CGFloat.random(in: 0...(.pi * 2))
 
             let angle = CGFloat.random(in: 0...(.pi * 2))
-            let dist = CGFloat.random(in: 80...200)
+            let dist = CGFloat.random(in: 80...220)
             let endPoint = CGPoint(x: cos(angle) * dist, y: sin(angle) * dist)
             let duration = TimeInterval.random(in: 0.5...1.0)
 
@@ -201,7 +231,8 @@ enum ParticleEffects {
                 SKAction.group([
                     SKAction.move(to: endPoint, duration: duration),
                     SKAction.fadeOut(withDuration: duration),
-                    SKAction.scale(to: 0.0, duration: duration)
+                    SKAction.scale(to: 0.0, duration: duration),
+                    SKAction.rotate(byAngle: CGFloat.random(in: -3...3), duration: duration)
                 ]),
                 SKAction.removeFromParent()
             ]))
@@ -214,5 +245,18 @@ enum ParticleEffects {
         ]))
 
         return container
+    }
+
+    /// Screen shake effect for explosive moments
+    static func screenShake(on node: SKNode, intensity: CGFloat = 4, duration: TimeInterval = 0.3) {
+        let shakeCount = Int(duration / 0.03)
+        var actions: [SKAction] = []
+        for _ in 0..<shakeCount {
+            let dx = CGFloat.random(in: -intensity...intensity)
+            let dy = CGFloat.random(in: -intensity...intensity)
+            actions.append(SKAction.moveBy(x: dx, y: dy, duration: 0.03))
+        }
+        actions.append(SKAction.move(to: .zero, duration: 0.05))
+        node.run(SKAction.sequence(actions))
     }
 }

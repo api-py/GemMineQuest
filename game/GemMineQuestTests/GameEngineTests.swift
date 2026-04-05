@@ -55,8 +55,8 @@ final class GameEngineTests: XCTestCase {
         board.setGem(Gem(color: .ruby, row: 0, column: 0), at: GridPosition(row: 0, column: 0))
         board.setGem(Gem(color: .sapphire, row: 0, column: 1), at: GridPosition(row: 0, column: 1))
         board.setGem(Gem(color: .emerald, row: 0, column: 2), at: GridPosition(row: 0, column: 2))
-        board.setGem(Gem(color: .topaz, row: 1, column: 0), at: GridPosition(row: 1, column: 0))
-        board.setGem(Gem(color: .citrine, row: 1, column: 1), at: GridPosition(row: 1, column: 1))
+        board.setGem(Gem(color: .gold, row: 1, column: 0), at: GridPosition(row: 1, column: 0))
+        board.setGem(Gem(color: .silver, row: 1, column: 1), at: GridPosition(row: 1, column: 1))
 
         let events = engine.handleSwap(
             from: GridPosition(row: 0, column: 0),

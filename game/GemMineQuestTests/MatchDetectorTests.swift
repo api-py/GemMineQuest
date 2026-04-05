@@ -60,10 +60,10 @@ final class MatchDetectorTests: XCTestCase {
 
     func testSquareMatchCreatesDrone() {
         let board = makeBoard()
-        placeGem(board, color: .topaz, row: 0, col: 0)
-        placeGem(board, color: .topaz, row: 0, col: 1)
-        placeGem(board, color: .topaz, row: 1, col: 0)
-        placeGem(board, color: .topaz, row: 1, col: 1)
+        placeGem(board, color: .gold, row: 0, col: 0)
+        placeGem(board, color: .gold, row: 0, col: 1)
+        placeGem(board, color: .gold, row: 1, col: 0)
+        placeGem(board, color: .gold, row: 1, col: 1)
         // Different colors around
         placeGem(board, color: .ruby, row: 0, col: 2)
         placeGem(board, color: .sapphire, row: 1, col: 2)

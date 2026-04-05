@@ -36,10 +36,10 @@ enum Constants {
     static let mineBlastDronePoints = 250
 
     // MARK: - Board Layout
-    static let maxGemSize: CGFloat = 56.0
-    static let minGemSize: CGFloat = 32.0
-    static let boardPadding: CGFloat = 8.0
-    static let gemSpacing: CGFloat = 2.0
+    static let maxGemSize: CGFloat = 68.0
+    static let minGemSize: CGFloat = 36.0
+    static let boardPadding: CGFloat = 14.0
+    static let gemSpacing: CGFloat = 3.0
     static let hudHeight: CGFloat = 120.0
 
     // MARK: - Level Generation

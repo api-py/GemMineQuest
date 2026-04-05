@@ -55,7 +55,7 @@ struct MainMenuView: View {
                 .padding(.bottom, 10)
 
                 // Subtitle
-                Text("Mine precious gems deep underground")
+                Text("Mine gems & precious metals deep underground")
                     .font(.subheadline)
                     .foregroundColor(Color(hex: 0xCCBB99))
                     .padding(.bottom, 60)
@@ -114,9 +114,14 @@ struct MainMenuView: View {
 
     private func gemDecorationColor(_ index: Int) -> Color {
         let colors: [Color] = [
-            Color(hex: 0xE0115F), Color(hex: 0xFF8C00), Color(hex: 0xFFD700),
-            Color(hex: 0x50C878), Color(hex: 0x0F52BA), Color(hex: 0x9966CC),
-            Color(hex: 0xFFD700), Color(hex: 0xE0115F)
+            Color(hex: 0xE0115F), // Ruby red
+            Color(hex: 0xFFD700), // Gold
+            Color(hex: 0x50C878), // Emerald green
+            Color(hex: 0x0F52BA), // Sapphire blue
+            Color(hex: 0x9966CC), // Amethyst purple
+            Color(hex: 0xC0C0C0), // Silver
+            Color(hex: 0xFFD700), // Gold accent
+            Color(hex: 0xE0115F)  // Ruby accent
         ]
         return colors[index % colors.count]
     }

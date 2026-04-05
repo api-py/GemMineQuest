@@ -101,6 +101,14 @@ extension SKAction {
         let bounceUp = SKAction.moveBy(x: 0, y: 3, duration: 0.05)
         return SKAction.sequence([fall, bounceDown, bounceUp])
     }
+
+    static func springScale(to scale: CGFloat, duration: TimeInterval) -> SKAction {
+        let overshoot = SKAction.scale(to: scale * 1.15, duration: duration * 0.6)
+        overshoot.timingMode = .easeOut
+        let settle = SKAction.scale(to: scale, duration: duration * 0.4)
+        settle.timingMode = .easeInEaseOut
+        return SKAction.sequence([overshoot, settle])
+    }
 }
 
 // MARK: - Seeded Random Number Generator

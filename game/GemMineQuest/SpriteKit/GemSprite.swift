@@ -59,6 +59,13 @@ class GemSprite: SKNode {
         default:
             break
         }
+
+        // Idle breathing animation (subtle)
+        let breathe = SKAction.sequence([
+            SKAction.scale(to: 1.03, duration: 1.2),
+            SKAction.scale(to: 1.0, duration: 1.2)
+        ])
+        bodyNode?.run(SKAction.repeatForever(breathe), withKey: "breathe")
     }
 
     /// Update visual when gem becomes special
@@ -69,9 +76,13 @@ class GemSprite: SKNode {
     /// Highlight when selected
     func setHighlighted(_ highlighted: Bool) {
         if highlighted {
-            run(SKAction.scale(to: 1.1, duration: 0.1))
+            let overshoot = SKAction.scale(to: 1.18, duration: 0.08)
+            overshoot.timingMode = .easeOut
+            let settle = SKAction.scale(to: 1.12, duration: 0.06)
+            settle.timingMode = .easeInEaseOut
+            run(SKAction.sequence([overshoot, settle]), withKey: "highlight")
         } else {
-            run(SKAction.scale(to: 1.0, duration: 0.1))
+            run(SKAction.scale(to: 1.0, duration: 0.1), withKey: "highlight")
         }
     }
 }

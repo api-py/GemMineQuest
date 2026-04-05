@@ -4,7 +4,7 @@ class TileSprite: SKNode {
 
     let gridPosition: GridPosition
     let tileSize: CGFloat
-    private var backgroundNode: SKShapeNode?
+    private var backgroundNode: SKSpriteNode?
     private var overlayNode: SKNode?
 
     init(position: GridPosition, tileType: TileType, blocker: BlockerType?, size: CGFloat) {
@@ -24,13 +24,9 @@ class TileSprite: SKNode {
 
         guard tileType != .empty else { return }
 
-        // Base tile
-        let inset: CGFloat = 1.0
-        let rect = CGSize(width: tileSize - inset * 2, height: tileSize - inset * 2)
-        let bg = SKShapeNode(rectOf: rect, cornerRadius: 4)
-        bg.fillColor = ColorPalette.tileNormal
-        bg.strokeColor = SKColor(white: 0.3, alpha: 0.2)
-        bg.lineWidth = 0.5
+        // Base tile (texture-based with bevel)
+        let tileTex = TextureFactory.shared.tileTexture(size: tileSize)
+        let bg = SKSpriteNode(texture: tileTex, size: CGSize(width: tileSize, height: tileSize))
         backgroundNode = bg
         addChild(bg)
 
@@ -94,12 +90,15 @@ class TileSprite: SKNode {
         ore.lineWidth = double ? 2.0 : 1.5
         container.addChild(ore)
 
-        // Speckles
+        // Sparkle speckles using glow textures
         let speckleCount = double ? 6 : 3
         for _ in 0..<speckleCount {
-            let speckle = SKShapeNode(circleOfRadius: 2)
-            speckle.fillColor = ColorPalette.sparkleGold.withAlphaComponent(0.5)
-            speckle.strokeColor = .clear
+            let glowTex = TextureFactory.shared.softGlowTexture(size: 8)
+            let speckle = SKSpriteNode(texture: glowTex, size: CGSize(width: 8, height: 8))
+            speckle.color = ColorPalette.sparkleGold
+            speckle.colorBlendFactor = 1.0
+            speckle.alpha = 0.6
+            speckle.blendMode = .add
             let maxOffset = tileSize * 0.35
             speckle.position = CGPoint(
                 x: CGFloat.random(in: -maxOffset...maxOffset),
@@ -207,7 +206,15 @@ class TileSprite: SKNode {
             lava.glowWidth = 4
             container.addChild(lava)
 
-            // Pulsing glow
+            // Additive glow overlay
+            let glowTex = TextureFactory.shared.softGlowTexture(size: tileSize)
+            let glowSprite = SKSpriteNode(texture: glowTex, size: CGSize(width: tileSize, height: tileSize))
+            glowSprite.color = ColorPalette.lavaGlow
+            glowSprite.colorBlendFactor = 1.0
+            glowSprite.alpha = 0.3
+            glowSprite.blendMode = .add
+            container.addChild(glowSprite)
+
             lava.run(VisualEffects.pulseAction(scale: 1.05, duration: 1.0))
 
         case .tnt(let countdown):
@@ -218,7 +225,7 @@ class TileSprite: SKNode {
             container.addChild(tntBody)
 
             let label = SKLabelNode(text: "\(countdown)")
-            label.fontName = "AvenirNext-Bold"
+            label.fontName = "AvenirNext-Heavy"
             label.fontSize = tileSize * 0.35
             label.fontColor = .white
             label.verticalAlignmentMode = .center
@@ -235,6 +242,16 @@ class TileSprite: SKNode {
             fuse.strokeColor = SKColor(hex: 0xDEB887)
             fuse.lineWidth = 1.5
             container.addChild(fuse)
+
+            // Fuse spark glow
+            let sparkTex = TextureFactory.shared.softGlowTexture(size: 12)
+            let spark = SKSpriteNode(texture: sparkTex, size: CGSize(width: 12, height: 12))
+            spark.color = .orange
+            spark.colorBlendFactor = 1.0
+            spark.blendMode = .add
+            spark.position = CGPoint(x: tileSize * 0.15, y: tileSize * 0.5)
+            spark.run(VisualEffects.shimmerAction(duration: 0.5))
+            container.addChild(spark)
 
         case .amber:
             let amberRect = SKShapeNode(rectOf: CGSize(width: tileSize * 0.85, height: tileSize * 0.85), cornerRadius: 6)

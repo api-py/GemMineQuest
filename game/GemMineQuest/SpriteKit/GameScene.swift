@@ -1,4 +1,5 @@
 import SpriteKit
+import UIKit
 
 protocol GameSceneDelegate: AnyObject {
     func gameDidComplete(stars: Int, score: Int)
@@ -94,15 +95,43 @@ class GameScene: SKScene {
     // MARK: - Background
 
     private func setupBackground() {
-        // Simple dark gradient background
-        let bg = SKShapeNode(rectOf: size)
+        // Gradient background (rendered texture)
+        let bgSize = CGSize(width: size.width, height: size.height)
+        let bgRenderer = UIGraphicsImageRenderer(size: bgSize)
+        let bgImage = bgRenderer.image { ctx in
+            let gc = ctx.cgContext
+            let colorSpace = CGColorSpaceCreateDeviceRGB()
+            let topColor = UIColor(red: 0.08, green: 0.05, blue: 0.15, alpha: 1.0)   // Dark blue-purple
+            let midColor = UIColor(red: 0.12, green: 0.07, blue: 0.04, alpha: 1.0)    // Cave brown
+            let botColor = UIColor(red: 0.05, green: 0.03, blue: 0.02, alpha: 1.0)    // Near black
+            let colors = [topColor.cgColor, midColor.cgColor, botColor.cgColor] as CFArray
+            if let gradient = CGGradient(colorsSpace: colorSpace, colors: colors, locations: [0.0, 0.5, 1.0]) {
+                gc.drawLinearGradient(gradient,
+                                      start: CGPoint(x: bgSize.width / 2, y: 0),
+                                      end: CGPoint(x: bgSize.width / 2, y: bgSize.height),
+                                      options: [])
+            }
+            // Subtle vignette
+            let vignetteColors = [
+                UIColor(white: 0.0, alpha: 0.0).cgColor,
+                UIColor(white: 0.0, alpha: 0.4).cgColor
+            ] as CFArray
+            if let vignetteGrad = CGGradient(colorsSpace: colorSpace, colors: vignetteColors, locations: [0.0, 1.0]) {
+                let center = CGPoint(x: bgSize.width / 2, y: bgSize.height / 2)
+                let radius = max(bgSize.width, bgSize.height) * 0.7
+                gc.drawRadialGradient(vignetteGrad,
+                                      startCenter: center, startRadius: radius * 0.3,
+                                      endCenter: center, endRadius: radius,
+                                      options: [.drawsAfterEndLocation])
+            }
+        }
+        let bgTex = SKTexture(image: bgImage)
+        let bg = SKSpriteNode(texture: bgTex, size: bgSize)
         bg.position = CGPoint(x: size.width / 2, y: size.height / 2)
-        bg.fillColor = ColorPalette.background
-        bg.strokeColor = .clear
         bg.zPosition = -10
         addChild(bg)
 
-        // Board background
+        // Board dark background
         let boardBg = SKShapeNode(rectOf: CGSize(
             width: layout.boardSize.width + 12,
             height: layout.boardSize.height + 12
@@ -112,10 +141,54 @@ class GameScene: SKScene {
             y: layout.boardOrigin.y + layout.boardSize.height / 2
         )
         boardBg.fillColor = ColorPalette.boardBackground
-        boardBg.strokeColor = SKColor(hex: 0x6B4F3A, alpha: 0.3)
-        boardBg.lineWidth = 1.5
+        boardBg.strokeColor = .clear
         boardBg.zPosition = -5
         boardLayer.addChild(boardBg)
+
+        // Golden decorative frame around board
+        let frameSize = CGSize(
+            width: layout.boardSize.width + 24,
+            height: layout.boardSize.height + 24
+        )
+        let frameTex = TextureFactory.shared.boardFrameTexture(size: frameSize, frameWidth: 6)
+        let frame = SKSpriteNode(texture: frameTex, size: frameSize)
+        frame.position = boardBg.position
+        frame.zPosition = -4
+        boardLayer.addChild(frame)
+
+        // Ambient dust particles
+        addAmbientParticles()
+    }
+
+    private func addAmbientParticles() {
+        let glowTex = TextureFactory.shared.softGlowTexture(size: 8)
+        let emitter = SKEmitterNode()
+        emitter.particleTexture = glowTex
+        emitter.particleBirthRate = 3
+        emitter.particleLifetime = 6
+        emitter.particleLifetimeRange = 3
+        emitter.emissionAngle = .pi / 2
+        emitter.emissionAngleRange = .pi * 2
+        emitter.particleSpeed = 8
+        emitter.particleSpeedRange = 5
+        emitter.particleAlpha = 0.15
+        emitter.particleAlphaRange = 0.1
+        emitter.particleAlphaSpeed = -0.02
+        emitter.particleScale = 0.3
+        emitter.particleScaleRange = 0.2
+        emitter.particleColor = ColorPalette.sparkleGold
+        emitter.particleColorBlendFactor = 1.0
+        emitter.particleBlendMode = .add
+        emitter.position = CGPoint(
+            x: layout.boardOrigin.x + layout.boardSize.width / 2,
+            y: layout.boardOrigin.y + layout.boardSize.height / 2
+        )
+        emitter.particlePositionRange = CGVector(
+            dx: layout.boardSize.width,
+            dy: layout.boardSize.height
+        )
+        emitter.zPosition = 5
+        boardLayer.addChild(emitter)
     }
 
     // MARK: - Sprite Building

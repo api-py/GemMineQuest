@@ -36,4 +36,16 @@ enum ColorPalette {
     static let sparkleGold = SKColor(hex: 0xFFD700)
     static let dustBrown = SKColor(hex: 0x8B7355)
     static let mineBlastOrange = SKColor(hex: 0xFF8C00)
+
+    // MARK: - Metallic Colors (for gold/silver gem accents)
+    static let metallicGoldHighlight = SKColor(hex: 0xFFF8DC)
+    static let metallicGoldBase = SKColor(hex: 0xFFD700)
+    static let metallicGoldShadow = SKColor(hex: 0xB8860B)
+    static let metallicSilverHighlight = SKColor(hex: 0xE8E8E8)
+    static let metallicSilverBase = SKColor(hex: 0xC0C0C0)
+    static let metallicSilverShadow = SKColor(hex: 0x708090)
+
+    // MARK: - Frame & Chrome
+    static let frameGold = SKColor(hex: 0xD4A035)
+    static let frameGoldDark = SKColor(hex: 0x8B6914)
 }
