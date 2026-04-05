@@ -29,10 +29,20 @@ class GameEngine {
         guard board[posA] != nil, board[posB] != nil else { return [] }
         guard board.isPlayable(posA), board.isPlayable(posB) else { return [] }
 
-        if case .cage = board.blockerAt(posA) { return [.invalidSwap(from: posA, to: posB)] }
-        if case .cage = board.blockerAt(posB) { return [.invalidSwap(from: posA, to: posB)] }
-        if case .amber = board.blockerAt(posA) { return [.invalidSwap(from: posA, to: posB)] }
-        if case .amber = board.blockerAt(posB) { return [.invalidSwap(from: posA, to: posB)] }
+        if let blockerA = board.blockerAt(posA) {
+            switch blockerA {
+            case .cage, .amber, .granite, .boulder, .lava:
+                return [.invalidSwap(from: posA, to: posB)]
+            default: break
+            }
+        }
+        if let blockerB = board.blockerAt(posB) {
+            switch blockerB {
+            case .cage, .amber, .granite, .boulder, .lava:
+                return [.invalidSwap(from: posA, to: posB)]
+            default: break
+            }
+        }
 
         let gemA = board[posA]!
         let gemB = board[posB]!
@@ -102,7 +112,10 @@ class GameEngine {
         var events: [GameEvent] = []
         var chainIndex = 0
 
-        while true {
+        var cascadeRound = 0
+        let maxCascadeRounds = 50
+        while cascadeRound < maxCascadeRounds {
+            cascadeRound += 1
             let matches = matchDetector.detectMatches(on: board)
             if matches.isEmpty { break }
 
@@ -229,7 +242,6 @@ class GameEngine {
             events.append(contentsOf: objectiveTracker.checkTreasureDrops(on: board, state: state))
 
             chainIndex += 1
-            if chainIndex > 50 { break }
         }
 
         return events

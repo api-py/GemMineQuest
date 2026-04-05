@@ -80,7 +80,6 @@ enum BoosterType: String {
     case pickaxe
     case dynamite       // 3x3 blast radius
     case gemForge       // Places a Crystal Ball + Volatile on the board
-    case swapCharge
     case droneStrike
     case mineCartRush
     case extraMoves

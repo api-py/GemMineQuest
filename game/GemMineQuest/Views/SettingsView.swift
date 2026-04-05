@@ -145,7 +145,6 @@ struct BoosterSettingsRow: View {
         case .pickaxe: return "hammer.fill"
         case .dynamite: return "flame.fill"
         case .gemForge: return "wand.and.stars"
-        case .swapCharge: return "arrow.left.arrow.right"
         case .droneStrike: return "scope"
         case .mineCartRush: return "bolt.horizontal.fill"
         default: return "questionmark"
@@ -157,7 +156,6 @@ struct BoosterSettingsRow: View {
         case .pickaxe: return "Pickaxe"
         case .dynamite: return "Dynamite"
         case .gemForge: return "Gem Forge"
-        case .swapCharge: return "Swap Charge"
         case .droneStrike: return "Drone Strike"
         case .mineCartRush: return "Mine Cart Rush"
         default: return booster.rawValue

@@ -232,7 +232,7 @@ struct GameContainerView: View {
                             viewModel.scene?.activateMineCartRush()
                         case .gemForge:
                             viewModel.scene?.activateGemForge()
-                        case .pickaxe, .dynamite, .swapCharge:
+                        case .pickaxe, .dynamite:
                             viewModel.scene?.activeBooster = booster
                         default:
                             break

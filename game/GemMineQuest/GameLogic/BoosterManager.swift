@@ -17,7 +17,7 @@ class BoosterManager {
     func placeCrystalBall(on board: Board) -> GameEvent? {
         let candidates = board.allPlayablePositions().filter {
             guard let gem = board[$0] else { return false }
-            return gem.special == .none
+            return gem.special == .none && board.blockerAt($0) == nil
         }
         guard let pos = candidates.randomElement() else { return nil }
 
@@ -34,7 +34,7 @@ class BoosterManager {
         var events: [GameEvent] = []
         let candidates = board.allPlayablePositions().filter {
             guard let gem = board[$0] else { return false }
-            return gem.special == .none
+            return gem.special == .none && board.blockerAt($0) == nil
         }.shuffled()
 
         // Place one laser gem
@@ -63,7 +63,7 @@ class BoosterManager {
 
         let candidates = board.allPlayablePositions().filter {
             guard let gem = board[$0] else { return false }
-            return gem.special == .none
+            return gem.special == .none && board.blockerAt($0) == nil
         }.shuffled()
 
         // Filter out positions adjacent to existing specials (least priority for crystal ball)
@@ -120,9 +120,20 @@ class BoosterManager {
 
         for target in affected {
             board.removeGem(at: target)
-            if board.blockerAt(target) != nil {
-                board.setBlocker(nil, at: target)
-                events.append(.blockerDestroyed(at: target))
+            if let blocker = board.blockerAt(target) {
+                switch blocker {
+                case .granite(let layers):
+                    if layers > 1 {
+                        board.setBlocker(.granite(layers: layers - 1), at: target)
+                        events.append(.blockerDamaged(at: target, type: blocker))
+                    } else {
+                        board.setBlocker(nil, at: target)
+                        events.append(.blockerDestroyed(at: target))
+                    }
+                default:
+                    board.setBlocker(nil, at: target)
+                    events.append(.blockerDestroyed(at: target))
+                }
             }
         }
         events.append(contentsOf: blockerManager.processMatchAdjacent(
@@ -170,16 +181,6 @@ class BoosterManager {
         events.append(.scoreUpdated(newScore: state.score, delta: delta, at: pos))
 
         return events
-    }
-
-    /// Swap Charge: swap two adjacent gems without using a move
-    func useSwapCharge(from posA: GridPosition, to posB: GridPosition,
-                        on board: Board) -> [GameEvent] {
-        guard GridPosition.isAdjacent(posA, posB),
-              board[posA] != nil, board[posB] != nil else { return [] }
-
-        board.swapGems(posA, posB)
-        return [.boosterUsed(type: .swapCharge), .swap(from: posA, to: posB)]
     }
 
     /// Drone Strike: deploy 3 drones to clear random targets

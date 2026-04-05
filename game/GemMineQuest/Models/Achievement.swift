@@ -110,7 +110,7 @@ enum Achievement: String, CaseIterable {
             guard completed.count >= 5 else { return false }
             for i in 0..<(completed.count - 4) {
                 let slice = Array(completed[i..<(i + 5)])
-                if slice.last! - slice.first! == 4 { return true }
+                if let last = slice.last, let first = slice.first, last - first == 4 { return true }
             }
             return false
         case .explosionExpert:

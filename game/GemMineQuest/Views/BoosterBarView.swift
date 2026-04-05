@@ -38,10 +38,6 @@ struct BoosterBarView: View {
                               count: inventory.count(for: .gemForge), godMode: inventory.godModeActive,
                               onTap: { onBoosterSelected(.gemForge) },
                               onLongPress: { withAnimation { showingHint = .gemForge }; dismissHint() })
-                BoosterButton(icon: "arrow.left.arrow.right", label: "Swap", hint: "Free swap",
-                              count: inventory.count(for: .swapCharge), godMode: inventory.godModeActive,
-                              onTap: { onBoosterSelected(.swapCharge) },
-                              onLongPress: { withAnimation { showingHint = .swapCharge }; dismissHint() })
                 BoosterButton(icon: "scope", label: "Drone", hint: "Seek 5",
                               count: inventory.count(for: .droneStrike), godMode: inventory.godModeActive,
                               onTap: { onBoosterSelected(.droneStrike) },
@@ -87,7 +83,6 @@ struct BoosterBarView: View {
         case .pickaxe: return "Pickaxe — Tap any gem to destroy it instantly"
         case .dynamite: return "Dynamite — Tap to blast a 3x3 area"
         case .gemForge: return "Gem Forge — Places a Crystal Ball and Volatile gem"
-        case .swapCharge: return "Swap Charge — Swap any two gems, no move cost"
         case .droneStrike: return "Drone Strike — 5 seekers target random gems"
         case .mineCartRush: return "Mine Cart Rush — Converts a row to laser gems"
         default: return ""

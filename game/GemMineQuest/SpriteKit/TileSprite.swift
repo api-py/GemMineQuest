@@ -258,9 +258,10 @@ class TileSprite: SKNode {
             // Inner bevel: slightly lighter rect inset by 2px
             let insetRect = CGSize(width: rect.width - 4, height: rect.height - 4)
             let innerBevel = SKShapeNode(rectOf: insetRect, cornerRadius: 3)
-            let bevelR = min(1.0, (graniteColor.cgColor.components?[0] ?? 0.5) + 0x10 / 255.0)
-            let bevelG = min(1.0, (graniteColor.cgColor.components?[1] ?? 0.5) + 0x10 / 255.0)
-            let bevelB = min(1.0, (graniteColor.cgColor.components?[2] ?? 0.5) + 0x10 / 255.0)
+            let components = graniteColor.cgColor.components ?? [0.5, 0.5, 0.5]
+            let bevelR = min(1.0, (components.count > 0 ? components[0] : 0.5) + CGFloat(0x10) / 255.0)
+            let bevelG = min(1.0, (components.count > 1 ? components[1] : 0.5) + CGFloat(0x10) / 255.0)
+            let bevelB = min(1.0, (components.count > 2 ? components[2] : 0.5) + CGFloat(0x10) / 255.0)
             innerBevel.fillColor = SKColor(red: bevelR, green: bevelG, blue: bevelB, alpha: 1.0)
             innerBevel.strokeColor = .clear
             container.addChild(innerBevel)

@@ -80,6 +80,10 @@ class BoardFiller {
                     let targetRow = row - holeCount
                     guard targetRow >= 0 else { continue }
                     let targetPos = GridPosition(row: targetRow, column: col)
+                    // Don't drop gems onto positions with immovable blockers
+                    if isImmovableBlocker(board: board, pos: targetPos) {
+                        continue
+                    }
                     if let gem = board[pos] {
                         board.removeGem(at: pos)
                         board.setGem(gem, at: targetPos)
@@ -107,6 +111,7 @@ class BoardFiller {
 
                 guard board.isPlayable(pos) else { continue }
                 guard board[pos] == nil else { continue }
+                guard !isImmovableBlocker(board: board, pos: pos) else { continue }
                 guard cannotFillVertically(board: board, col: col, row: row) else { continue }
 
                 // Try upper-left first (left bias)
@@ -166,13 +171,11 @@ class BoardFiller {
     }
 
     private func isBlockedPosition(board: Board, pos: GridPosition) -> Bool {
-        if let blocker = board.blockerAt(pos) {
-            switch blocker {
-            case .boulder: return true
-            default: return false
-            }
+        guard let blocker = board.blockerAt(pos) else { return false }
+        switch blocker {
+        case .boulder, .granite: return true
+        default: return false
         }
-        return false
     }
 
     // MARK: - Initial Fill

@@ -17,7 +17,6 @@ struct ShopItem: Identifiable {
         ShopItem(id: "drone_3", boosterType: .droneStrike, quantity: 3, price: 5000, displayName: "Drone x3", iconName: "scope"),
         ShopItem(id: "forge_1", boosterType: .gemForge, quantity: 1, price: 2500, displayName: "Gem Forge", iconName: "sparkles"),
         ShopItem(id: "forge_3", boosterType: .gemForge, quantity: 3, price: 6500, displayName: "Forge x3", iconName: "sparkles"),
-        ShopItem(id: "swap_3", boosterType: .swapCharge, quantity: 3, price: 1200, displayName: "Swap x3", iconName: "arrow.left.arrow.right"),
         ShopItem(id: "cart_1", boosterType: .mineCartRush, quantity: 1, price: 3000, displayName: "Mine Cart", iconName: "tram.fill"),
     ]
 }

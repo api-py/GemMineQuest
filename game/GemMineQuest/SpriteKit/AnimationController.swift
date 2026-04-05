@@ -191,16 +191,18 @@ class AnimationController {
         let posB = layout.positionFor(to)
 
         // Raise swapping gems above others to prevent overlap
-        spriteA?.zPosition = 10
-        spriteB?.zPosition = 10
+        spriteA?.zPosition = 10.0 + CGFloat(from.row) * 0.01
+        spriteB?.zPosition = 10.0 + CGFloat(to.row) * 0.01
 
+        let restingZA: CGFloat = 1.0 + CGFloat(to.row) * 0.01  // A goes to 'to' position
+        let restingZB: CGFloat = 1.0 + CGFloat(from.row) * 0.01  // B goes to 'from' position
         spriteA?.run(SKAction.sequence([
             SKAction.moveWithEase(to: posB, duration: Constants.swapDuration),
-            SKAction.run { spriteA?.zPosition = 1 }
+            SKAction.run { spriteA?.zPosition = restingZA }
         ]))
         spriteB?.run(SKAction.sequence([
             SKAction.moveWithEase(to: posA, duration: Constants.swapDuration),
-            SKAction.run { spriteB?.zPosition = 1 }
+            SKAction.run { spriteB?.zPosition = restingZB }
         ]))
 
         scene.updateGemSpriteMapping(from: from, to: to)
@@ -429,10 +431,10 @@ class AnimationController {
                 let duration = Constants.fallDurationPerRow * Double(rowDiff)
 
                 let capturedSprite = sprite
-                capturedSprite.zPosition = 5 + CGFloat(rowDiff) * 0.1  // Above stationary gems during fall
+                capturedSprite.zPosition = 10.0 + CGFloat(move.to.row) * 0.01  // Above stationary gems during fall
                 capturedSprite.run(SKAction.sequence([
                     SKAction.fallWithBounce(to: targetPos, duration: duration),
-                    SKAction.run { capturedSprite.zPosition = 1 }
+                    SKAction.run { capturedSprite.zPosition = 1.0 + CGFloat(move.to.row) * 0.01 }
                 ]))
                 scene.moveGemSprite(from: move.from, to: move.to)
                 maxDuration = max(maxDuration, duration + Constants.fallBounce)
@@ -450,7 +452,7 @@ class AnimationController {
             let sprite = GemSprite(gem: gem, size: layout.gemSize)
             sprite.position = layout.entryPositionFor(column: pos.column)
             let rowsToFall = CGFloat(scene.gameState?.board.numRows ?? 8) - CGFloat(pos.row)
-            sprite.zPosition = 10 + rowsToFall * 0.1
+            sprite.zPosition = 10.0 + CGFloat(pos.row) * 0.01
             scene.boardLayer.addChild(sprite)
             scene.setGemSprite(sprite, at: pos)
 
@@ -458,9 +460,10 @@ class AnimationController {
             let duration = Constants.fallDurationPerRow * Double(rowsToFall)
 
             let capturedSprite = sprite
+            let restingZ: CGFloat = 1.0 + CGFloat(pos.row) * 0.01
             capturedSprite.run(SKAction.sequence([
                 SKAction.fallWithBounce(to: targetPos, duration: duration),
-                SKAction.run { capturedSprite.zPosition = 1 }
+                SKAction.run { capturedSprite.zPosition = restingZ }
             ]))
             maxDuration = max(maxDuration, duration + Constants.fallBounce)
         }

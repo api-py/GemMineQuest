@@ -209,7 +209,7 @@ enum ParticleEffects {
             } else {
                 debris = SKShapeNode(rectOf: CGSize(width: size * 1.5, height: size), cornerRadius: 1)
             }
-            debris.fillColor = [ColorPalette.mineBlastOrange, ColorPalette.sparkleGold, .white, SKColor(hex: 0xFF6600)].randomElement()!
+            debris.fillColor = [ColorPalette.mineBlastOrange, ColorPalette.sparkleGold, .white, SKColor(hex: 0xFF6600)].randomElement() ?? .white
             debris.strokeColor = .clear
             debris.glowWidth = 1.0
 
@@ -348,7 +348,7 @@ enum ParticleEffects {
                 sparkle = SKShapeNode(circleOfRadius: CGFloat.random(in: 2...6))
             }
 
-            sparkle.fillColor = [ColorPalette.sparkleGold, ColorPalette.sparkleWhite, ColorPalette.mineBlastOrange].randomElement()!
+            sparkle.fillColor = [ColorPalette.sparkleGold, ColorPalette.sparkleWhite, ColorPalette.mineBlastOrange].randomElement() ?? .white
             sparkle.strokeColor = .clear
             sparkle.glowWidth = 1.5
 

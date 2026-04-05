@@ -318,7 +318,7 @@ class GameScene: SKScene {
 
                 let sprite = GemSprite(gem: gem, size: layout.gemSize)
                 sprite.position = layout.positionFor(pos)
-                sprite.zPosition = 1
+                sprite.zPosition = 1.0 + CGFloat(row) * 0.01
                 boardLayer.addChild(sprite)
                 gemSprites[row][col] = sprite
             }
@@ -361,7 +361,7 @@ class GameScene: SKScene {
 
                 let sprite = GemSprite(gem: gem, size: layout.gemSize)
                 sprite.position = layout.positionFor(pos)
-                sprite.zPosition = 1
+                sprite.zPosition = 1.0 + CGFloat(row) * 0.01
                 boardLayer.addChild(sprite)
                 if row < gemSprites.count && col < gemSprites[row].count {
                     gemSprites[row][col] = sprite
@@ -397,7 +397,7 @@ class GameScene: SKScene {
 
         let sprite = GemSprite(gem: gem, size: layout.gemSize)
         sprite.position = layout.positionFor(pos)
-        sprite.zPosition = 10
+        sprite.zPosition = 1.0 + CGFloat(pos.row) * 0.01
         boardLayer.addChild(sprite)
         gemSprites[pos.row][pos.column] = sprite
     }
@@ -410,7 +410,7 @@ class GameScene: SKScene {
             for col in 0..<board.numColumns {
                 let pos = GridPosition(row: row, column: col)
                 if let sprite = gemSpriteAt(pos) {
-                    sprite.zPosition = 1
+                    sprite.zPosition = 1.0 + CGFloat(row) * 0.01
                 }
             }
         }
@@ -892,9 +892,6 @@ class GameScene: SKScene {
             ]))
             return
 
-        case .swapCharge:
-            // TODO: swap charge needs two taps
-            break
         default:
             break
         }

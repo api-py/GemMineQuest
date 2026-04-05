@@ -43,7 +43,7 @@ class BoosterInventory: ObservableObject {
         save()
     }
 
-    static let allInGameBoosters: [BoosterType] = [.pickaxe, .dynamite, .gemForge, .swapCharge, .droneStrike, .mineCartRush]
+    static let allInGameBoosters: [BoosterType] = [.pickaxe, .dynamite, .gemForge, .droneStrike, .mineCartRush]
 
     var godModeActive: Bool = false
 
