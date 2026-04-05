@@ -29,19 +29,11 @@ class GameEngine {
         guard board[posA] != nil, board[posB] != nil else { return [] }
         guard board.isPlayable(posA), board.isPlayable(posB) else { return [] }
 
-        if let blockerA = board.blockerAt(posA) {
-            switch blockerA {
-            case .cage, .amber, .granite, .boulder, .lava, .tnt:
-                return [.invalidSwap(from: posA, to: posB)]
-            default: break
-            }
+        if board.blockerAt(posA) != nil {
+            return [.invalidSwap(from: posA, to: posB)]
         }
-        if let blockerB = board.blockerAt(posB) {
-            switch blockerB {
-            case .cage, .amber, .granite, .boulder, .lava, .tnt:
-                return [.invalidSwap(from: posA, to: posB)]
-            default: break
-            }
+        if board.blockerAt(posB) != nil {
+            return [.invalidSwap(from: posA, to: posB)]
         }
 
         let gemA = board[posA]!
