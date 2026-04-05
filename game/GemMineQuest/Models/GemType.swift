@@ -3,8 +3,8 @@ import SpriteKit
 // MARK: - Gem Colors (6 mineral types)
 enum GemColor: Int, CaseIterable, Codable {
     case ruby = 0
-    case topaz = 1
-    case citrine = 2
+    case gold = 1
+    case silver = 2
     case emerald = 3
     case sapphire = 4
     case amethyst = 5
@@ -12,8 +12,8 @@ enum GemColor: Int, CaseIterable, Codable {
     var displayName: String {
         switch self {
         case .ruby: return "Ruby"
-        case .topaz: return "Topaz"
-        case .citrine: return "Citrine"
+        case .gold: return "Gold"
+        case .silver: return "Silver"
         case .emerald: return "Emerald"
         case .sapphire: return "Sapphire"
         case .amethyst: return "Amethyst"
@@ -23,8 +23,8 @@ enum GemColor: Int, CaseIterable, Codable {
     var colorHint: String {
         switch self {
         case .ruby: return "red"
-        case .topaz: return "orange"
-        case .citrine: return "yellow"
+        case .gold: return "gold"
+        case .silver: return "silver"
         case .emerald: return "green"
         case .sapphire: return "blue"
         case .amethyst: return "purple"
@@ -34,8 +34,8 @@ enum GemColor: Int, CaseIterable, Codable {
     var primaryColor: SKColor {
         switch self {
         case .ruby: return SKColor(red: 0.95, green: 0.08, blue: 0.12, alpha: 1.0)       // Vivid red
-        case .topaz: return SKColor(red: 1.0, green: 0.55, blue: 0.05, alpha: 1.0)        // Vivid orange
-        case .citrine: return SKColor(red: 1.0, green: 0.85, blue: 0.05, alpha: 1.0)      // Vivid gold
+        case .gold: return SKColor(hex: 0xFFD700)
+        case .silver: return SKColor(hex: 0xC0C0C0)
         case .emerald: return SKColor(red: 0.05, green: 0.75, blue: 0.28, alpha: 1.0)     // Vivid green
         case .sapphire: return SKColor(red: 0.10, green: 0.25, blue: 0.90, alpha: 1.0)    // Vivid blue
         case .amethyst: return SKColor(red: 0.58, green: 0.12, blue: 0.88, alpha: 1.0)    // Vivid purple
@@ -45,8 +45,8 @@ enum GemColor: Int, CaseIterable, Codable {
     var lightColor: SKColor {
         switch self {
         case .ruby: return SKColor(red: 1.0, green: 0.45, blue: 0.48, alpha: 1.0)
-        case .topaz: return SKColor(red: 1.0, green: 0.78, blue: 0.35, alpha: 1.0)
-        case .citrine: return SKColor(red: 1.0, green: 0.95, blue: 0.45, alpha: 1.0)
+        case .gold: return SKColor(hex: 0xFFF8DC)
+        case .silver: return SKColor(hex: 0xE8E8E8)
         case .emerald: return SKColor(red: 0.30, green: 0.95, blue: 0.55, alpha: 1.0)
         case .sapphire: return SKColor(red: 0.40, green: 0.58, blue: 1.0, alpha: 1.0)
         case .amethyst: return SKColor(red: 0.78, green: 0.45, blue: 1.0, alpha: 1.0)
@@ -56,12 +56,16 @@ enum GemColor: Int, CaseIterable, Codable {
     var darkColor: SKColor {
         switch self {
         case .ruby: return SKColor(red: 0.50, green: 0.0, blue: 0.04, alpha: 1.0)
-        case .topaz: return SKColor(red: 0.55, green: 0.22, blue: 0.0, alpha: 1.0)
-        case .citrine: return SKColor(red: 0.55, green: 0.44, blue: 0.0, alpha: 1.0)
+        case .gold: return SKColor(hex: 0xB8860B)
+        case .silver: return SKColor(hex: 0x708090)
         case .emerald: return SKColor(red: 0.0, green: 0.35, blue: 0.10, alpha: 1.0)
         case .sapphire: return SKColor(red: 0.03, green: 0.10, blue: 0.45, alpha: 1.0)
         case .amethyst: return SKColor(red: 0.28, green: 0.04, blue: 0.45, alpha: 1.0)
         }
+    }
+
+    var isMetal: Bool {
+        self == .gold || self == .silver
     }
 
     static func random() -> GemColor {

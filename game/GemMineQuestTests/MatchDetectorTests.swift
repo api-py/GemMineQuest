@@ -67,8 +67,8 @@ final class MatchDetectorTests: XCTestCase {
 
     func testVerticalMatch4CreatesLaser() {
         let board = makeBoard()
-        place(board, .topaz, 0, 3); place(board, .topaz, 1, 3)
-        place(board, .topaz, 2, 3); place(board, .topaz, 3, 3)
+        place(board, .gold, 0, 3); place(board, .gold, 1, 3)
+        place(board, .gold, 2, 3); place(board, .gold, 3, 3)
         place(board, .ruby, 4, 3)
         let matches = detector.detectMatches(on: board)
         XCTAssertEqual(matches.count, 1)
@@ -91,7 +91,7 @@ final class MatchDetectorTests: XCTestCase {
 
     func testHorizontalMatch5CreatesCrystalBall() {
         let board = makeBoard()
-        for col in 0..<5 { place(board, .citrine, 1, col) }
+        for col in 0..<5 { place(board, .silver, 1, col) }
         place(board, .ruby, 1, 5)
         let matches = detector.detectMatches(on: board)
         XCTAssertEqual(matches.count, 1)
@@ -102,8 +102,8 @@ final class MatchDetectorTests: XCTestCase {
 
     func testSquareMatchCreatesDrone() {
         let board = makeBoard()
-        place(board, .topaz, 0, 0); place(board, .topaz, 0, 1)
-        place(board, .topaz, 1, 0); place(board, .topaz, 1, 1)
+        place(board, .gold, 0, 0); place(board, .gold, 0, 1)
+        place(board, .gold, 1, 0); place(board, .gold, 1, 1)
         place(board, .ruby, 0, 2); place(board, .sapphire, 1, 2)
         let matches = detector.detectMatches(on: board)
         let squares = matches.filter { $0.pattern == .square }
@@ -164,7 +164,7 @@ final class MatchDetectorTests: XCTestCase {
     func testWouldNotMatch() {
         let board = makeBoard()
         place(board, .ruby, 0, 0); place(board, .sapphire, 0, 1)
-        place(board, .emerald, 0, 2); place(board, .topaz, 0, 3)
+        place(board, .emerald, 0, 2); place(board, .gold, 0, 3)
         let from = GridPosition(row: 0, column: 0)
         let to = GridPosition(row: 0, column: 1)
         XCTAssertFalse(detector.wouldMatch(board: board, swapping: from, with: to))

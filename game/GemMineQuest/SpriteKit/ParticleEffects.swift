@@ -10,27 +10,15 @@ enum ParticleEffects {
 
         let particleCount = 16
         for i in 0..<particleCount {
-            // Mix of circles and small diamond shapes for variety
-            let particle: SKShapeNode
-            if i % 3 == 0 {
-                // Diamond-shaped fragment
-                let s = CGFloat.random(in: 2.0...5.0)
-                let path = CGMutablePath()
-                path.move(to: CGPoint(x: 0, y: s))
-                path.addLine(to: CGPoint(x: s * 0.6, y: 0))
-                path.addLine(to: CGPoint(x: 0, y: -s))
-                path.addLine(to: CGPoint(x: -s * 0.6, y: 0))
-                path.closeSubpath()
-                particle = SKShapeNode(path: path)
-            } else {
-                particle = SKShapeNode(circleOfRadius: CGFloat.random(in: 1.5...4.0))
-            }
+            let particleSize = CGFloat.random(in: 4.0...10.0)
+            let glowTex = TextureFactory.shared.softGlowTexture(size: particleSize)
+            let particle = SKSpriteNode(texture: glowTex, size: CGSize(width: particleSize, height: particleSize))
+            particle.blendMode = .add
+            particle.colorBlendFactor = 1.0
 
             // Vary between gem color, lighter, and white
             let colorVariant: SKColor = [color, color.withAlphaComponent(0.7), .white][i % 3]
-            particle.fillColor = colorVariant
-            particle.strokeColor = .clear
-            particle.glowWidth = 1.0
+            particle.color = colorVariant
             particle.position = .zero
 
             let angle = CGFloat.random(in: 0...(.pi * 2))
@@ -54,11 +42,13 @@ enum ParticleEffects {
             container.addChild(particle)
         }
 
-        // White flash (brighter, with glow)
-        let flash = SKShapeNode(circleOfRadius: 12)
-        flash.fillColor = SKColor(white: 1.0, alpha: 0.7)
-        flash.strokeColor = .clear
-        flash.glowWidth = 8
+        // White flash (brighter, with glow texture)
+        let flashTex = TextureFactory.shared.softGlowTexture(size: 24)
+        let flash = SKSpriteNode(texture: flashTex, size: CGSize(width: 24, height: 24))
+        flash.blendMode = .add
+        flash.colorBlendFactor = 1.0
+        flash.color = SKColor(white: 1.0, alpha: 1.0)
+        flash.alpha = 0.7
         flash.run(SKAction.sequence([
             SKAction.group([
                 SKAction.scale(to: 2.5, duration: 0.12),
@@ -69,10 +59,12 @@ enum ParticleEffects {
         container.addChild(flash)
 
         // Color flash
-        let colorFlash = SKShapeNode(circleOfRadius: 18)
-        colorFlash.fillColor = color.withAlphaComponent(0.4)
-        colorFlash.strokeColor = .clear
-        colorFlash.glowWidth = 5
+        let colorFlashTex = TextureFactory.shared.softGlowTexture(size: 36)
+        let colorFlash = SKSpriteNode(texture: colorFlashTex, size: CGSize(width: 36, height: 36))
+        colorFlash.blendMode = .add
+        colorFlash.colorBlendFactor = 1.0
+        colorFlash.color = color
+        colorFlash.alpha = 0.4
         colorFlash.run(SKAction.sequence([
             SKAction.group([
                 SKAction.scale(to: 2.0, duration: 0.18),
