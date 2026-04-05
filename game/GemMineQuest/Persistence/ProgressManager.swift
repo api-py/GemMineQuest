@@ -131,7 +131,7 @@ class ProgressManager: ObservableObject {
         guard let lastSpinStr = progress.lastSpinDate else { return true }
         let formatter = ISO8601DateFormatter()
         guard let lastDate = formatter.date(from: lastSpinStr) else { return true }
-        return Date().timeIntervalSince(lastDate) >= 4 * 3600  // 4 hours
+        return !Calendar.current.isDateInToday(lastDate)
     }
 
     func recordSpin() {

@@ -155,6 +155,9 @@ struct DailyRewardView: View {
             claimedReward = reward
             showClaimed = true
         }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
+            onDismiss()
+        }
     }
 
     private func dayRewardIcon(_ day: Int) -> String {

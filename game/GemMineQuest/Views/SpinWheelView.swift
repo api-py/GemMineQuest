@@ -22,8 +22,14 @@ struct SpinWheelView: View {
     ]
 
     private let segmentColors: [UInt32] = [
-        0xFF3B30, 0xFF9500, 0xFFCC00, 0x34C759,
-        0x00C7BE, 0x007AFF, 0xAF52DE, 0xFF2D55
+        0xC0392B,  // Dark red
+        0xD68910,  // Dark amber
+        0xD4AC0D,  // Dark gold
+        0x27AE60,  // Forest green
+        0x1ABC9C,  // Teal
+        0x2980B9,  // Dark blue
+        0x8E44AD,  // Dark purple
+        0xC0392B,  // Dark rose
     ]
 
     var body: some View {
@@ -136,7 +142,7 @@ struct SpinWheelView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 14))
                             .shadow(color: Color(hex: 0xC71414).opacity(0.5), radius: 8, y: 4)
                     }
-                    .disabled(isSpinning)
+                    .disabled(isSpinning || !progressManager.hasFreeSpin())
                 }
 
                 // Close button

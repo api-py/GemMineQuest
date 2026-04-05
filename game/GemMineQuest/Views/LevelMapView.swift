@@ -127,7 +127,9 @@ struct LevelMapView: View {
                                 .offset(x: 18, y: -22)
                         }
                     }.scaleEffect(spinPulse)
-                }.padding(.trailing, 20).padding(.bottom, 20)
+                }
+                .opacity(progressManager.hasFreeSpin() ? 1.0 : 0.4)
+                .padding(.trailing, 20).padding(.bottom, 20)
             }
         }
         .onAppear {

@@ -241,7 +241,6 @@ struct GameContainerView: View {
             // Objective banner on level start
             if showObjectiveBanner {
                 VStack {
-                    Spacer()
                     let level = LevelGenerator.getLevel(number: levelNumber)
                     HStack(spacing: 8) {
                         ForEach(level.objectives.indices, id: \.self) { i in
@@ -267,6 +266,7 @@ struct GameContainerView: View {
                     )
                     Spacer()
                 }
+                .padding(.top, 200)
                 .transition(.opacity)
                 .allowsHitTesting(false)
                 .zIndex(50)
@@ -349,7 +349,7 @@ struct GameContainerView: View {
             withAnimation(.easeIn(duration: 0.3)) {
                 showObjectiveBanner = true
             }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
                 withAnimation(.easeOut(duration: 0.3)) {
                     showObjectiveBanner = false
                 }

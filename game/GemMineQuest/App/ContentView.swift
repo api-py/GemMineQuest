@@ -38,7 +38,7 @@ struct ContentView: View {
                         withAnimation(.easeInOut(duration: 0.3)) { currentScreen = .levelDetail(level) }
                     },
                     onBack: { withAnimation(.easeInOut(duration: 0.3)) { currentScreen = .menu } },
-                    onSpinWheel: { showSpinWheel = true }
+                    onSpinWheel: { if progressManager.hasFreeSpin() { showSpinWheel = true } }
                 )
                 .transition(.move(edge: .trailing))
                 .onAppear { checkMilestones() }

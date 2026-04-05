@@ -80,7 +80,7 @@ struct ShopView: View {
 
     @ViewBuilder
     private func shopItemCard(_ item: ShopItem) -> some View {
-        let canAfford = progressManager.progress.coins >= item.price
+        let canAfford = isGodMode || progressManager.progress.coins >= item.price
         let justPurchased = purchasedItemId == item.id && showPurchaseFlash
 
         VStack(spacing: 8) {

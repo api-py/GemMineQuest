@@ -37,8 +37,8 @@ class TileSprite: SKNode {
         if tileType == .oreVein || tileType == .doubleOre {
             // Tint tile gold for ore
             if let sprite = backgroundNode as? SKSpriteNode {
-                sprite.color = SKColor(hex: 0xDAA520)
-                sprite.colorBlendFactor = tileType == .doubleOre ? 0.4 : 0.25
+                sprite.color = SKColor(hex: 0xFFC107)
+                sprite.colorBlendFactor = tileType == .doubleOre ? 0.55 : 0.45
             }
 
             let overlay = createOreOverlay(double: tileType == .doubleOre)
@@ -69,8 +69,8 @@ class TileSprite: SKNode {
         if tileType == .oreVein || tileType == .doubleOre {
             // Tint tile gold for ore
             if let sprite = backgroundNode as? SKSpriteNode {
-                sprite.color = SKColor(hex: 0xDAA520)
-                sprite.colorBlendFactor = tileType == .doubleOre ? 0.4 : 0.25
+                sprite.color = SKColor(hex: 0xFFC107)
+                sprite.colorBlendFactor = tileType == .doubleOre ? 0.55 : 0.45
             }
 
             let overlay = createOreOverlay(double: tileType == .doubleOre)
@@ -112,12 +112,19 @@ class TileSprite: SKNode {
         // Bright gold fill - very visible
         let ore = SKShapeNode(rectOf: rect, cornerRadius: 4)
         ore.fillColor = double
-            ? SKColor(red: 0.85, green: 0.65, blue: 0.10, alpha: 0.50)
-            : SKColor(red: 0.75, green: 0.55, blue: 0.10, alpha: 0.40)
+            ? SKColor(red: 0.85, green: 0.65, blue: 0.10, alpha: 0.70)
+            : SKColor(red: 0.75, green: 0.55, blue: 0.10, alpha: 0.60)
         ore.strokeColor = SKColor(hex: 0xFFD700)
         ore.lineWidth = double ? 3.5 : 3.0
         ore.glowWidth = double ? 4.0 : 2.5
         container.addChild(ore)
+
+        // Thin gold border stroke
+        let border = SKShapeNode(rectOf: rect, cornerRadius: 4)
+        border.fillColor = .clear
+        border.strokeColor = SKColor(hex: 0xFFD700)
+        border.lineWidth = 1.5
+        container.addChild(border)
 
         // Gold sparkle flecks - bigger and brighter
         let numFlecks = double ? 6 : 4
@@ -232,7 +239,7 @@ class TileSprite: SKNode {
             let grainColors: [SKColor]
             switch layers {
             case 3:
-                graniteColor = SKColor(hex: 0x555555)
+                graniteColor = SKColor(hex: 0x505868)
                 grainColors = [SKColor(hex: 0x4A4A4A), SKColor(hex: 0x606060), SKColor(hex: 0x505050)]
             case 2:
                 graniteColor = SKColor(hex: 0x707070)
@@ -244,33 +251,43 @@ class TileSprite: SKNode {
 
             let stone = SKShapeNode(rectOf: rect, cornerRadius: 4)
             stone.fillColor = graniteColor
-            stone.strokeColor = SKColor(hex: 0x404040)
-            stone.lineWidth = 1.5
+            stone.strokeColor = SKColor(white: 0.7, alpha: 0.4)
+            stone.lineWidth = 1.0
             container.addChild(stone)
+
+            // Inner bevel: slightly lighter rect inset by 2px
+            let insetRect = CGSize(width: rect.width - 4, height: rect.height - 4)
+            let innerBevel = SKShapeNode(rectOf: insetRect, cornerRadius: 3)
+            let bevelR = min(1.0, (graniteColor.cgColor.components?[0] ?? 0.5) + 0x10 / 255.0)
+            let bevelG = min(1.0, (graniteColor.cgColor.components?[1] ?? 0.5) + 0x10 / 255.0)
+            let bevelB = min(1.0, (graniteColor.cgColor.components?[2] ?? 0.5) + 0x10 / 255.0)
+            innerBevel.fillColor = SKColor(red: bevelR, green: bevelG, blue: bevelB, alpha: 1.0)
+            innerBevel.strokeColor = .clear
+            container.addChild(innerBevel)
 
             // Specular highlight bar across top 20%
             let highlightRect = CGSize(width: rect.width * 0.8, height: rect.height * 0.12)
             let highlight = SKShapeNode(rectOf: highlightRect, cornerRadius: 2)
-            highlight.fillColor = SKColor(white: 1.0, alpha: 0.15)
+            highlight.fillColor = SKColor(white: 1.0, alpha: 0.30)
             highlight.strokeColor = .clear
             highlight.position = CGPoint(x: 0, y: tileSize * 0.3)
             container.addChild(highlight)
 
             // Shadow strip along bottom 15%
             let shadowStrip = SKShapeNode(rectOf: CGSize(width: rect.width * 0.9, height: rect.height * 0.1), cornerRadius: 2)
-            shadowStrip.fillColor = SKColor(white: 0.0, alpha: 0.2)
+            shadowStrip.fillColor = SKColor(white: 0.0, alpha: 0.35)
             shadowStrip.strokeColor = .clear
             shadowStrip.position = CGPoint(x: 0, y: -tileSize * 0.33)
             container.addChild(shadowStrip)
 
             // Stone grain texture — small elliptical spots
             let grainData: [(CGPoint, CGSize)] = [
-                (CGPoint(x: -tileSize * 0.2, y: tileSize * 0.15), CGSize(width: tileSize * 0.12, height: tileSize * 0.06)),
-                (CGPoint(x: tileSize * 0.15, y: -tileSize * 0.1), CGSize(width: tileSize * 0.1, height: tileSize * 0.05)),
-                (CGPoint(x: -tileSize * 0.08, y: -tileSize * 0.2), CGSize(width: tileSize * 0.08, height: tileSize * 0.06)),
-                (CGPoint(x: tileSize * 0.22, y: tileSize * 0.08), CGSize(width: tileSize * 0.07, height: tileSize * 0.04)),
-                (CGPoint(x: -tileSize * 0.25, y: -tileSize * 0.05), CGSize(width: tileSize * 0.09, height: tileSize * 0.05)),
-                (CGPoint(x: tileSize * 0.05, y: tileSize * 0.25), CGSize(width: tileSize * 0.06, height: tileSize * 0.04)),
+                (CGPoint(x: -tileSize * 0.2, y: tileSize * 0.15), CGSize(width: tileSize * 0.156, height: tileSize * 0.078)),
+                (CGPoint(x: tileSize * 0.15, y: -tileSize * 0.1), CGSize(width: tileSize * 0.13, height: tileSize * 0.065)),
+                (CGPoint(x: -tileSize * 0.08, y: -tileSize * 0.2), CGSize(width: tileSize * 0.104, height: tileSize * 0.078)),
+                (CGPoint(x: tileSize * 0.22, y: tileSize * 0.08), CGSize(width: tileSize * 0.091, height: tileSize * 0.052)),
+                (CGPoint(x: -tileSize * 0.25, y: -tileSize * 0.05), CGSize(width: tileSize * 0.117, height: tileSize * 0.065)),
+                (CGPoint(x: tileSize * 0.05, y: tileSize * 0.25), CGSize(width: tileSize * 0.078, height: tileSize * 0.052)),
             ]
             for (i, (pos, size)) in grainData.enumerated() {
                 let grain = SKShapeNode(ellipseOf: size)
@@ -384,12 +401,14 @@ class TileSprite: SKNode {
             lava.fillColor = ColorPalette.lava.withAlphaComponent(0.7)
             lava.strokeColor = ColorPalette.lavaGlow
             lava.lineWidth = 2
-            lava.glowWidth = 5
+            lava.glowWidth = 2
+            lava.zPosition = -1
             container.addChild(lava)
 
             let core = SKShapeNode(rectOf: CGSize(width: tileSize * 0.5, height: tileSize * 0.5), cornerRadius: 8)
             core.fillColor = ColorPalette.lavaYellow.withAlphaComponent(0.25)
             core.strokeColor = .clear
+            core.zPosition = -1
             container.addChild(core)
 
             // Animated lava bubbles
