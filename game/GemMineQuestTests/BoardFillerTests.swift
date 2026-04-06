@@ -4,14 +4,14 @@ import XCTest
 final class BoardFillerTests: XCTestCase {
 
     func testInitialFillNoMatches() {
-        let board = Board(numRows: 8, numColumns: 8)
+        let board = Board()
         let filler = BoardFiller()
         let detector = MatchDetector()
 
         filler.initialFill(board: board, numColors: 6)
 
-        for row in 0..<8 {
-            for col in 0..<8 {
+        for row in 0..<Constants.defaultGridRows {
+            for col in 0..<Constants.defaultGridColumns {
                 XCTAssertNotNil(board[row, col], "Gem missing at (\(row), \(col))")
             }
         }
@@ -21,22 +21,22 @@ final class BoardFillerTests: XCTestCase {
     }
 
     func testSeededFillIsDeterministic() {
-        let board1 = Board(numRows: 8, numColumns: 8)
-        let board2 = Board(numRows: 8, numColumns: 8)
+        let board1 = Board()
+        let board2 = Board()
         let filler = BoardFiller()
 
         filler.initialFill(board: board1, numColors: 6, seed: 12345)
         filler.initialFill(board: board2, numColors: 6, seed: 12345)
 
-        for row in 0..<8 {
-            for col in 0..<8 {
+        for row in 0..<Constants.defaultGridRows {
+            for col in 0..<Constants.defaultGridColumns {
                 XCTAssertEqual(board1[row, col]?.color, board2[row, col]?.color)
             }
         }
     }
 
     func testDropAndFillNoGaps() {
-        let board = Board(numRows: 8, numColumns: 8)
+        let board = Board()
         let filler = BoardFiller()
         filler.initialFill(board: board, numColors: 6)
 
@@ -50,8 +50,8 @@ final class BoardFillerTests: XCTestCase {
         let _ = filler.dropAndFill(board: board)
 
         // After fill, ALL playable positions must have gems
-        for row in 0..<8 {
-            for col in 0..<8 {
+        for row in 0..<Constants.defaultGridRows {
+            for col in 0..<Constants.defaultGridColumns {
                 let pos = GridPosition(row: row, column: col)
                 if board.isPlayable(pos) {
                     XCTAssertNotNil(board[pos], "Empty gap at (\(row), \(col)) after dropAndFill")
@@ -61,7 +61,7 @@ final class BoardFillerTests: XCTestCase {
     }
 
     func testVerticalGravityGemsDropDown() {
-        let board = Board(numRows: 8, numColumns: 8)
+        let board = Board()
         let filler = BoardFiller()
 
         // Place a gem at row 5 col 0, leave rows 0-4 empty
@@ -77,7 +77,7 @@ final class BoardFillerTests: XCTestCase {
 
     func testGravityConverges() {
         // Ensure gravity doesn't loop infinitely
-        let board = Board(numRows: 8, numColumns: 8)
+        let board = Board()
         let filler = BoardFiller()
         filler.initialFill(board: board, numColors: 6)
 
@@ -98,7 +98,7 @@ final class BoardFillerTests: XCTestCase {
 
     func testShapedBoardGravity() {
         // Board with holes - gravity should respect the shape
-        let board = Board(numRows: 8, numColumns: 8)
+        let board = Board()
         // Make corners empty (not playable)
         board.tiles[0][0] = .empty
         board.tiles[0][1] = .empty
@@ -119,7 +119,7 @@ final class BoardFillerTests: XCTestCase {
 
     func testDiagonalFillAroundBlocker() {
         // Place a boulder mid-column, verify gems can roll diagonally
-        let board = Board(numRows: 8, numColumns: 8)
+        let board = Board()
         let filler = BoardFiller()
 
         // Place boulder at row 3, col 3 — this blocks vertical gravity

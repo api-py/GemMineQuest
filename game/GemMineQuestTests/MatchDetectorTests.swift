@@ -5,7 +5,7 @@ final class MatchDetectorTests: XCTestCase {
 
     let detector = MatchDetector()
 
-    private func makeBoard() -> Board { Board(numRows: 8, numColumns: 8) }
+    private func makeBoard() -> Board { Board() }
 
     private func place(_ board: Board, _ color: GemColor, _ row: Int, _ col: Int) {
         board.setGem(Gem(color: color, row: row, column: col), at: GridPosition(row: row, column: col))

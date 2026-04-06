@@ -11,7 +11,7 @@ final class CascadeTests: XCTestCase {
                 number: 1, maxMoves: 20,
                 objectives: [.reachScore(target: 100)],
                 targetScores: [100, 200, 300],
-                tileLayout: Array(repeating: Array(repeating: 1, count: 8), count: 8),
+                tileLayout: Array(repeating: Array(repeating: 1, count: Constants.defaultGridColumns), count: Constants.defaultGridRows),
                 blockerLayout: nil, treasureColumns: nil, numColors: 6
             )
             let board = level.buildBoard()
@@ -42,7 +42,7 @@ final class CascadeTests: XCTestCase {
             number: 1, maxMoves: 50,
             objectives: [.reachScore(target: 100)],
             targetScores: [100, 200, 300],
-            tileLayout: Array(repeating: Array(repeating: 1, count: 8), count: 8),
+            tileLayout: Array(repeating: Array(repeating: 1, count: Constants.defaultGridColumns), count: Constants.defaultGridRows),
             blockerLayout: nil, treasureColumns: nil, numColors: 5
         )
         let board = level.buildBoard()
@@ -80,7 +80,7 @@ final class CascadeTests: XCTestCase {
 
     /// Gravity must leave no empty playable cells
     func testGravityFillsAllGaps() {
-        let board = Board(numRows: 8, numColumns: 8)
+        let board = Board()
         let filler = BoardFiller()
         filler.initialFill(board: board, numColors: 6, seed: 42)
 

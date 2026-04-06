@@ -15,7 +15,7 @@ struct BoardLayout {
     static let topMargin: CGFloat = 100
     static let bottomMargin: CGFloat = 80
 
-    init(sceneSize: CGSize, numRows: Int = 8, numColumns: Int = 8) {
+    init(sceneSize: CGSize, numRows: Int = Constants.defaultGridRows, numColumns: Int = Constants.defaultGridColumns) {
         self.sceneSize = sceneSize
         self.numRows = numRows
         self.numColumns = numColumns

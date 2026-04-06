@@ -9,7 +9,7 @@ final class GameEngineTests: XCTestCase {
             number: 1, maxMoves: moves,
             objectives: [.reachScore(target: 100)],
             targetScores: [100, 200, 300],
-            tileLayout: Array(repeating: Array(repeating: 1, count: 8), count: 8),
+            tileLayout: Array(repeating: Array(repeating: 1, count: Constants.defaultGridColumns), count: Constants.defaultGridRows),
             blockerLayout: nil, treasureColumns: nil, numColors: colors
         )
     }
