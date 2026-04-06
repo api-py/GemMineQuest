@@ -100,6 +100,13 @@ class GameScene: SKScene {
         resetHintTimer()
     }
 
+    override func willMove(from view: SKView) {
+        hintTimer?.invalidate()
+        hintTimer = nil
+        longPressTimer?.invalidate()
+        longPressTimer = nil
+    }
+
     override func didChangeSize(_ oldSize: CGSize) {
         guard let state = gameState, size.width > 0, size.height > 0 else { return }
         layout = BoardLayout(sceneSize: size,
@@ -186,10 +193,21 @@ class GameScene: SKScene {
             width: layout.boardSize.width + frameInset,
             height: layout.boardSize.height + frameInset
         )
+
+        // Golden glow backdrop behind the frame
+        let glowFrame = SKShapeNode(rectOf: frameRect, cornerRadius: 12)
+        glowFrame.fillColor = .clear
+        glowFrame.strokeColor = ColorPalette.boardFrameGold.withAlphaComponent(0.35)
+        glowFrame.lineWidth = 10
+        glowFrame.glowWidth = 18
+        glowFrame.position = boardCenter
+        glowFrame.zPosition = -4.5
+        boardLayer.addChild(glowFrame)
+
         let frame = SKShapeNode(rectOf: frameRect, cornerRadius: 10)
         frame.fillColor = .clear
         frame.strokeColor = ColorPalette.boardFrameGold
-        frame.lineWidth = 3.5
+        frame.lineWidth = 6.0
         frame.position = boardCenter
         frame.zPosition = -4
         boardLayer.addChild(frame)
@@ -206,7 +224,19 @@ class GameScene: SKScene {
         innerFrame.zPosition = -4
         boardLayer.addChild(innerFrame)
 
-        // Corner ornaments (small diamonds at each corner)
+        // Third decorative inner accent line
+        let accentFrame = SKShapeNode(rectOf: CGSize(
+            width: layout.boardSize.width + 4,
+            height: layout.boardSize.height + 4
+        ), cornerRadius: 5)
+        accentFrame.fillColor = .clear
+        accentFrame.strokeColor = ColorPalette.boardFrameGoldLight.withAlphaComponent(0.3)
+        accentFrame.lineWidth = 0.5
+        accentFrame.position = boardCenter
+        accentFrame.zPosition = -4
+        boardLayer.addChild(accentFrame)
+
+        // Corner ornaments (larger diamonds at each corner)
         let halfW = frameRect.width / 2
         let halfH = frameRect.height / 2
         let corners = [
@@ -216,7 +246,7 @@ class GameScene: SKScene {
             CGPoint(x: halfW, y: -halfH),
         ]
         for corner in corners {
-            let ornament = createCornerOrnament(size: 8)
+            let ornament = createCornerOrnament(size: 14)
             ornament.position = CGPoint(x: boardCenter.x + corner.x, y: boardCenter.y + corner.y)
             ornament.zPosition = -3
             boardLayer.addChild(ornament)
@@ -226,8 +256,18 @@ class GameScene: SKScene {
         addAmbientParticles()
     }
 
-    /// Small decorative diamond shape for board frame corners.
+    /// Decorative diamond shape with glow for board frame corners.
     private func createCornerOrnament(size s: CGFloat) -> SKNode {
+        let container = SKNode()
+
+        // Glow circle behind diamond
+        let glow = SKShapeNode(circleOfRadius: s * 0.8)
+        glow.fillColor = ColorPalette.boardFrameGold.withAlphaComponent(0.15)
+        glow.strokeColor = .clear
+        glow.glowWidth = 6.0
+        container.addChild(glow)
+
+        // Outer diamond
         let path = CGMutablePath()
         path.move(to: CGPoint(x: 0, y: s))
         path.addLine(to: CGPoint(x: s, y: 0))
@@ -238,9 +278,25 @@ class GameScene: SKScene {
         let diamond = SKShapeNode(path: path)
         diamond.fillColor = ColorPalette.boardFrameGoldLight
         diamond.strokeColor = ColorPalette.boardFrameGold
-        diamond.lineWidth = 1.0
-        diamond.glowWidth = 2.0
-        return diamond
+        diamond.lineWidth = 1.5
+        diamond.glowWidth = 3.0
+        container.addChild(diamond)
+
+        // Inner accent diamond
+        let innerS = s * 0.45
+        let innerPath = CGMutablePath()
+        innerPath.move(to: CGPoint(x: 0, y: innerS))
+        innerPath.addLine(to: CGPoint(x: innerS, y: 0))
+        innerPath.addLine(to: CGPoint(x: 0, y: -innerS))
+        innerPath.addLine(to: CGPoint(x: -innerS, y: 0))
+        innerPath.closeSubpath()
+
+        let innerDiamond = SKShapeNode(path: innerPath)
+        innerDiamond.fillColor = ColorPalette.boardFrameGold.withAlphaComponent(0.6)
+        innerDiamond.strokeColor = .clear
+        container.addChild(innerDiamond)
+
+        return container
     }
 
     /// Adds slow-floating dust/sparkle motes behind the board.

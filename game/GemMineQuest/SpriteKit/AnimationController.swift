@@ -175,6 +175,9 @@ class AnimationController {
             scene.boardLayer.addChild(effect)
             return 0.5
 
+        case .wormAppeared(let pos):
+            return animateWorm(at: pos)
+
         default:
             return 0
         }
@@ -243,6 +246,7 @@ class AnimationController {
                     scene.boardLayer.addChild(effect)
                 }
 
+                sprite.prepareForRemoval()
                 sprite.run(SKAction.sequence([
                     SKAction.shrinkAndFade(duration: Constants.matchRemoveDuration),
                     SKAction.removeFromParent()
@@ -282,6 +286,7 @@ class AnimationController {
 
         // Always remove the activating special gem's sprite too
         if let activatingSprite = scene.gemSpriteAt(pos) {
+            activatingSprite.prepareForRemoval()
             activatingSprite.run(SKAction.sequence([
                 SKAction.shrinkAndFade(duration: 0.2),
                 SKAction.removeFromParent()
@@ -404,9 +409,11 @@ class AnimationController {
         }
         for affectedPos in affected {
             if let sprite = scene.gemSpriteAt(affectedPos) {
+                sprite.prepareForRemoval()
+                // Immediately hide the gem body to prevent lingering behind new falling gems
                 sprite.run(SKAction.sequence([
+                    SKAction.fadeOut(withDuration: 0.05),
                     SKAction.wait(forDuration: removalDelay),
-                    SKAction.shrinkAndFade(duration: 0.2),
                     SKAction.removeFromParent()
                 ]))
                 scene.removeGemSprite(at: affectedPos)
@@ -537,6 +544,7 @@ class AnimationController {
                 scene.boardLayer.addChild(effect)
 
                 if let sprite = scene.gemSpriteAt(to) {
+                    sprite.prepareForRemoval()
                     sprite.run(SKAction.sequence([
                         SKAction.shrinkAndFade(duration: 0.2),
                         SKAction.removeFromParent()
@@ -602,6 +610,95 @@ class AnimationController {
         return container
     }
 
+    // MARK: - Worm Animation
+
+    private func animateWorm(at pos: GridPosition) -> TimeInterval {
+        guard let scene = scene else { return 0 }
+        let worldPos = layout.positionFor(pos)
+
+        // Create worm body (segmented green/brown)
+        let wormContainer = SKNode()
+        wormContainer.position = CGPoint(x: worldPos.x, y: worldPos.y - layout.tileSize * 0.6)
+        wormContainer.zPosition = 42
+        scene.boardLayer.addChild(wormContainer)
+
+        let segmentCount = 5
+        let segmentRadius: CGFloat = layout.tileSize * 0.06
+        for i in 0..<segmentCount {
+            let segment = SKShapeNode(circleOfRadius: segmentRadius * (i == 0 ? 1.3 : 1.0))
+            let green = CGFloat(0.35) + CGFloat(i) * 0.08
+            segment.fillColor = SKColor(red: 0.3, green: green, blue: 0.15, alpha: 1.0)
+            segment.strokeColor = SKColor(red: 0.2, green: 0.25, blue: 0.1, alpha: 0.6)
+            segment.lineWidth = 0.5
+            segment.position = CGPoint(x: 0, y: -CGFloat(i) * segmentRadius * 1.6)
+            wormContainer.addChild(segment)
+        }
+
+        // Eyes on head segment
+        for dx: CGFloat in [-1, 1] {
+            let eye = SKShapeNode(circleOfRadius: segmentRadius * 0.35)
+            eye.fillColor = .white
+            eye.strokeColor = .clear
+            eye.position = CGPoint(x: dx * segmentRadius * 0.5, y: segmentRadius * 0.3)
+            wormContainer.children.first?.addChild(eye)
+
+            let pupil = SKShapeNode(circleOfRadius: segmentRadius * 0.18)
+            pupil.fillColor = .black
+            pupil.strokeColor = .clear
+            pupil.position = CGPoint(x: 0, y: segmentRadius * 0.05)
+            eye.addChild(pupil)
+        }
+
+        wormContainer.setScale(0.3)
+        wormContainer.alpha = 0
+
+        // Animation: burrow up, eat, burrow down
+        let riseY = layout.tileSize * 0.6
+        wormContainer.run(SKAction.sequence([
+            // Rise up from below tile
+            SKAction.group([
+                SKAction.fadeIn(withDuration: 0.1),
+                SKAction.scale(to: 1.0, duration: 0.2),
+                SKAction.moveBy(x: 0, y: riseY, duration: 0.25)
+            ]),
+            // Chomp animation (wiggle)
+            SKAction.repeat(SKAction.sequence([
+                SKAction.rotate(byAngle: 0.15, duration: 0.06),
+                SKAction.rotate(byAngle: -0.3, duration: 0.06),
+                SKAction.rotate(byAngle: 0.15, duration: 0.06)
+            ]), count: 2),
+            // Pause
+            SKAction.wait(forDuration: 0.1),
+            // Burrow back down
+            SKAction.group([
+                SKAction.moveBy(x: 0, y: -riseY, duration: 0.2),
+                SKAction.scale(to: 0.3, duration: 0.2),
+                SKAction.fadeOut(withDuration: 0.15)
+            ]),
+            SKAction.removeFromParent()
+        ]))
+
+        // Remove the gem sprite at the position (worm ate it)
+        if let sprite = scene.gemSpriteAt(pos) {
+            sprite.prepareForRemoval()
+            sprite.run(SKAction.sequence([
+                SKAction.wait(forDuration: 0.35),
+                SKAction.fadeOut(withDuration: 0.1),
+                SKAction.removeFromParent()
+            ]))
+            scene.removeGemSprite(at: pos)
+        }
+
+        // Dust particles where worm appears
+        let dust = ParticleEffects.gemShatter(at: worldPos, color: ColorPalette.dustBrown)
+        dust.run(SKAction.sequence([
+            SKAction.wait(forDuration: 0.2),
+            SKAction.run { scene.boardLayer.addChild(dust) }
+        ]))
+
+        return 0.8
+    }
+
     // MARK: - Phase Grouping
 
     private func groupIntoPhases(_ events: [GameEvent]) -> [[GameEvent]] {
@@ -630,7 +727,7 @@ class AnimationController {
                 phases.append(currentPhase)
                 currentPhase = []
 
-            case .boardShuffled:
+            case .boardShuffled, .wormAppeared:
                 if !currentPhase.isEmpty { phases.append(currentPhase); currentPhase = [] }
                 phases.append([event])
 

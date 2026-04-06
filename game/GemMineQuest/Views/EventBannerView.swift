@@ -6,6 +6,7 @@ struct EventBannerView: View {
 
     @State private var timeRemaining: TimeInterval = 0
     @State private var slideOffset: CGFloat = -300
+    @State private var countdownTimer: Timer?
 
     private var eventTitle: String {
         "Weekend Mining Rush"
@@ -130,14 +131,18 @@ struct EventBannerView: View {
             withAnimation(.spring(response: 0.5, dampingFraction: 0.7).delay(0.5)) {
                 slideOffset = 60
             }
-            // Start countdown timer
-            Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
+            // Start countdown timer (stored for cleanup)
+            countdownTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { timer in
                 updateTimer()
                 if timeRemaining <= 0 {
                     timer.invalidate()
                     onDismiss()
                 }
             }
+        }
+        .onDisappear {
+            countdownTimer?.invalidate()
+            countdownTimer = nil
         }
     }
 

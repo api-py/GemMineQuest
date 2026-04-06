@@ -16,6 +16,8 @@ struct GameContainerView: View {
     @State private var showExitConfirmation = false
     @State private var showShop = false
     @State private var showObjectiveBanner = false
+    @State private var hudTooltipText: String?
+    @State private var awardedBoosterMessage: String?
 
     init(levelNumber: Int, onDismiss: @escaping () -> Void, onNextLevel: @escaping (Int) -> Void) {
         self.levelNumber = levelNumber
@@ -74,7 +76,10 @@ struct GameContainerView: View {
                             ObjectiveIconView(
                                 objective: level.objectives[i],
                                 current: progress.current,
-                                target: progress.target
+                                target: progress.target,
+                                onLongPress: { text in
+                                    withAnimation { hudTooltipText = text }
+                                }
                             )
                         }
                     }
@@ -117,6 +122,9 @@ struct GameContainerView: View {
                             )
                             .shadow(color: Color.black.opacity(0.2), radius: 4, y: 2)
                     )
+                    .onLongPressGesture(minimumDuration: 0.4) {
+                        withAnimation { hudTooltipText = "Moves remaining. Match gems wisely before they run out!" }
+                    }
                 }
                 .padding(.horizontal, 12)
                 .padding(.vertical, 6)
@@ -148,6 +156,9 @@ struct GameContainerView: View {
                             .fill(Color.black.opacity(0.4))
                             .overlay(Capsule().stroke(Color(hex: 0xC9A84C).opacity(0.3), lineWidth: 1))
                     )
+                    .onLongPressGesture(minimumDuration: 0.4) {
+                        withAnimation { hudTooltipText = "Your current score for this level. Earn points by matching gems and activating specials." }
+                    }
 
                     Spacer()
 
@@ -157,6 +168,9 @@ struct GameContainerView: View {
                             .font(.system(size: 22))
                             .foregroundColor(Color(hex: 0xFFD700))
                     }
+                    .onLongPressGesture(minimumDuration: 0.4) {
+                        withAnimation { hudTooltipText = "Open the shop to buy boosters with coins." }
+                    }
 
                     // Exit button
                     Button { showExitConfirmation = true } label: {
@@ -165,6 +179,7 @@ struct GameContainerView: View {
                             .foregroundColor(Color(hex: 0xC71414))
                     }
 
+                    #if DEBUG
                     // God mode toggle
                     HStack(spacing: 3) {
                         Text("GOD")
@@ -184,10 +199,38 @@ struct GameContainerView: View {
                             .fill(Color.black.opacity(0.4))
                             .overlay(Capsule().stroke(Color(hex: 0xC9A84C).opacity(0.15), lineWidth: 0.5))
                     )
+                    #endif
                 }
                 .padding(.horizontal, 12)
                 .padding(.vertical, 4)
                 .background(Color(hex: 0x1A0E05).opacity(0.8))
+
+                // HUD tooltip (shown below all banners, above board)
+                if let tooltip = hudTooltipText {
+                    Text(tooltip)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(Color(hex: 0xFFF8E8))
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 10)
+                        .background(
+                            RoundedRectangle(cornerRadius: 10)
+                                .fill(Color(hex: 0x1A0E05).opacity(0.92))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 10)
+                                        .stroke(Color(hex: 0xC9A84C), lineWidth: 1.5)
+                                )
+                        )
+                        .padding(.horizontal, 20)
+                        .padding(.top, 6)
+                        .transition(.opacity)
+                        .allowsHitTesting(false)
+                        .onAppear {
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 5.0) {
+                                withAnimation { hudTooltipText = nil }
+                            }
+                        }
+                }
 
                 // Objective banner on level start
                 if showObjectiveBanner {
@@ -268,6 +311,27 @@ struct GameContainerView: View {
                 }
             }
 
+            // Booster award toast
+            if let message = awardedBoosterMessage {
+                VStack {
+                    Text(message)
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(.white)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 8)
+                        .background(Capsule().fill(Color(hex: 0x4CAF50).opacity(0.9)))
+                        .transition(.move(edge: .top).combined(with: .opacity))
+                    Spacer().allowsHitTesting(false)
+                }
+                .padding(.top, 50)
+                .allowsHitTesting(false)
+                .onAppear {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+                        withAnimation { awardedBoosterMessage = nil }
+                    }
+                }
+            }
+
             // Game over overlay
             if viewModel.showGameOver && !showTransition {
                 GameOverView(
@@ -276,6 +340,11 @@ struct GameContainerView: View {
                     score: viewModel.finalScore,
                     levelNumber: levelNumber,
                     onRetry: {
+                        if !viewModel.didWin {
+                            if let awarded = progressManager.recordLevelLoss(level: levelNumber, boosterInventory: boosterInventory) {
+                                withAnimation { awardedBoosterMessage = "Free \(awarded.rawValue) booster! (10 attempts reward)" }
+                            }
+                        }
                         startTransition(text: "Retry — Level \(levelNumber)") {
                             viewModel.retryLevel()
                         }
@@ -292,7 +361,12 @@ struct GameContainerView: View {
                             onNextLevel(next)
                         }
                     },
-                    onMenu: onDismiss
+                    onMenu: {
+                        if !viewModel.didWin {
+                            let _ = progressManager.recordLevelLoss(level: levelNumber, boosterInventory: boosterInventory)
+                        }
+                        onDismiss()
+                    }
                 )
                 .transition(.opacity)
             }
@@ -519,8 +593,7 @@ struct ObjectiveIconView: View {
     let objective: LevelObjective
     let current: Int
     let target: Int
-
-    @State private var showDescription = false
+    var onLongPress: ((String) -> Void)? = nil
 
     private var isComplete: Bool { current >= target }
 
@@ -605,38 +678,8 @@ struct ObjectiveIconView: View {
         }
         .frame(width: 48)
         .onLongPressGesture(minimumDuration: 0.4) {
-            showDescription = true
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-                showDescription = false
-            }
+            onLongPress?(objective.descriptionText)
         }
-        .overlay(
-            Group {
-                if showDescription {
-                    Text(objective.descriptionText)
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundColor(Color(hex: 0xFFF8E8))
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 8)
-                        .background(
-                            RoundedRectangle(cornerRadius: 8)
-                                .fill(Color(hex: 0x1A0E05).opacity(0.92))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 8)
-                                        .stroke(Color(hex: 0xC9A84C), lineWidth: 1.5)
-                                )
-                        )
-                        .fixedSize(horizontal: false, vertical: true)
-                        .frame(width: 180)
-                        .offset(y: 60)
-                        .transition(.opacity)
-                        .onTapGesture { showDescription = false }
-                        .zIndex(100)
-                }
-            }
-            , alignment: .top
-        )
-        .animation(.easeInOut(duration: 0.2), value: showDescription)
     }
 }
 

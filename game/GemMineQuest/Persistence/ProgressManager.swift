@@ -33,7 +33,26 @@ class ProgressManager: ObservableObject {
         // Award coins based on stars earned
         let coinReward = stars * 25
         progress.addCoins(coinReward)
+        // Reset consecutive loss counter on win
+        if stars > 0 {
+            progress.consecutiveLosses[level] = 0
+        }
         save()
+    }
+
+    /// Record a loss on a level. Returns a booster type if one was awarded (every 10 consecutive losses).
+    func recordLevelLoss(level: Int, boosterInventory: BoosterInventory) -> BoosterType? {
+        progress.totalGamesPlayed += 1
+        progress.consecutiveLosses[level, default: 0] += 1
+        let count = progress.consecutiveLosses[level] ?? 0
+        save()
+
+        guard count > 0, count % 10 == 0 else { return nil }
+
+        let inGameBoosters: [BoosterType] = [.pickaxe, .dynamite, .droneStrike, .gemForge, .mineCartRush]
+        let awarded = inGameBoosters.randomElement() ?? .pickaxe
+        boosterInventory.increment(awarded)
+        return awarded
     }
 
     func isLevelUnlocked(_ level: Int) -> Bool {

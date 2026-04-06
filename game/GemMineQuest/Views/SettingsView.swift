@@ -30,6 +30,7 @@ struct SettingsView: View {
                 .padding(.horizontal)
 
                 List {
+                    #if DEBUG
                     Section {
                         // God Mode toggle
                         HStack {
@@ -50,6 +51,7 @@ struct SettingsView: View {
                             .foregroundColor(Color(hex: 0xE8A035))
                     }
                     .listRowBackground(Color(hex: 0x0D1A0C))
+                    #endif
 
                     Section {
                         HStack {

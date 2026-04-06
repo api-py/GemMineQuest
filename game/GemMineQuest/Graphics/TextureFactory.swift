@@ -240,7 +240,7 @@ class TextureFactory {
         let scale: CGFloat = 3.0
         let px = size * scale
         let inset: CGFloat = scale * 0.5
-        let cornerR: CGFloat = 4 * scale
+        let cornerR: CGFloat = 8 * scale
         let renderer = UIGraphicsImageRenderer(size: CGSize(width: px, height: px))
 
         let image = renderer.image { ctx in
@@ -254,15 +254,9 @@ class TextureFactory {
             gc.addPath(path)
             gc.clip()
 
-            let topColor: UIColor
-            let botColor: UIColor
-            if isLight {
-                topColor = UIColor(red: 0.62, green: 0.52, blue: 0.38, alpha: 1.0)  // Rich warm tan
-                botColor = UIColor(red: 0.54, green: 0.44, blue: 0.30, alpha: 1.0)
-            } else {
-                topColor = UIColor(red: 0.50, green: 0.40, blue: 0.28, alpha: 1.0)  // Warm brown
-                botColor = UIColor(red: 0.42, green: 0.34, blue: 0.22, alpha: 1.0)
-            }
+            // Uniform blue tiles — identical for both light/dark variants
+            let topColor = UIColor(red: 0.45, green: 0.65, blue: 0.90, alpha: 1.0)   // Light sky blue
+            let botColor = UIColor(red: 0.22, green: 0.40, blue: 0.68, alpha: 1.0)   // Deeper blue
 
             let tileColors = [topColor.cgColor, botColor.cgColor] as CFArray
             if let tileGrad = CGGradient(colorsSpace: colorSpace, colors: tileColors, locations: [0.0, 1.0]) {
