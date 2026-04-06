@@ -2,16 +2,7 @@ import Foundation
 
 class LevelGenerator {
 
-    static func loadLevel(number: Int) -> Level? {
-        let name = String(format: "level_%03d", number)
-        guard let url = Bundle.main.url(forResource: name, withExtension: "json",
-                                         subdirectory: "Levels"),
-              let data = try? Data(contentsOf: url) else { return nil }
-        return try? JSONDecoder().decode(Level.self, from: data)
-    }
-
     static func getLevel(number: Int) -> Level {
-        if let level = loadLevel(number: number) { return level }
         return generateLevel(number: number)
     }
 
@@ -29,7 +20,7 @@ class LevelGenerator {
         case 130...: levelFloor = 0.82
         default: levelFloor = 0.0
         }
-        let difficulty = max(levelFloor, min(1.0 - exp(-Double(number) / 80.0), 0.98))
+        let difficulty = max(levelFloor, min(1.0 - exp(-Double(number) / 60.0), 0.98))
 
         let levelType = determineLevelType(number: number, rng: &rng)
         let baseMoves = determineMoves(difficulty: difficulty, rng: &rng)
@@ -39,14 +30,12 @@ class LevelGenerator {
         let blockerLayout = generateBlockers(difficulty: difficulty, tileLayout: tileLayout, rng: &rng)
         let treasureColumns = levelType == .treasureDrop ? generateTreasureColumns(tileLayout: tileLayout, rng: &rng) : nil
 
-        // Solvability taxes: ensure high-difficulty levels have enough moves
+        // Solvability taxes: tight safety net without making levels too easy
         let blockerCount = blockerLayout?.flatMap { $0 }.compactMap({ $0 }).count ?? 0
-        let blockerTax = min(5, blockerCount / 3)
+        let blockerTax = min(3, blockerCount / 4)
 
         let oreCount = tileLayout.flatMap { $0 }.filter { $0 == 2 || $0 == 3 }.count
-        let oreTax = min(3, oreCount / 4)
-
-        let colorTax = numColors >= 6 ? 1 : 0
+        let oreTax = min(2, oreCount / 5)
 
         // TNT safety: ensure at least tntCountdown + 3 moves
         var minTNTMoves = 0
@@ -60,7 +49,7 @@ class LevelGenerator {
             }
         }
 
-        let moves = max(baseMoves + blockerTax + oreTax + colorTax, minTNTMoves)
+        let moves = max(baseMoves + blockerTax + oreTax, minTNTMoves)
         let targetScores = generateTargetScores(difficulty: difficulty, moves: moves)
 
         return Level(
@@ -279,8 +268,8 @@ class LevelGenerator {
         let rows = tileLayout.count; let cols = tileLayout.first?.count ?? Constants.defaultGridColumns
         var layout: [[Level.BlockerData?]] = Array(repeating: Array(repeating: nil, count: cols), count: rows)
 
-        // Gradual blocker increase: 1-2 at easy, up to 15 at hardest
-        let blockerCount = max(2, Int(difficulty * 24))
+        // Gradual blocker increase: 1-2 at easy, up to 20+ at hardest
+        let blockerCount = max(2, Int(difficulty * 30))
         var placed = 0
         for _ in 0..<200 {
             guard placed < blockerCount else { break }

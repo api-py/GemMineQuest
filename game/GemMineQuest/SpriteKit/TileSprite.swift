@@ -35,10 +35,10 @@ class TileSprite: SKNode {
 
         // Ore vein overlay
         if tileType == .oreVein || tileType == .doubleOre {
-            // Tint tile gold for ore
+            // Full gold override — prevents blue tile bleed-through
             if let sprite = backgroundNode as? SKSpriteNode {
-                sprite.color = SKColor(hex: 0xFFC107)
-                sprite.colorBlendFactor = tileType == .doubleOre ? 0.55 : 0.45
+                sprite.color = SKColor(red: 0.82, green: 0.65, blue: 0.20, alpha: 1.0)
+                sprite.colorBlendFactor = 1.0
             }
 
             let overlay = createOreOverlay(double: tileType == .doubleOre)
@@ -72,10 +72,10 @@ class TileSprite: SKNode {
         overlayNode = nil
 
         if tileType == .oreVein || tileType == .doubleOre {
-            // Tint tile gold for ore
+            // Full gold override — prevents blue tile bleed-through
             if let sprite = backgroundNode as? SKSpriteNode {
-                sprite.color = SKColor(hex: 0xFFC107)
-                sprite.colorBlendFactor = tileType == .doubleOre ? 0.55 : 0.45
+                sprite.color = SKColor(red: 0.82, green: 0.65, blue: 0.20, alpha: 1.0)
+                sprite.colorBlendFactor = 1.0
             }
 
             let overlay = createOreOverlay(double: tileType == .doubleOre)

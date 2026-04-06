@@ -99,11 +99,12 @@ class MatchDetector {
         // Phase 4: Classify segments into specials (L/T → wrapped, 5+ → color bomb, 4 → striped)
         let segmentResults = classifySegments(horizontal: horizontalSegments, vertical: verticalSegments)
 
-        // Phase 5: Deduplicate squares against higher-priority segment results
-        // L/T shapes (priority 80) beat squares (priority 40)
-        let coveredBySegments = segmentResults.reduce(into: Set<GridPosition>()) { $0.formUnion($1.positions) }
-        // Only discard a square if ALL 4 of its positions are already covered by segment matches
-        let filteredSquares = squareResults.filter { !$0.positions.isSubset(of: coveredBySegments) }
+        // Phase 5: Only discard squares if a HIGHER priority special covers them.
+        // Normal 3-matches (priority 20) should NOT suppress drones (priority 40).
+        let highPriorityPositions = segmentResults
+            .filter { ($0.specialType != nil) && (priorityScore($0) > 40) }
+            .reduce(into: Set<GridPosition>()) { $0.formUnion($1.positions) }
+        let filteredSquares = squareResults.filter { !$0.positions.isSubset(of: highPriorityPositions) }
 
         return segmentResults + filteredSquares
     }
@@ -125,7 +126,8 @@ class MatchDetector {
         for row in 0..<board.numRows {
             for col in 0..<board.numColumns {
                 let pos = GridPosition(row: row, column: col)
-                guard board[pos] != nil, board.isPlayable(pos) else { continue }
+                guard board[pos] != nil, board.isPlayable(pos),
+                      board.blockerAt(pos) == nil else { continue }
 
                 let neighbors = [
                     GridPosition(row: row, column: col + 1),
@@ -135,7 +137,8 @@ class MatchDetector {
                 for neighbor in neighbors {
                     guard board.isValidPosition(neighbor),
                           board[neighbor] != nil,
-                          board.isPlayable(neighbor) else { continue }
+                          board.isPlayable(neighbor),
+                          board.blockerAt(neighbor) == nil else { continue }
 
                     board.swapGems(pos, neighbor)
                     let matches = detectMatches(on: board)
@@ -163,13 +166,16 @@ class MatchDetector {
         for row in 0..<board.numRows {
             for col in 0..<board.numColumns {
                 let pos = GridPosition(row: row, column: col)
-                guard board[pos] != nil, board.isPlayable(pos) else { continue }
+                guard board[pos] != nil, board.isPlayable(pos),
+                      board.blockerAt(pos) == nil else { continue }
                 let right = GridPosition(row: row, column: col + 1)
-                if board.isValidPosition(right) && board[right] != nil && board.isPlayable(right) {
+                if board.isValidPosition(right) && board[right] != nil && board.isPlayable(right)
+                    && board.blockerAt(right) == nil {
                     if wouldMatch(board: board, swapping: pos, with: right) { return true }
                 }
                 let up = GridPosition(row: row + 1, column: col)
-                if board.isValidPosition(up) && board[up] != nil && board.isPlayable(up) {
+                if board.isValidPosition(up) && board[up] != nil && board.isPlayable(up)
+                    && board.blockerAt(up) == nil {
                     if wouldMatch(board: board, swapping: pos, with: up) { return true }
                 }
             }
