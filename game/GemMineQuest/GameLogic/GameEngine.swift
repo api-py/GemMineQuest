@@ -577,6 +577,23 @@ class GameEngine {
             events.append(.boardShuffled)
         }
 
+        // Emit final objective progress so the UI displays the completed state
+        // (e.g. 12/12 ore) before the levelComplete banner appears
+        for objective in state.level.objectives {
+            switch objective {
+            case .reachScore(let target):
+                events.append(.objectiveProgress(text: "Score", current: state.score, target: target))
+            case .clearAllOre:
+                events.append(.objectiveProgress(text: "Ore cleared", current: state.oreCleared, target: state.totalOre))
+            case .dropTreasures(let count):
+                events.append(.objectiveProgress(text: "Treasures", current: state.treasuresDropped, target: count))
+            case .collectGems(let color, let count):
+                events.append(.objectiveProgress(text: color.displayName, current: state.gemsCollected[color] ?? 0, target: count))
+            case .collectSpecials(let type, let count):
+                events.append(.objectiveProgress(text: type.displayName, current: state.specialsCollected[type] ?? 0, target: count))
+            }
+        }
+
         if state.checkObjectives() {
             state.isComplete = true
             events.append(contentsOf: mineBlast.execute(state: state, board: board))

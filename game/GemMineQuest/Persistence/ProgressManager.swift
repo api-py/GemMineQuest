@@ -27,6 +27,13 @@ class ProgressManager: ObservableObject {
         self.progress = PlayerProgress()
     }
 
+    func spendCoins(_ amount: Int) -> Bool {
+        guard progress.coins >= amount else { return false }
+        progress.addCoins(-amount)
+        save()
+        return true
+    }
+
     func saveLevelResult(level: Int, stars: Int, score: Int) {
         progress.recordResult(level: level, stars: stars, score: score)
         progress.totalGamesPlayed += 1

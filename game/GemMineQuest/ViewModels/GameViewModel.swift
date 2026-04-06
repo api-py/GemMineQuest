@@ -57,6 +57,14 @@ class GameViewModel: ObservableObject {
         retryCount += 1  // Forces SwiftUI view rebuild
     }
 
+    func continueWithMoves(_ count: Int) {
+        guard let state = scene?.gameState else { return }
+        state.isFailed = false
+        state.movesRemaining += count
+        showGameOver = false
+        refreshDisplay()
+    }
+
     var nextLevelNumber: Int { levelNumber + 1 }
 
     // Display properties for SwiftUI overlay
