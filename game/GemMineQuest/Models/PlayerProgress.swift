@@ -14,6 +14,7 @@ struct PlayerProgress: Codable {
     var totalGamesPlayed: Int = 0
     var unlockedAchievements: [String] = []
     var claimedMilestones: [String] = []
+    var consecutiveLosses: [Int: Int] = [:]  // level number -> sequential loss count
 
     func isUnlocked(_ level: Int) -> Bool {
         level <= highestUnlocked

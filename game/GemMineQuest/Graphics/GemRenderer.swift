@@ -18,6 +18,7 @@ class GemRenderer {
         // Glow halo behind gem (additive blend)
         let glowTexture = TextureFactory.shared.softGlowTexture(size: size * 1.3)
         let glowSprite = SKSpriteNode(texture: glowTexture, size: CGSize(width: size * 1.3, height: size * 1.3))
+        glowSprite.name = "glowHalo"
         glowSprite.color = color.lightColor
         glowSprite.colorBlendFactor = 0.7
         glowSprite.alpha = 0.18

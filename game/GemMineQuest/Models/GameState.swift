@@ -25,6 +25,11 @@ class GameState: ObservableObject {
         return n >= 5 && (n % 10 == 5)
     }
 
+    /// Whether this level has the worm mechanic (every 5th level)
+    var isWormLevel: Bool {
+        level.number >= 5 && level.number % 5 == 0
+    }
+
     init(level: Level, board: Board) {
         self.level = level
         self.board = board

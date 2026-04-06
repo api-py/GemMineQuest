@@ -26,7 +26,7 @@ class GameEngine {
 
     func handleSwap(from posA: GridPosition, to posB: GridPosition) -> [GameEvent] {
         guard GridPosition.isAdjacent(posA, posB) else { return [] }
-        guard board[posA] != nil, board[posB] != nil else { return [] }
+        guard let gemA = board[posA], let gemB = board[posB] else { return [] }
         guard board.isPlayable(posA), board.isPlayable(posB) else { return [] }
 
         if board.blockerAt(posA) != nil {
@@ -35,9 +35,6 @@ class GameEngine {
         if board.blockerAt(posB) != nil {
             return [.invalidSwap(from: posA, to: posB)]
         }
-
-        let gemA = board[posA]!
-        let gemB = board[posB]!
 
         // Two specials swapped together
         if gemA.special != .none && gemB.special != .none {
@@ -73,6 +70,11 @@ class GameEngine {
         if state.isShuffleLevel && state.movesMade % 3 == 0 && !state.isComplete && !state.isFailed {
             shuffleBoard()
             events.append(.boardShuffled)
+        }
+
+        // Worm mechanic: every 5 moves on worm levels, worm eats a random gem/blocker
+        if state.isWormLevel && state.movesMade % 5 == 0 && !state.isComplete && !state.isFailed {
+            events.append(contentsOf: processWorm())
         }
 
         return events
@@ -167,6 +169,11 @@ class GameEngine {
                         let neighborColors = pos.neighbors.compactMap { board[$0]?.color }
                         let targetColor = neighborColors.randomElement() ?? gem.color
                         affected = specialResolver.resolveCrystalBall(targetColor: targetColor, on: board)
+                    } else if gem.special == .miningDrone {
+                        // Drone hit by chain: deploy drones (chain reaction)
+                        let droneEvents = deployDrones(from: pos, count: 3)
+                        events.append(contentsOf: droneEvents)
+                        affected = []
                     } else {
                         affected = specialResolver.resolve(special: gem.special, at: pos, on: board)
                     }
@@ -175,6 +182,9 @@ class GameEngine {
                         let delta = scoreCalculator.scoreForSpecialActivation(gem.special)
                         state.score += delta
                         events.append(.scoreUpdated(newScore: state.score, delta: delta, at: pos))
+
+                        // Direct path damage: lasers/volatiles damage blockers in their path
+                        events.append(contentsOf: damageBlockersInPath(affected))
 
                         // Chain reaction: newly affected positions may contain specials
                         for affectedPos in affected {
@@ -253,6 +263,8 @@ class GameEngine {
         if specialGem.special == .miningDrone {
             let targets = specialResolver.getDroneTargets(count: 3, on: board, prioritizeOre: true)
             for target in targets {
+                // Check for special gem at target BEFORE removing — chain reaction
+                let targetGem = board[target]
                 events.append(.droneDeployed(from: specialPos, to: target))
                 if let blocker = board.blockerAt(target) {
                     switch blocker {
@@ -271,8 +283,29 @@ class GameEngine {
                 }
                 board.removeGem(at: target)
                 state.score += 60
+
+                // Chain reaction: if drone hit a special gem, activate it
+                if let tGem = targetGem, tGem.special != .none, tGem.special != .miningDrone {
+                    let chainAffected = specialResolver.resolve(special: tGem.special, at: target, on: board)
+                    if !chainAffected.isEmpty {
+                        events.append(.specialActivated(type: tGem.special, at: target, affected: chainAffected))
+                        let delta = scoreCalculator.scoreForSpecialActivation(tGem.special)
+                        state.score += delta
+                        events.append(.scoreUpdated(newScore: state.score, delta: delta, at: target))
+                        for p in chainAffected { board.removeGem(at: p) }
+                        events.append(contentsOf: blockerManager.processMatchAdjacent(
+                            matchedPositions: chainAffected, on: board
+                        ))
+                        events.append(contentsOf: damageBlockersInPath(chainAffected))
+                    }
+                } else if let tGem = targetGem, tGem.special == .miningDrone {
+                    // Drone hit another drone — deploy that drone's targets too
+                    events.append(contentsOf: deployDrones(from: target, count: 3))
+                }
             }
             board.removeGem(at: specialPos)
+            // Emit event so AnimationController removes the drone sprite at specialPos
+            events.append(.specialActivated(type: .miningDrone, at: specialPos, affected: []))
         } else {
             let affected = specialResolver.resolve(special: specialGem.special, at: specialPos, on: board)
             if !affected.isEmpty {
@@ -285,6 +318,8 @@ class GameEngine {
                 events.append(contentsOf: blockerManager.processMatchAdjacent(
                     matchedPositions: Set(affected), on: board
                 ))
+                // Direct path damage: lasers/volatiles damage blockers in their path
+                events.append(contentsOf: damageBlockersInPath(affected))
             }
         }
 
@@ -565,5 +600,128 @@ class GameEngine {
     func initializeBoard(seed: UInt64) -> [GameEvent] {
         boardFiller.initialFill(board: board, numColors: state.level.effectiveNumColors, seed: seed)
         return processCascade()
+    }
+
+    // MARK: - Helpers
+
+    /// Damage blockers that are directly ON the affected positions (not just adjacent).
+    /// Used for laser/volatile paths that should damage granite, cage, amber in their direct path.
+    private func damageBlockersInPath(_ positions: Set<GridPosition>) -> [GameEvent] {
+        var events: [GameEvent] = []
+        for pos in positions {
+            guard let blocker = board.blockerAt(pos) else { continue }
+            switch blocker {
+            case .granite(let layers):
+                if layers > 1 {
+                    board.setBlocker(.granite(layers: layers - 1), at: pos)
+                    events.append(.blockerDamaged(at: pos, type: blocker))
+                } else {
+                    board.setBlocker(nil, at: pos)
+                    events.append(.blockerDestroyed(at: pos))
+                }
+            case .cage:
+                board.setBlocker(nil, at: pos)
+                events.append(.blockerDestroyed(at: pos))
+            case .amber:
+                board.setBlocker(nil, at: pos)
+                events.append(.blockerDestroyed(at: pos))
+            default:
+                break
+            }
+        }
+        return events
+    }
+
+    /// Deploy drones from a position (used for chain reactions when a drone is destroyed).
+    private func deployDrones(from pos: GridPosition, count: Int) -> [GameEvent] {
+        var events: [GameEvent] = []
+        let targets = specialResolver.getDroneTargets(count: count, on: board, prioritizeOre: true)
+        for target in targets {
+            let targetGem = board[target]
+            events.append(.droneDeployed(from: pos, to: target))
+            if let blocker = board.blockerAt(target) {
+                switch blocker {
+                case .granite(let layers):
+                    if layers > 1 {
+                        board.setBlocker(.granite(layers: layers - 1), at: target)
+                        events.append(.blockerDamaged(at: target, type: blocker))
+                    } else {
+                        board.setBlocker(nil, at: target)
+                        events.append(.blockerDestroyed(at: target))
+                    }
+                default:
+                    board.setBlocker(nil, at: target)
+                    events.append(.blockerDestroyed(at: target))
+                }
+            }
+            board.removeGem(at: target)
+            state.score += 60
+
+            // Chain: if drone hit a special gem, activate it
+            if let tGem = targetGem, tGem.special != .none, tGem.special != .miningDrone {
+                let chainAffected = specialResolver.resolve(special: tGem.special, at: target, on: board)
+                if !chainAffected.isEmpty {
+                    events.append(.specialActivated(type: tGem.special, at: target, affected: chainAffected))
+                    let delta = scoreCalculator.scoreForSpecialActivation(tGem.special)
+                    state.score += delta
+                    events.append(.scoreUpdated(newScore: state.score, delta: delta, at: target))
+                    for p in chainAffected { board.removeGem(at: p) }
+                    events.append(contentsOf: blockerManager.processMatchAdjacent(
+                        matchedPositions: chainAffected, on: board
+                    ))
+                    events.append(contentsOf: damageBlockersInPath(chainAffected))
+                }
+            }
+        }
+        return events
+    }
+
+    // MARK: - Worm Mechanic
+
+    private func processWorm() -> [GameEvent] {
+        var events: [GameEvent] = []
+
+        // Build candidate list: non-special gems + destructible blocker tiles
+        var candidates: [(GridPosition, Bool)] = [] // (pos, isBlocker)
+        for pos in board.allPlayablePositions() {
+            if let blocker = board.blockerAt(pos) {
+                switch blocker {
+                case .granite, .cage, .boulder, .amber:
+                    candidates.append((pos, true))
+                default: break
+                }
+            } else if let gem = board[pos], gem.special == .none {
+                candidates.append((pos, false))
+            }
+        }
+
+        guard let (target, isBlocker) = candidates.randomElement() else { return events }
+
+        events.append(.wormAppeared(at: target))
+
+        if isBlocker {
+            if case .granite(let layers) = board.blockerAt(target) {
+                if layers > 1 {
+                    board.setBlocker(.granite(layers: layers - 1), at: target)
+                    events.append(.blockerDamaged(at: target, type: .granite(layers: layers)))
+                } else {
+                    board.setBlocker(nil, at: target)
+                    events.append(.blockerDestroyed(at: target))
+                }
+            } else {
+                board.setBlocker(nil, at: target)
+                events.append(.blockerDestroyed(at: target))
+            }
+        }
+
+        if board[target] != nil {
+            board.removeGem(at: target)
+        }
+
+        let (falls, newGems) = boardFiller.dropAndFill(board: board, numColors: state.level.effectiveNumColors)
+        if !falls.isEmpty { events.append(.gemsFell(moves: falls)) }
+        if !newGems.isEmpty { events.append(.gemsAdded(gems: newGems)) }
+
+        return events
     }
 }

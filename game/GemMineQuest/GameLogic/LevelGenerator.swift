@@ -32,13 +32,36 @@ class LevelGenerator {
         let difficulty = max(levelFloor, min(1.0 - exp(-Double(number) / 80.0), 0.98))
 
         let levelType = determineLevelType(number: number, rng: &rng)
-        let moves = determineMoves(difficulty: difficulty, rng: &rng)
+        let baseMoves = determineMoves(difficulty: difficulty, rng: &rng)
         let numColors = determineNumColors(difficulty: difficulty, number: number, rng: &rng)
         let tileLayout = generateTileLayout(difficulty: difficulty, levelType: levelType, rng: &rng)
         let objectives = generateObjectives(levelType: levelType, difficulty: difficulty, rng: &rng)
-        let targetScores = generateTargetScores(difficulty: difficulty, moves: moves)
         let blockerLayout = generateBlockers(difficulty: difficulty, tileLayout: tileLayout, rng: &rng)
         let treasureColumns = levelType == .treasureDrop ? generateTreasureColumns(tileLayout: tileLayout, rng: &rng) : nil
+
+        // Solvability taxes: ensure high-difficulty levels have enough moves
+        let blockerCount = blockerLayout?.flatMap { $0 }.compactMap({ $0 }).count ?? 0
+        let blockerTax = min(5, blockerCount / 3)
+
+        let oreCount = tileLayout.flatMap { $0 }.filter { $0 == 2 || $0 == 3 }.count
+        let oreTax = min(3, oreCount / 4)
+
+        let colorTax = numColors >= 6 ? 1 : 0
+
+        // TNT safety: ensure at least tntCountdown + 3 moves
+        var minTNTMoves = 0
+        if let blockers = blockerLayout {
+            let tntCountdowns = blockers.flatMap { $0 }.compactMap { b -> Int? in
+                guard let b = b, b.type == "tnt", let v = b.value else { return nil }
+                return v
+            }
+            if let minCountdown = tntCountdowns.min() {
+                minTNTMoves = minCountdown + 3
+            }
+        }
+
+        let moves = max(baseMoves + blockerTax + oreTax + colorTax, minTNTMoves)
+        let targetScores = generateTargetScores(difficulty: difficulty, moves: moves)
 
         return Level(
             number: number, maxMoves: moves, objectives: objectives,

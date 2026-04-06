@@ -70,6 +70,13 @@ class GemSprite: SKNode {
         }
     }
 
+    /// Hide glow/sparkle/overlay before fade animation to prevent additive-blend flash artifacts.
+    func prepareForRemoval() {
+        bodyNode?.childNode(withName: "glowHalo")?.alpha = 0
+        bodyNode?.childNode(withName: "sparkle")?.alpha = 0
+        specialOverlay?.alpha = 0
+    }
+
     /// Update visual when gem becomes special
     func updateSpecial(to type: SpecialType) {
         buildVisual()

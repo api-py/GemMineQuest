@@ -190,16 +190,18 @@ class SpecialGemResolver {
 
     /// Get drone target positions (random gems, prioritizing objectives)
     func getDroneTargets(count: Int, on board: Board, prioritizeOre: Bool = true) -> [GridPosition] {
-        var lavaCandidates: [GridPosition] = []
-        var boulderCandidates: [GridPosition] = []
-        var cageCandidates: [GridPosition] = []
-        var tntCandidates: [GridPosition] = []
         var oreCandidates: [GridPosition] = []
-        var gemCandidates: [GridPosition] = []
+        var graniteCandidates: [GridPosition] = []
+        var cageCandidates: [GridPosition] = []
+        var boulderCandidates: [GridPosition] = []
+        var lavaCandidates: [GridPosition] = []
+        var tntCandidates: [GridPosition] = []
+        var normalGemCandidates: [GridPosition] = []
 
         for pos in board.allPlayablePositions() {
             if let blocker = board.blockerAt(pos) {
                 switch blocker {
+                case .granite: graniteCandidates.append(pos)
                 case .lava: lavaCandidates.append(pos)
                 case .boulder: boulderCandidates.append(pos)
                 case .cage: cageCandidates.append(pos)
@@ -207,29 +209,23 @@ class SpecialGemResolver {
                 default: break
                 }
             }
-            if board[pos] != nil {
-                // Lava-adjacent gem positions (no blocker on the gem itself)
-                if board.blockerAt(pos) == nil {
-                    let hasAdjacentLava = pos.neighbors.contains { n in
-                        guard board.isValidPosition(n) else { return false }
-                        if case .lava = board.blockerAt(n) { return true }
-                        return false
-                    }
-                    if hasAdjacentLava {
-                        lavaCandidates.append(pos)
-                    }
-                }
+            if let gem = board[pos] {
                 if board.hasOreVein(at: pos) {
                     oreCandidates.append(pos)
                 }
-                gemCandidates.append(pos)
+                // Only target normal gems — never target special/booster gems
+                if gem.special == .none && board.blockerAt(pos) == nil {
+                    normalGemCandidates.append(pos)
+                }
             }
         }
 
+        // Priority: Ore → Granite → Cage → Boulder → Lava → TNT → Normal gems (no specials)
         var targets: [GridPosition] = []
         let priorityLists = [
-            lavaCandidates, boulderCandidates, cageCandidates,
-            tntCandidates, oreCandidates, gemCandidates
+            oreCandidates, graniteCandidates, cageCandidates,
+            boulderCandidates, lavaCandidates, tntCandidates,
+            normalGemCandidates
         ]
         for list in priorityLists {
             let remaining = count - targets.count

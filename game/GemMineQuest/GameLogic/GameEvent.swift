@@ -48,6 +48,9 @@ enum GameEvent: Equatable {
     case boardShuffled
     case droneDeployed(from: GridPosition, to: GridPosition)
 
+    // Worm
+    case wormAppeared(at: GridPosition)
+
     // Encouragement popup
     case encouragement(text: String)
 
