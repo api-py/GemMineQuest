@@ -63,6 +63,10 @@ class GameViewModel: ObservableObject {
         state.movesRemaining += count
         showGameOver = false
         refreshDisplay()
+        // If objectives are already met (e.g. score reached before buying moves), complete immediately
+        if state.checkObjectives() {
+            scene?.triggerLevelComplete()
+        }
     }
 
     var nextLevelNumber: Int { levelNumber + 1 }

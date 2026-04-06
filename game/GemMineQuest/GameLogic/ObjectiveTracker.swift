@@ -29,7 +29,7 @@ class ObjectiveTracker {
             }
         }
 
-        // Report objective progress and encouragement
+        // Report objective progress and encouragement (each message shown at most once)
         for objective in state.level.objectives {
             switch objective {
             case .reachScore(let target):
@@ -37,21 +37,33 @@ class ObjectiveTracker {
                     text: "Score", current: state.score, target: target
                 ))
                 if state.score >= Int(Double(target) * 0.85) && state.score < target {
-                    events.append(.encouragement(text: "Almost there!"))
+                    let msg = "Almost there!"
+                    if !state.shownEncouragements.contains(msg) {
+                        state.shownEncouragements.insert(msg)
+                        events.append(.encouragement(text: msg))
+                    }
                 }
             case .clearAllOre:
                 events.append(.objectiveProgress(
                     text: "Ore cleared", current: state.oreCleared, target: state.totalOre
                 ))
                 if state.totalOre > 0 && state.oreCleared == state.totalOre - 1 {
-                    events.append(.encouragement(text: "Last ore vein!"))
+                    let msg = "Last ore vein!"
+                    if !state.shownEncouragements.contains(msg) {
+                        state.shownEncouragements.insert(msg)
+                        events.append(.encouragement(text: msg))
+                    }
                 }
             case .dropTreasures(let count):
                 events.append(.objectiveProgress(
                     text: "Treasures", current: state.treasuresDropped, target: count
                 ))
                 if state.treasuresDropped == count - 1 {
-                    events.append(.encouragement(text: "One more treasure!"))
+                    let msg = "One more treasure!"
+                    if !state.shownEncouragements.contains(msg) {
+                        state.shownEncouragements.insert(msg)
+                        events.append(.encouragement(text: msg))
+                    }
                 }
             case .collectGems(let color, let count):
                 let current = state.gemsCollected[color] ?? 0
@@ -59,7 +71,11 @@ class ObjectiveTracker {
                     text: color.displayName, current: current, target: count
                 ))
                 if current >= count - 2 && current < count {
-                    events.append(.encouragement(text: "\(count - current) \(color.displayName) left!"))
+                    let msg = "\(count - current) \(color.displayName) left!"
+                    if !state.shownEncouragements.contains(msg) {
+                        state.shownEncouragements.insert(msg)
+                        events.append(.encouragement(text: msg))
+                    }
                 }
             case .collectSpecials(let type, let count):
                 let current = state.specialsCollected[type] ?? 0
@@ -67,14 +83,22 @@ class ObjectiveTracker {
                     text: type.displayName, current: current, target: count
                 ))
                 if current == count - 1 {
-                    events.append(.encouragement(text: "One more \(type.displayName)!"))
+                    let msg = "One more \(type.displayName)!"
+                    if !state.shownEncouragements.contains(msg) {
+                        state.shownEncouragements.insert(msg)
+                        events.append(.encouragement(text: msg))
+                    }
                 }
             }
         }
 
-        // Low moves warning
+        // Low moves warning (show once per threshold)
         if state.movesRemaining <= 3 && state.movesRemaining > 0 && !state.godModeEnabled {
-            events.append(.encouragement(text: "\(state.movesRemaining) moves left!"))
+            let msg = "\(state.movesRemaining) moves left!"
+            if !state.shownEncouragements.contains(msg) {
+                state.shownEncouragements.insert(msg)
+                events.append(.encouragement(text: msg))
+            }
         }
 
         return events

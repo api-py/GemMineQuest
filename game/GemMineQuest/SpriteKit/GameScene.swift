@@ -831,6 +831,20 @@ class GameScene: SKScene {
 
     // MARK: - Game Actions
 
+    /// Trigger level completion when objectives are already met (e.g. after buying extra moves).
+    func triggerLevelComplete() {
+        guard let state = gameState else { return }
+        state.isComplete = true
+        let events: [GameEvent] = [.levelComplete(stars: state.starRating, score: state.score)]
+        isAnimating = true
+        animationController.animateEvents(events) { [weak self] in
+            guard let self else { return }
+            self.syncSpritesWithBoard()
+            self.isAnimating = false
+            self.gameSceneDelegate?.gameDidComplete(stars: state.starRating, score: state.score)
+        }
+    }
+
     private func handleSwap(from: GridPosition, to: GridPosition) {
         guard let engine = gameEngine else { return }
         guard !isAnimating else { return }

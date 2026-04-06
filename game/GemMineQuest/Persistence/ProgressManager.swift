@@ -34,12 +34,13 @@ class ProgressManager: ObservableObject {
         return true
     }
 
-    func saveLevelResult(level: Int, stars: Int, score: Int) {
+    func saveLevelResult(level: Int, stars: Int, score: Int, goldSpent: Int = 0) {
         progress.recordResult(level: level, stars: stars, score: score)
         progress.totalGamesPlayed += 1
-        // Award coins based on stars earned
+        // Award coins based on stars earned + 50% refund of gold spent on extra moves
         let coinReward = stars * 25
-        progress.addCoins(coinReward)
+        let refundBonus = (goldSpent > 0 && stars > 0) ? goldSpent / 2 : 0
+        progress.addCoins(coinReward + refundBonus)
         // Reset consecutive loss counter on win
         if stars > 0 {
             progress.consecutiveLosses[level] = 0
