@@ -5,9 +5,11 @@ struct GameOverView: View {
     let stars: Int
     let score: Int
     let levelNumber: Int
+    let playerCoins: Int
     var onRetry: () -> Void
     var onNextLevel: () -> Void
     var onMenu: () -> Void
+    var onBuyMoves: ((Int, Int) -> Void)? = nil
 
     // 4-phase win animation states
     @State private var showTitle = false
@@ -132,7 +134,7 @@ struct GameOverView: View {
                                 )
 
                             HStack(spacing: 16) {
-                                Label("+\(coinReward)", systemImage: "star.circle.fill")
+                                Label("+\(coinReward) gold", systemImage: "dollarsign.circle.fill")
                                     .font(.system(size: 16, weight: .bold))
                                     .foregroundColor(Color(hex: 0xFFD700))
                             }
@@ -156,31 +158,58 @@ struct GameOverView: View {
                         .font(.body)
                         .foregroundColor(Color(hex: 0xCCBB99))
 
-                    // "Need more moves?" offer
+                    // "Need more moves?" purchase options
                     if showMoreMovesOffer {
                         VStack(spacing: 10) {
                             Text("Need more moves?")
                                 .font(.system(size: 18, weight: .bold, design: .rounded))
                                 .foregroundColor(.white)
 
-                            HStack(spacing: 6) {
-                                Image(systemName: "plus.circle.fill")
-                                    .foregroundColor(Color(hex: 0xFFD700))
-                                Text("+5 moves for 50 Gold")
-                                    .font(.system(size: 14, weight: .semibold))
-                                    .foregroundColor(Color(hex: 0xCCBB99))
-                            }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 10)
-                            .background(
-                                RoundedRectangle(cornerRadius: 12)
-                                    .fill(Color(hex: 0x2A1E10))
-                                    .overlay(
+                            Text("\(playerCoins) gold available")
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundColor(Color(hex: 0x8B7355))
+
+                            ForEach([(1, 25), (5, 100), (15, 200)], id: \.0) { moves, cost in
+                                Button {
+                                    onBuyMoves?(moves, cost)
+                                } label: {
+                                    HStack(spacing: 8) {
+                                        Image(systemName: "plus.circle.fill")
+                                            .foregroundColor(Color(hex: 0xFFD700))
+                                        Text("+\(moves) move\(moves > 1 ? "s" : "")")
+                                            .font(.system(size: 14, weight: .bold))
+                                            .foregroundColor(.white)
+                                        Spacer()
+                                        HStack(spacing: 3) {
+                                            Image(systemName: "dollarsign.circle.fill")
+                                                .font(.system(size: 12))
+                                            Text("\(cost)")
+                                                .font(.system(size: 14, weight: .bold))
+                                        }
+                                        .foregroundColor(playerCoins >= cost
+                                            ? Color(hex: 0xFFD700)
+                                            : Color(hex: 0x5A4530))
+                                    }
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 10)
+                                    .background(
                                         RoundedRectangle(cornerRadius: 12)
-                                            .stroke(Color(hex: 0xC9A84C).opacity(0.3), lineWidth: 1)
+                                            .fill(Color(hex: 0x2A1E10))
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 12)
+                                                    .stroke(
+                                                        playerCoins >= cost
+                                                            ? Color(hex: 0xC9A84C).opacity(0.4)
+                                                            : Color(hex: 0x3A2A1A).opacity(0.3),
+                                                        lineWidth: 1
+                                                    )
+                                            )
                                     )
-                            )
+                                }
+                                .disabled(playerCoins < cost)
+                            }
                         }
+                        .frame(maxWidth: 260)
                         .transition(.scale.combined(with: .opacity))
                         .padding(.top, 8)
                     }

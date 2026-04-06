@@ -164,7 +164,7 @@ struct GameContainerView: View {
 
                     // Shop button
                     Button { showShop = true } label: {
-                        Image(systemName: "star.circle.fill")
+                        Image(systemName: "bag.fill")
                             .font(.system(size: 22))
                             .foregroundColor(Color(hex: 0xFFD700))
                     }
@@ -339,6 +339,7 @@ struct GameContainerView: View {
                     stars: viewModel.stars,
                     score: viewModel.finalScore,
                     levelNumber: levelNumber,
+                    playerCoins: progressManager.progress.coins,
                     onRetry: {
                         if !viewModel.didWin {
                             if let awarded = progressManager.recordLevelLoss(level: levelNumber, boosterInventory: boosterInventory) {
@@ -366,6 +367,10 @@ struct GameContainerView: View {
                             let _ = progressManager.recordLevelLoss(level: levelNumber, boosterInventory: boosterInventory)
                         }
                         onDismiss()
+                    },
+                    onBuyMoves: { moves, cost in
+                        guard progressManager.spendCoins(cost) else { return }
+                        viewModel.continueWithMoves(moves)
                     }
                 )
                 .transition(.opacity)
