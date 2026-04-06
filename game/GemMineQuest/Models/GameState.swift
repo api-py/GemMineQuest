@@ -17,6 +17,8 @@ class GameState: ObservableObject {
     @Published var movesMade: Int = 0
 
     var godModeEnabled: Bool = false
+    var shownEncouragements: Set<String> = []
+    var goldSpentThisLevel: Int = 0
 
     /// Whether this level shuffles gems after every 3rd move
     var isShuffleLevel: Bool {

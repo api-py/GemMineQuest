@@ -352,8 +352,10 @@ struct GameContainerView: View {
                     },
                     onNextLevel: {
                         let next = viewModel.nextLevelNumber
+                        let goldSpent = viewModel.scene?.gameState?.goldSpentThisLevel ?? 0
                         progressManager.saveLevelResult(
-                            level: levelNumber, stars: viewModel.stars, score: viewModel.finalScore
+                            level: levelNumber, stars: viewModel.stars,
+                            score: viewModel.finalScore, goldSpent: goldSpent
                         )
                         boosterInventory.checkMilestoneReward(levelCompleted: levelNumber)
                         let threeStarCount = progressManager.progress.levelStars.values.filter { $0 >= 3 }.count
@@ -370,6 +372,7 @@ struct GameContainerView: View {
                     },
                     onBuyMoves: { moves, cost in
                         guard progressManager.spendCoins(cost) else { return }
+                        viewModel.scene?.gameState?.goldSpentThisLevel += cost
                         viewModel.continueWithMoves(moves)
                     }
                 )

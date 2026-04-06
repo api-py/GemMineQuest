@@ -293,10 +293,16 @@ class GameEngine {
                         state.score += delta
                         events.append(.scoreUpdated(newScore: state.score, delta: delta, at: target))
                         for p in chainAffected { board.removeGem(at: p) }
-                        events.append(contentsOf: blockerManager.processMatchAdjacent(
+                        let chainAdjacentEvents = blockerManager.processMatchAdjacent(
                             matchedPositions: chainAffected, on: board
-                        ))
-                        events.append(contentsOf: damageBlockersInPath(chainAffected))
+                        )
+                        events.append(contentsOf: chainAdjacentEvents)
+                        let chainDamagedPositions = Set(chainAdjacentEvents.compactMap { e -> GridPosition? in
+                            if case .blockerDamaged(let p, _) = e { return p }
+                            if case .blockerDestroyed(let p) = e { return p }
+                            return nil
+                        })
+                        events.append(contentsOf: damageBlockersInPath(chainAffected, alreadyDamaged: chainDamagedPositions))
                     }
                 } else if let tGem = targetGem, tGem.special == .miningDrone {
                     // Drone hit another drone — deploy that drone's targets too
@@ -315,11 +321,17 @@ class GameEngine {
                 events.append(.scoreUpdated(newScore: state.score, delta: delta, at: specialPos))
                 board.removeGem(at: specialPos)
                 for pos in affected { board.removeGem(at: pos) }
-                events.append(contentsOf: blockerManager.processMatchAdjacent(
+                let adjacentEvents = blockerManager.processMatchAdjacent(
                     matchedPositions: Set(affected), on: board
-                ))
-                // Direct path damage: lasers/volatiles damage blockers in their path
-                events.append(contentsOf: damageBlockersInPath(affected))
+                )
+                events.append(contentsOf: adjacentEvents)
+                // Direct path damage, skipping positions already damaged by adjacent logic
+                let adjacentDamaged = Set(adjacentEvents.compactMap { e -> GridPosition? in
+                    if case .blockerDamaged(let p, _) = e { return p }
+                    if case .blockerDestroyed(let p) = e { return p }
+                    return nil
+                })
+                events.append(contentsOf: damageBlockersInPath(affected, alreadyDamaged: adjacentDamaged))
             }
         }
 
@@ -623,9 +635,12 @@ class GameEngine {
 
     /// Damage blockers that are directly ON the affected positions (not just adjacent).
     /// Used for laser/volatile paths that should damage granite, cage, amber in their direct path.
-    private func damageBlockersInPath(_ positions: Set<GridPosition>) -> [GameEvent] {
+    /// `alreadyDamaged` prevents double-damage when processMatchAdjacent already hit these positions.
+    private func damageBlockersInPath(_ positions: Set<GridPosition>,
+                                      alreadyDamaged: Set<GridPosition> = []) -> [GameEvent] {
         var events: [GameEvent] = []
         for pos in positions {
+            guard !alreadyDamaged.contains(pos) else { continue }
             guard let blocker = board.blockerAt(pos) else { continue }
             switch blocker {
             case .granite(let layers):
@@ -683,10 +698,16 @@ class GameEngine {
                     state.score += delta
                     events.append(.scoreUpdated(newScore: state.score, delta: delta, at: target))
                     for p in chainAffected { board.removeGem(at: p) }
-                    events.append(contentsOf: blockerManager.processMatchAdjacent(
+                    let droneChainAdj = blockerManager.processMatchAdjacent(
                         matchedPositions: chainAffected, on: board
-                    ))
-                    events.append(contentsOf: damageBlockersInPath(chainAffected))
+                    )
+                    events.append(contentsOf: droneChainAdj)
+                    let droneChainDamaged = Set(droneChainAdj.compactMap { e -> GridPosition? in
+                        if case .blockerDamaged(let p, _) = e { return p }
+                        if case .blockerDestroyed(let p) = e { return p }
+                        return nil
+                    })
+                    events.append(contentsOf: damageBlockersInPath(chainAffected, alreadyDamaged: droneChainDamaged))
                 }
             }
         }
