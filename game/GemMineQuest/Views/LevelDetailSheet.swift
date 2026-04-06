@@ -1,8 +1,10 @@
 import SwiftUI
+import MapKit
 
 struct LevelDetailSheet: View {
     let levelNumber: Int
     @EnvironmentObject var progressManager: ProgressManager
+    @EnvironmentObject var boosterInventory: BoosterInventory
     var onPlay: () -> Void
     var onDismiss: () -> Void
 
@@ -10,91 +12,187 @@ struct LevelDetailSheet: View {
         LevelGenerator.getLevel(number: levelNumber)
     }
 
+    private var isShuffleLevel: Bool {
+        levelNumber >= 5 && (levelNumber % 10 == 5)
+    }
+
+    private var difficultyBadge: (text: String, color: UInt32)? {
+        if levelNumber >= 50 {
+            return ("Super Hard", 0xFF4444)
+        } else if levelNumber >= 25 {
+            return ("Hard", 0xFF6347)
+        }
+        return nil
+    }
+
     var body: some View {
-        ZStack {
-            Color(hex: 0x1A0F0A).ignoresSafeArea()
+        VStack(spacing: 0) {
+            ZStack {
+                Color.black.ignoresSafeArea()
+                    .overlay(
+                        Image("mine_bg_3")
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .opacity(0.4)
+                            .clipped()
+                    )
+                    .clipped()
 
-            VStack(spacing: 24) {
-                // Level number
-                Text("Level \(levelNumber)")
-                    .font(.system(size: 32, weight: .bold, design: .rounded))
-                    .foregroundColor(Color(hex: 0xFFD700))
-
-                // Best score
-                if progressManager.progress.highScore(for: levelNumber) > 0 {
-                    VStack(spacing: 4) {
-                        StarRatingView(stars: progressManager.progress.stars(for: levelNumber), size: 24)
-                        Text("Best: \(progressManager.progress.highScore(for: levelNumber))")
-                            .font(.caption)
-                            .foregroundColor(Color(hex: 0xCCBB99))
-                    }
-                }
-
-                Divider().background(Color(hex: 0x6B4F3A))
-
-                // Objectives
-                VStack(spacing: 12) {
-                    Text("Objectives")
-                        .font(.headline)
-                        .foregroundColor(Color(hex: 0xE8A035))
-
-                    ForEach(level.objectives.indices, id: \.self) { i in
+                ScrollView {
+                    VStack(spacing: 16) {
+                        // Back button row
                         HStack {
-                            Image(systemName: objectiveIcon(level.objectives[i]))
-                                .foregroundColor(Color(hex: 0xFFD700))
-                            Text(level.objectives[i].displayText)
-                                .foregroundColor(.white)
+                            Button(action: onDismiss) {
+                                Image(systemName: "chevron.left")
+                                    .font(.system(size: 18, weight: .bold))
+                                    .foregroundColor(Color(hex: 0xCCBB99))
+                                    .padding(10)
+                                    .background(Circle().fill(Color.black.opacity(0.4)))
+                            }
                             Spacer()
                         }
                         .padding(.horizontal)
-                    }
-                }
 
-                // Move limit
-                HStack {
-                    Image(systemName: "figure.walk")
-                        .foregroundColor(Color(hex: 0xCCBB99))
-                    Text("\(level.maxMoves) moves")
-                        .foregroundColor(Color(hex: 0xCCBB99))
-                }
+                        // Level number and Welsh name
+                        Text("Level \(levelNumber)")
+                            .font(.system(size: 32, weight: .bold, design: .rounded))
+                            .foregroundColor(Color(hex: 0xFFD700))
 
-                Spacer()
+                        HStack(spacing: 8) {
+                            Text(WelshPlaceNames.name(for: levelNumber))
+                                .font(.system(size: 18, weight: .medium, design: .serif))
+                                .foregroundColor(Color(hex: 0xCCBB99))
+                                .italic()
 
-                // Play button
-                Button(action: onPlay) {
-                    HStack {
-                        Image(systemName: "hammer.fill")
-                        Text("START DIG")
-                            .font(.title3.weight(.bold))
-                    }
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 18)
-                    .background(
-                        LinearGradient(
-                            colors: [Color(hex: 0xE8A035), Color(hex: 0xC68020)],
-                            startPoint: .top, endPoint: .bottom
+                            if let badge = difficultyBadge {
+                                Text(badge.text)
+                                    .font(.system(size: 11, weight: .bold))
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 3)
+                                    .background(
+                                        Capsule()
+                                            .fill(Color(hex: badge.color))
+                                    )
+                            }
+                        }
+
+                        // Welsh town map
+                        let welshPlace = WelshPlaceNames.place(for: levelNumber)
+                        let mapRegion = MKCoordinateRegion(
+                            center: welshPlace.coordinate,
+                            span: MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
                         )
-                    )
-                    .clipShape(RoundedRectangle(cornerRadius: 16))
-                }
-                .padding(.horizontal, 30)
+                        Map(initialPosition: .region(mapRegion)) {
+                            Marker(welshPlace.name, coordinate: welshPlace.coordinate)
+                                .tint(.red)
+                        }
+                        .mapStyle(.hybrid(elevation: .realistic))
+                        .frame(height: 250)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .padding(.horizontal)
+                        .allowsHitTesting(false)
 
-                Button("Back", action: onDismiss)
-                    .foregroundColor(Color(hex: 0x8B7355))
-                    .padding(.bottom, 20)
+                        // Best score
+                        if progressManager.progress.highScore(for: levelNumber) > 0 {
+                            VStack(spacing: 4) {
+                                StarRatingView(stars: progressManager.progress.stars(for: levelNumber), size: 24)
+                                Text("Best: \(progressManager.progress.highScore(for: levelNumber))")
+                                    .font(.caption)
+                                    .foregroundColor(Color(hex: 0xCCBB99))
+                            }
+                        }
+
+                        Divider().background(Color(hex: 0x6B4F3A))
+
+                        // Objectives
+                        VStack(spacing: 12) {
+                            Text("Objectives")
+                                .font(.headline)
+                                .foregroundColor(Color(hex: 0xE8A035))
+
+                            ForEach(level.objectives.indices, id: \.self) { i in
+                                VStack(alignment: .leading, spacing: 2) {
+                                    HStack {
+                                        Image(systemName: objectiveIcon(level.objectives[i]))
+                                            .foregroundColor(Color(hex: 0xFFD700))
+                                        Text(level.objectives[i].displayText)
+                                            .foregroundColor(.white)
+                                        Spacer()
+                                    }
+                                    Text(level.objectives[i].descriptionText)
+                                        .font(.caption)
+                                        .foregroundColor(Color(hex: 0x8B7355))
+                                        .padding(.leading, 28)
+                                }
+                                .padding(.horizontal)
+                            }
+                        }
+
+                        // Move limit
+                        HStack {
+                            Image(systemName: "figure.walk")
+                                .foregroundColor(Color(hex: 0xCCBB99))
+                            Text("\(level.maxMoves) moves")
+                                .foregroundColor(Color(hex: 0xCCBB99))
+                        }
+
+                        // Shuffle warning
+                        if isShuffleLevel {
+                            HStack(spacing: 6) {
+                                Image(systemName: "arrow.triangle.2.circlepath")
+                                    .foregroundColor(Color(hex: 0xFF6347))
+                                Text("Gems shuffle every 3 moves!")
+                                    .font(.system(size: 13, weight: .semibold))
+                                    .foregroundColor(Color(hex: 0xFF6347))
+                            }
+                            .padding(.vertical, 6)
+                            .padding(.horizontal, 12)
+                            .background(
+                                RoundedRectangle(cornerRadius: 8)
+                                    .fill(Color(hex: 0xFF6347).opacity(0.15))
+                            )
+                        }
+
+                    }
+                    .padding(.top, 16)
+                    .padding(.bottom, 16)
+                }
             }
-            .padding(.top, 30)
+
+            // Play button - fixed at bottom, outside ScrollView
+            Button(action: onPlay) {
+                HStack {
+                    Image(systemName: "hammer.fill")
+                    Text(progressManager.progress.stars(for: levelNumber) > 0 ? "DIG AGAIN" : "START DIG")
+                        .font(.title3.weight(.bold))
+                }
+                .foregroundColor(.white)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 20)
+                .background(
+                    LinearGradient(
+                        colors: [Color(hex: 0xD41818), Color(hex: 0x8B0000)],
+                        startPoint: .top, endPoint: .bottom
+                    )
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .shadow(color: Color(hex: 0xC71414).opacity(0.5), radius: 8, y: 4)
+            }
+            .padding(.horizontal, 24)
+            .padding(.bottom, 40)
+            .background(Color.black)
         }
     }
 
     private func objectiveIcon(_ objective: LevelObjective) -> String {
         switch objective {
         case .reachScore: return "target"
-        case .clearAllOre: return "pickaxe"
+        case .clearAllOre: return "hammer.fill"
         case .dropTreasures: return "shippingbox.fill"
         case .collectGems: return "diamond.fill"
         case .collectSpecials: return "sparkles"
         }
     }
+
 }

@@ -1,13 +1,19 @@
 import SpriteKit
 
 /// Calculates positions for the game board, adapting to screen size.
+/// The board fills the scene with small margins — NO SpriteKit HUD.
+/// All game info (score, moves, objectives) is handled by SwiftUI overlay.
 struct BoardLayout {
     let numRows: Int
     let numColumns: Int
     let tileSize: CGFloat
-    let boardOrigin: CGPoint  // Bottom-left of board
+    let boardOrigin: CGPoint
     let boardSize: CGSize
     let sceneSize: CGSize
+
+    // Reserve space for SwiftUI overlays (safe area + top bar + bottom booster bar)
+    static let topMargin: CGFloat = 100
+    static let bottomMargin: CGFloat = 80
 
     init(sceneSize: CGSize, numRows: Int = 8, numColumns: Int = 8) {
         self.sceneSize = sceneSize
@@ -15,7 +21,7 @@ struct BoardLayout {
         self.numColumns = numColumns
 
         let availableWidth = sceneSize.width - Constants.boardPadding * 2
-        let availableHeight = sceneSize.height - Constants.hudHeight - Constants.boardPadding * 3
+        let availableHeight = sceneSize.height - Self.topMargin - Self.bottomMargin
 
         let maxTileW = availableWidth / CGFloat(numColumns)
         let maxTileH = availableHeight / CGFloat(numRows)
@@ -26,13 +32,13 @@ struct BoardLayout {
             height: tileSize * CGFloat(numRows)
         )
 
-        // Center board horizontally, place below HUD
+        // Position board: center horizontally, vertically centered between top bar and booster bar
         let boardX = (sceneSize.width - boardSize.width) / 2
-        let boardY = (sceneSize.height - Constants.hudHeight - boardSize.height) / 2
-        self.boardOrigin = CGPoint(x: boardX, y: max(boardY, Constants.boardPadding))
+        let verticalPadding = max((availableHeight - boardSize.height) / 2, 0)
+        let boardY = Self.bottomMargin + verticalPadding
+        self.boardOrigin = CGPoint(x: max(boardX, Constants.boardPadding), y: max(boardY, Self.bottomMargin))
     }
 
-    /// Get screen position for a grid position (center of tile)
     func positionFor(row: Int, column: Int) -> CGPoint {
         CGPoint(
             x: boardOrigin.x + CGFloat(column) * tileSize + tileSize / 2,
@@ -44,32 +50,19 @@ struct BoardLayout {
         positionFor(row: pos.row, column: pos.column)
     }
 
-    /// Convert screen point to grid position (nil if outside board)
     func gridPositionFor(point: CGPoint) -> GridPosition? {
         let col = Int((point.x - boardOrigin.x) / tileSize)
         let row = Int((point.y - boardOrigin.y) / tileSize)
-
-        guard row >= 0 && row < numRows && col >= 0 && col < numColumns else {
-            return nil
-        }
+        guard row >= 0 && row < numRows && col >= 0 && col < numColumns else { return nil }
         return GridPosition(row: row, column: col)
     }
 
-    /// Gem visual size (slightly smaller than tile for spacing)
-    var gemSize: CGFloat {
-        tileSize - Constants.gemSpacing * 2
-    }
+    var gemSize: CGFloat { tileSize - Constants.gemSpacing * 2 }
 
-    /// Position for new gems entering from above (for animation start)
     func entryPositionFor(column: Int) -> CGPoint {
         CGPoint(
             x: boardOrigin.x + CGFloat(column) * tileSize + tileSize / 2,
             y: boardOrigin.y + CGFloat(numRows) * tileSize + tileSize
         )
-    }
-
-    /// HUD area (above the board)
-    var hudOrigin: CGPoint {
-        CGPoint(x: sceneSize.width / 2, y: sceneSize.height - Constants.hudHeight / 2 - 10)
     }
 }

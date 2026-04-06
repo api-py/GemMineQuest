@@ -3,7 +3,9 @@ import SpriteKit
 class HUDNode: SKNode {
 
     private var scoreLabel: SKLabelNode!
+    private var scoreShadowLabel: SKLabelNode!
     private var movesLabel: SKLabelNode!
+    private var movesShadowLabel: SKLabelNode!
     private var objectiveLabel: SKLabelNode!
     private var movesIcon: SKLabelNode!
     private let hudWidth: CGFloat
@@ -27,38 +29,79 @@ class HUDNode: SKNode {
         addChild(bg)
 
         // Score section (left)
+        let scoreTitleShadow = SKLabelNode(text: "SCORE")
+        scoreTitleShadow.fontName = "AvenirNext-Heavy"
+        scoreTitleShadow.fontSize = 11
+        scoreTitleShadow.fontColor = SKColor(white: 0, alpha: 0.6)
+        scoreTitleShadow.position = CGPoint(x: -hudWidth * 0.3 + 1, y: 15 - 1)
+        addChild(scoreTitleShadow)
+
         let scoreTitleLabel = SKLabelNode(text: "SCORE")
-        scoreTitleLabel.fontName = "AvenirNext-Medium"
+        scoreTitleLabel.fontName = "AvenirNext-Heavy"
         scoreTitleLabel.fontSize = 11
         scoreTitleLabel.fontColor = ColorPalette.textSecondary
         scoreTitleLabel.position = CGPoint(x: -hudWidth * 0.3, y: 15)
         addChild(scoreTitleLabel)
 
+        scoreShadowLabel = SKLabelNode(text: "0")
+        let scoreShadow = scoreShadowLabel!
+        scoreShadow.fontName = "AvenirNext-Heavy"
+        scoreShadow.fontSize = 26
+        scoreShadow.fontColor = SKColor(white: 0, alpha: 0.6)
+        scoreShadow.position = CGPoint(x: -hudWidth * 0.3 + 1, y: -10 - 1)
+        addChild(scoreShadow)
+
         scoreLabel = SKLabelNode(text: "0")
-        scoreLabel.fontName = "AvenirNext-Bold"
-        scoreLabel.fontSize = 22
+        scoreLabel.fontName = "AvenirNext-Heavy"
+        scoreLabel.fontSize = 26
         scoreLabel.fontColor = ColorPalette.textGold
         scoreLabel.position = CGPoint(x: -hudWidth * 0.3, y: -10)
         addChild(scoreLabel)
 
         // Moves section (center)
+        let movesTitleShadow = SKLabelNode(text: "MOVES")
+        movesTitleShadow.fontName = "AvenirNext-Heavy"
+        movesTitleShadow.fontSize = 11
+        movesTitleShadow.fontColor = SKColor(white: 0, alpha: 0.6)
+        movesTitleShadow.position = CGPoint(x: 1, y: 15 - 1)
+        addChild(movesTitleShadow)
+
         let movesTitleLabel = SKLabelNode(text: "MOVES")
-        movesTitleLabel.fontName = "AvenirNext-Medium"
+        movesTitleLabel.fontName = "AvenirNext-Heavy"
         movesTitleLabel.fontSize = 11
         movesTitleLabel.fontColor = ColorPalette.textSecondary
         movesTitleLabel.position = CGPoint(x: 0, y: 15)
         addChild(movesTitleLabel)
 
+        movesShadowLabel = SKLabelNode(text: "20")
+        let movesShadow = movesShadowLabel!
+        movesShadow.fontName = "AvenirNext-Heavy"
+        movesShadow.fontSize = 28
+        movesShadow.fontColor = SKColor(white: 0, alpha: 0.6)
+        movesShadow.position = CGPoint(x: 1, y: -12 - 1)
+        addChild(movesShadow)
+
         movesLabel = SKLabelNode(text: "20")
-        movesLabel.fontName = "AvenirNext-Bold"
+        movesLabel.fontName = "AvenirNext-Heavy"
         movesLabel.fontSize = 28
         movesLabel.fontColor = ColorPalette.textPrimary
         movesLabel.position = CGPoint(x: 0, y: -12)
         addChild(movesLabel)
 
         // Objective section (right)
+        let objectiveShadow = SKLabelNode(text: "")
+        objectiveShadow.fontName = "AvenirNext-Heavy"
+        objectiveShadow.fontSize = 13
+        objectiveShadow.fontColor = SKColor(white: 0, alpha: 0.6)
+        objectiveShadow.position = CGPoint(x: hudWidth * 0.3 + 1, y: 2 - 1)
+        objectiveShadow.preferredMaxLayoutWidth = hudWidth * 0.35
+        objectiveShadow.numberOfLines = 2
+        objectiveShadow.verticalAlignmentMode = .center
+        objectiveShadow.name = "objectiveShadow"
+        addChild(objectiveShadow)
+
         objectiveLabel = SKLabelNode(text: "")
-        objectiveLabel.fontName = "AvenirNext-DemiBold"
+        objectiveLabel.fontName = "AvenirNext-Heavy"
         objectiveLabel.fontSize = 13
         objectiveLabel.fontColor = ColorPalette.textSecondary
         objectiveLabel.position = CGPoint(x: hudWidth * 0.3, y: 2)
@@ -69,7 +112,9 @@ class HUDNode: SKNode {
     }
 
     func updateScore(_ score: Int) {
-        scoreLabel.text = "\(score)"
+        let text = "\(score)"
+        scoreLabel.text = text
+        scoreShadowLabel?.text = text
         // Pop animation
         scoreLabel.run(SKAction.sequence([
             SKAction.scale(to: 1.2, duration: 0.1),
@@ -78,7 +123,9 @@ class HUDNode: SKNode {
     }
 
     func updateMoves(_ moves: Int, godMode: Bool) {
-        movesLabel.text = godMode ? "\u{221E}" : "\(moves)"  // ∞ symbol
+        let text = godMode ? "\u{221E}" : "\(moves)"  // ∞ symbol
+        movesLabel.text = text
+        movesShadowLabel?.text = text
         movesLabel.fontColor = moves <= 3 && !godMode ? SKColor.red : ColorPalette.textPrimary
 
         if moves <= 3 && !godMode {
@@ -91,6 +138,9 @@ class HUDNode: SKNode {
 
     func updateObjective(_ text: String) {
         objectiveLabel.text = text
+        if let shadow = childNode(withName: "objectiveShadow") as? SKLabelNode {
+            shadow.text = text
+        }
     }
 
     func showScorePopup(delta: Int, at position: CGPoint) {

@@ -1,28 +1,190 @@
 {
-    "number": 7,
-    "maxMoves": 18,
-    "objectives": [{ "type": "reachScore", "target": 3000 }],
-    "targetScores": [3000, 6000, 10000],
-    "tileLayout": [
-        [1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1]
+  "number": 7,
+  "maxMoves": 11,
+  "objectives": [
+    {
+      "type": "clearAllOre"
+    },
+    {
+      "type": "reachScore",
+      "target": 3000
+    }
+  ],
+  "targetScores": [
+    3449,
+    5750,
+    8049
+  ],
+  "tileLayout": [
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
     ],
-    "blockerLayout": [
-        [null, null, null, null, null, null, null, null],
-        [null, null, null, null, null, null, null, null],
-        [null, null, null, null, null, null, null, null],
-        [null, null, {"type": "granite", "value": 2}, null, null, null, null, null],
-        [null, null, null, null, null, {"type": "granite", "value": 2}, null, null],
-        [null, null, null, null, null, null, null, null],
-        [null, null, null, null, null, null, null, null],
-        [null, null, null, null, null, null, null, null]
+    [
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      2,
+      1
     ],
-    "treasureColumns": null,
-    "numColors": 6
+    [
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      2,
+      2,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      2,
+      2,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      2,
+      1,
+      1,
+      2,
+      1,
+      1
+    ],
+    [
+      1,
+      2,
+      1,
+      1,
+      1,
+      1,
+      2,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ]
+  ],
+  "blockerLayout": [
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      {
+        "type": "boulder",
+        "value": null
+      },
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      {
+        "type": "boulder",
+        "value": null
+      }
+    ]
+  ],
+  "treasureColumns": null,
+  "numColors": 6
 }

@@ -52,9 +52,9 @@ class SpecialGemResolver {
             return hPositions.union(vPositions)
         }
 
-        // Volatile + Volatile = 5x5 area
+        // Volatile + Volatile = CLEAR ENTIRE BOARD
         if typeA == .volatile && typeB == .volatile {
-            return resolveArea(center: posA, radius: 2, on: board)
+            return Set(board.allPlayablePositions().filter { board[$0] != nil })
         }
 
         // Laser + Volatile = 3-wide cross
@@ -63,10 +63,34 @@ class SpecialGemResolver {
             return resolveThickCross(at: center, on: board)
         }
 
-        // Drone combos
+        // Volatile + Drone = volatile teleports to random location and explodes there
+        if (typeA == .volatile && typeB == .miningDrone) || (typeA == .miningDrone && typeB == .volatile) {
+            let allPositions = board.allPlayablePositions().filter { board[$0] != nil }
+            guard let randomPos = allPositions.randomElement() else { return [] }
+            return resolveArea(center: randomPos, radius: 1, on: board)
+        }
+
+        // Drone + Drone = double explosion: two large 3x3 blasts at random locations
+        if typeA == .miningDrone && typeB == .miningDrone {
+            var affected = Set<GridPosition>()
+            let allGemPositions = board.allPlayablePositions().filter { board[$0] != nil }
+            // Two random explosion centers
+            let centers = allGemPositions.shuffled().prefix(2)
+            for center in centers {
+                let area = resolveArea(center: center, radius: 2, on: board) // 5x5 area
+                affected.formUnion(area)
+            }
+            // Also include positions A and B
+            affected.insert(posA)
+            affected.insert(posB)
+            return affected
+        }
+
+        // Drone + Laser: drones carry the laser effect
         if typeA == .miningDrone || typeB == .miningDrone {
-            // Drones carry the other special's effect - handled in GameEngine
-            return []
+            let otherType = typeA == .miningDrone ? typeB : typeA
+            let otherPos = typeA == .miningDrone ? posB : posA
+            return resolve(special: otherType, at: otherPos, on: board)
         }
 
         return []
@@ -166,30 +190,53 @@ class SpecialGemResolver {
 
     /// Get drone target positions (random gems, prioritizing objectives)
     func getDroneTargets(count: Int, on board: Board, prioritizeOre: Bool = true) -> [GridPosition] {
-        var candidates: [GridPosition] = []
+        var lavaCandidates: [GridPosition] = []
+        var boulderCandidates: [GridPosition] = []
+        var cageCandidates: [GridPosition] = []
+        var tntCandidates: [GridPosition] = []
         var oreCandidates: [GridPosition] = []
+        var gemCandidates: [GridPosition] = []
 
         for pos in board.allPlayablePositions() {
-            guard board[pos] != nil else { continue }
-            if board.hasOreVein(at: pos) {
-                oreCandidates.append(pos)
+            if let blocker = board.blockerAt(pos) {
+                switch blocker {
+                case .lava: lavaCandidates.append(pos)
+                case .boulder: boulderCandidates.append(pos)
+                case .cage: cageCandidates.append(pos)
+                case .tnt: tntCandidates.append(pos)
+                default: break
+                }
             }
-            candidates.append(pos)
+            if board[pos] != nil {
+                // Lava-adjacent gem positions (no blocker on the gem itself)
+                if board.blockerAt(pos) == nil {
+                    let hasAdjacentLava = pos.neighbors.contains { n in
+                        guard board.isValidPosition(n) else { return false }
+                        if case .lava = board.blockerAt(n) { return true }
+                        return false
+                    }
+                    if hasAdjacentLava {
+                        lavaCandidates.append(pos)
+                    }
+                }
+                if board.hasOreVein(at: pos) {
+                    oreCandidates.append(pos)
+                }
+                gemCandidates.append(pos)
+            }
         }
 
-        // Prioritize ore positions
         var targets: [GridPosition] = []
-        if prioritizeOre {
-            targets.append(contentsOf: oreCandidates.shuffled().prefix(count))
+        let priorityLists = [
+            lavaCandidates, boulderCandidates, cageCandidates,
+            tntCandidates, oreCandidates, gemCandidates
+        ]
+        for list in priorityLists {
+            let remaining = count - targets.count
+            guard remaining > 0 else { break }
+            let filtered = list.filter { !targets.contains($0) }.shuffled()
+            targets.append(contentsOf: filtered.prefix(remaining))
         }
-
-        // Fill remaining with random positions
-        let remaining = count - targets.count
-        if remaining > 0 {
-            let available = candidates.filter { !targets.contains($0) }.shuffled()
-            targets.append(contentsOf: available.prefix(remaining))
-        }
-
         return targets
     }
 }

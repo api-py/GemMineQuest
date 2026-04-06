@@ -1,5 +1,6 @@
 import SpriteKit
 
+@MainActor
 class AnimationController {
 
     weak var scene: GameScene?
@@ -21,13 +22,19 @@ class AnimationController {
 
     private func animatePhases(_ phases: [[GameEvent]], index: Int, completion: @escaping () -> Void) {
         guard index < phases.count else {
+            scene?.syncAllSpriteZPositions()
             completion()
             return
         }
 
         let phase = phases[index]
         animatePhase(phase) { [weak self] in
-            self?.animatePhases(phases, index: index + 1, completion: completion)
+            guard let self else {
+                // Scene deallocated mid-animation — still call completion to unblock game state
+                completion()
+                return
+            }
+            self.animatePhases(phases, index: index + 1, completion: completion)
         }
     }
 
@@ -44,7 +51,10 @@ class AnimationController {
         if maxDuration > 0 {
             scene.run(SKAction.sequence([
                 SKAction.wait(forDuration: maxDuration),
-                SKAction.run(completion)
+                SKAction.run { [weak self] in
+                    self?.scene?.syncAllSpriteZPositions()
+                    completion()
+                }
             ]))
         } else {
             completion()
@@ -137,11 +147,28 @@ class AnimationController {
             scene.addChild(effect)
             return 1.0
 
-        case .levelComplete, .levelFailed:
-            return 0 // Handled by GameScene via delegate
+        case .levelComplete(_, _):
+            // Show "Level Complete!" popup on board before game-over screen
+            let center = CGPoint(x: layout.sceneSize.width / 2, y: layout.sceneSize.height / 2)
+            let banner = createEncouragementBanner("Level Complete!", at: center, color: ColorPalette.sparkleGold, large: true)
+            scene.addChild(banner)
+            return 1.5
+
+        case .levelFailed:
+            let center = CGPoint(x: layout.sceneSize.width / 2, y: layout.sceneSize.height / 2)
+            let banner = createEncouragementBanner("Out of Moves!", at: center, color: SKColor(hex: 0xFF6347), large: true)
+            scene.addChild(banner)
+            return 1.2
 
         case .droneDeployed(let from, let to):
             return animateDrone(from: from, to: to)
+
+        case .encouragement(let text):
+            let center = CGPoint(x: layout.sceneSize.width / 2,
+                                  y: layout.boardOrigin.y + layout.boardSize.height / 2)
+            let banner = createEncouragementBanner(text, at: center, color: ColorPalette.sparkleGold, large: false)
+            scene.addChild(banner)
+            return 0.3  // Brief pause so player notices
 
         case .treasureDropped(let pos):
             let effect = VisualEffects.createStarBurst(at: layout.positionFor(pos), color: ColorPalette.sparkleGold)
@@ -163,8 +190,20 @@ class AnimationController {
         let posA = layout.positionFor(from)
         let posB = layout.positionFor(to)
 
-        spriteA?.run(SKAction.moveWithEase(to: posB, duration: Constants.swapDuration))
-        spriteB?.run(SKAction.moveWithEase(to: posA, duration: Constants.swapDuration))
+        // Raise swapping gems above others to prevent overlap
+        spriteA?.zPosition = 10.0 + CGFloat(from.row) * 0.01
+        spriteB?.zPosition = 10.0 + CGFloat(to.row) * 0.01
+
+        let restingZA: CGFloat = 1.0 + CGFloat(to.row) * 0.01  // A goes to 'to' position
+        let restingZB: CGFloat = 1.0 + CGFloat(from.row) * 0.01  // B goes to 'from' position
+        spriteA?.run(SKAction.sequence([
+            SKAction.moveWithEase(to: posB, duration: Constants.swapDuration),
+            SKAction.run { spriteA?.zPosition = restingZA }
+        ]))
+        spriteB?.run(SKAction.sequence([
+            SKAction.moveWithEase(to: posA, duration: Constants.swapDuration),
+            SKAction.run { spriteB?.zPosition = restingZB }
+        ]))
 
         scene.updateGemSpriteMapping(from: from, to: to)
 
@@ -218,6 +257,11 @@ class AnimationController {
     private func animateSpecialCreation(type: SpecialType, color: GemColor, at pos: GridPosition) -> TimeInterval {
         guard let scene = scene else { return 0 }
 
+        // Immediately hide any old sprite to prevent color flash
+        if let oldSprite = scene.gemSpriteAt(pos) {
+            oldSprite.alpha = 0
+        }
+
         scene.rebuildGemSprite(at: pos)
 
         if let sprite = scene.gemSpriteAt(pos) {
@@ -236,6 +280,15 @@ class AnimationController {
         guard let scene = scene else { return 0 }
         let center = layout.positionFor(pos)
 
+        // Always remove the activating special gem's sprite too
+        if let activatingSprite = scene.gemSpriteAt(pos) {
+            activatingSprite.run(SKAction.sequence([
+                SKAction.shrinkAndFade(duration: 0.2),
+                SKAction.removeFromParent()
+            ]))
+            scene.removeGemSprite(at: pos)
+        }
+
         switch type {
         case .laserHorizontal, .laserVertical:
             // Laser beam effect
@@ -253,22 +306,106 @@ class AnimationController {
             scene.boardLayer.addChild(beam)
 
         case .volatile:
+            // Charging glow at center before explosion
+            let chargeGlow = SKShapeNode(circleOfRadius: layout.tileSize * 0.3)
+            chargeGlow.fillColor = SKColor(red: 1, green: 0.4, blue: 0, alpha: 0.8)
+            chargeGlow.strokeColor = SKColor.white.withAlphaComponent(0.6)
+            chargeGlow.lineWidth = 2.0
+            chargeGlow.glowWidth = 6.0
+            chargeGlow.position = center
+            chargeGlow.zPosition = 45
+            chargeGlow.setScale(0.3)
+            scene.boardLayer.addChild(chargeGlow)
+
+            // Charge up, pause, then explode
+            chargeGlow.run(SKAction.sequence([
+                SKAction.scale(to: 1.5, duration: 0.25),
+                SKAction.wait(forDuration: 0.15),
+                SKAction.group([
+                    SKAction.scale(to: 3.0, duration: 0.15),
+                    SKAction.fadeOut(withDuration: 0.15)
+                ]),
+                SKAction.removeFromParent()
+            ]))
+
+            // Delayed explosion after charge
             let explosion = ParticleEffects.volatileExplosion(at: center)
+            explosion.alpha = 0
             scene.boardLayer.addChild(explosion)
+            explosion.run(SKAction.sequence([
+                SKAction.wait(forDuration: 0.4),
+                SKAction.fadeIn(withDuration: 0.05)
+            ]))
+
+            // Flash each affected gem's position after the charge
+            for affectedPos in affected {
+                let worldPos = layout.positionFor(affectedPos)
+                let flash = SKShapeNode(circleOfRadius: layout.tileSize * 0.45)
+                flash.fillColor = SKColor(red: 1, green: 0.5, blue: 0, alpha: 0.6)
+                flash.strokeColor = .clear
+                flash.position = worldPos
+                flash.zPosition = 40
+                flash.alpha = 0
+                scene.boardLayer.addChild(flash)
+                flash.run(SKAction.sequence([
+                    SKAction.wait(forDuration: 0.4),
+                    SKAction.fadeIn(withDuration: 0.05),
+                    SKAction.wait(forDuration: 0.1),
+                    SKAction.fadeOut(withDuration: 0.2),
+                    SKAction.removeFromParent()
+                ]))
+            }
 
         case .crystalBall:
             let wave = ParticleEffects.crystalBallWave(at: center)
             scene.boardLayer.addChild(wave)
 
+            // Draw laser lines from crystal ball to each affected gem
+            for (i, affectedPos) in affected.enumerated() {
+                let targetPoint = layout.positionFor(affectedPos)
+                let delay = Double(i) * 0.02 // Stagger the lines slightly
+
+                let line = SKShapeNode()
+                let path = CGMutablePath()
+                path.move(to: center)
+                path.addLine(to: targetPoint)
+                line.path = path
+                line.strokeColor = SKColor(red: 0.8, green: 0.4, blue: 1.0, alpha: 0.9)
+                line.lineWidth = 2.0
+                line.glowWidth = 4.0
+                line.zPosition = 35
+                line.alpha = 0
+                scene.boardLayer.addChild(line)
+
+                // Flash the line in then out
+                line.run(SKAction.sequence([
+                    SKAction.wait(forDuration: delay),
+                    SKAction.fadeIn(withDuration: 0.05),
+                    // Shake effect: slight position jitter
+                    SKAction.repeat(SKAction.sequence([
+                        SKAction.moveBy(x: CGFloat.random(in: -1.5...1.5), y: CGFloat.random(in: -1.5...1.5), duration: 0.03),
+                        SKAction.moveBy(x: CGFloat.random(in: -1.5...1.5), y: CGFloat.random(in: -1.5...1.5), duration: 0.03),
+                    ]), count: 3),
+                    SKAction.fadeOut(withDuration: 0.15),
+                    SKAction.removeFromParent()
+                ]))
+            }
+
         default:
             break
         }
 
-        // Remove affected gems
+        // Remove affected gems (with delay for charge-up animations)
+        let removalDelay: TimeInterval
+        switch type {
+        case .volatile: removalDelay = 0.5 // After charge-up + explosion
+        case .crystalBall: removalDelay = 0.25
+        default: removalDelay = 0.1
+        }
         for affectedPos in affected {
             if let sprite = scene.gemSpriteAt(affectedPos) {
                 sprite.run(SKAction.sequence([
-                    SKAction.wait(forDuration: 0.1),
+                    SKAction.wait(forDuration: removalDelay),
                     SKAction.shrinkAndFade(duration: 0.2),
                     SKAction.removeFromParent()
                 ]))
@@ -276,7 +413,11 @@ class AnimationController {
             }
         }
 
-        return Constants.specialActivationDuration
+        // Add a small pause after crystal ball explosion before gems fall
+        let duration = type == .crystalBall
+            ? Constants.specialActivationDuration + 0.3
+            : Constants.specialActivationDuration
+        return duration
     }
 
     private func animateFalls(moves: [(from: GridPosition, to: GridPosition)]) -> TimeInterval {
@@ -289,7 +430,12 @@ class AnimationController {
                 let rowDiff = abs(move.from.row - move.to.row)
                 let duration = Constants.fallDurationPerRow * Double(rowDiff)
 
-                sprite.run(SKAction.fallWithBounce(to: targetPos, duration: duration))
+                let capturedSprite = sprite
+                capturedSprite.zPosition = 10.0 + CGFloat(move.to.row) * 0.01  // Above stationary gems during fall
+                capturedSprite.run(SKAction.sequence([
+                    SKAction.fallWithBounce(to: targetPos, duration: duration),
+                    SKAction.run { capturedSprite.zPosition = 1.0 + CGFloat(move.to.row) * 0.01 }
+                ]))
                 scene.moveGemSprite(from: move.from, to: move.to)
                 maxDuration = max(maxDuration, duration + Constants.fallBounce)
             }
@@ -305,15 +451,20 @@ class AnimationController {
         for (gem, pos) in gems {
             let sprite = GemSprite(gem: gem, size: layout.gemSize)
             sprite.position = layout.entryPositionFor(column: pos.column)
-            sprite.zPosition = 10
+            let rowsToFall = CGFloat(scene.gameState?.board.numRows ?? 8) - CGFloat(pos.row)
+            sprite.zPosition = 10.0 + CGFloat(pos.row) * 0.01
             scene.boardLayer.addChild(sprite)
             scene.setGemSprite(sprite, at: pos)
 
             let targetPos = layout.positionFor(pos)
-            let rowsToFall = CGFloat(scene.gameState?.board.numRows ?? 8) - CGFloat(pos.row)
             let duration = Constants.fallDurationPerRow * Double(rowsToFall)
 
-            sprite.run(SKAction.fallWithBounce(to: targetPos, duration: duration))
+            let capturedSprite = sprite
+            let restingZ: CGFloat = 1.0 + CGFloat(pos.row) * 0.01
+            capturedSprite.run(SKAction.sequence([
+                SKAction.fallWithBounce(to: targetPos, duration: duration),
+                SKAction.run { capturedSprite.zPosition = restingZ }
+            ]))
             maxDuration = max(maxDuration, duration + Constants.fallBounce)
         }
 
@@ -322,34 +473,133 @@ class AnimationController {
 
     private func animateShuffle() -> TimeInterval {
         guard let scene = scene else { return 0 }
-        scene.rebuildAllGemSprites()
-        return 0.5
+
+        // Show reshuffling banner
+        let banner = MineBlastAnimation.createBannerNode(text: "Reshuffling...", size: layout.sceneSize)
+        scene.addChild(banner)
+
+        // Rebuild gems after a delay
+        scene.run(SKAction.sequence([
+            SKAction.wait(forDuration: 1.0),
+            SKAction.run { scene.rebuildAllGemSprites() }
+        ]))
+
+        return 1.8
     }
 
     private func animateDrone(from: GridPosition, to: GridPosition) -> TimeInterval {
         guard let scene = scene else { return 0 }
 
-        let drone = DroneSprite(size: layout.gemSize)
-        scene.boardLayer.addChild(drone)
-
         let startPos = layout.positionFor(from)
         let targetPos = layout.positionFor(to)
 
-        drone.flyToTarget(from: startPos, to: targetPos) { [weak scene] in
-            if let sprite = scene?.gemSpriteAt(to) {
+        // Create a visible drone orb that flies in an arc
+        let drone = SKShapeNode(circleOfRadius: 8)
+        drone.fillColor = SKColor(red: 0.0, green: 0.9, blue: 0.9, alpha: 1.0)
+        drone.strokeColor = SKColor.white
+        drone.lineWidth = 1.5
+        drone.glowWidth = 6.0
+        drone.zPosition = 40
+        drone.position = startPos
+        drone.setScale(0.3)
+        scene.boardLayer.addChild(drone)
+
+        // Arc path: rise up then curve down to target
+        let midPoint = CGPoint(
+            x: (startPos.x + targetPos.x) / 2 + CGFloat.random(in: -30...30),
+            y: max(startPos.y, targetPos.y) + 50
+        )
+        let arcPath = CGMutablePath()
+        arcPath.move(to: startPos)
+        arcPath.addQuadCurve(to: targetPos, control: midPoint)
+
+        let flyDuration: TimeInterval = 0.5
+        let flyAction = SKAction.follow(arcPath, asOffset: false, orientToPath: false, duration: flyDuration)
+        flyAction.timingMode = .easeInEaseOut
+
+        // Trail effect
+        let trail = SKShapeNode(circleOfRadius: 3)
+        trail.fillColor = SKColor.cyan.withAlphaComponent(0.4)
+        trail.strokeColor = .clear
+        trail.glowWidth = 3.0
+        trail.zPosition = 39
+
+        let targetColor = scene.gameState?.board[to]?.color.primaryColor ?? .cyan
+
+        drone.run(SKAction.sequence([
+            SKAction.scale(to: 1.0, duration: 0.15),
+            flyAction,
+            SKAction.run { [weak scene] in
+                guard let scene = scene else { return }
+                // Explosion at target
                 let effect = ParticleEffects.gemShatter(at: targetPos,
-                    color: scene?.gameState?.board[to]?.color.primaryColor ?? .white)
-                scene?.boardLayer.addChild(effect)
+                    color: targetColor)
+                scene.boardLayer.addChild(effect)
 
-                sprite.run(SKAction.sequence([
-                    SKAction.shrinkAndFade(duration: 0.2),
-                    SKAction.removeFromParent()
-                ]))
-                scene?.removeGemSprite(at: to)
-            }
-        }
+                if let sprite = scene.gemSpriteAt(to) {
+                    sprite.run(SKAction.sequence([
+                        SKAction.shrinkAndFade(duration: 0.2),
+                        SKAction.removeFromParent()
+                    ]))
+                    scene.removeGemSprite(at: to)
+                }
 
-        return Constants.droneFlightDuration
+                // Clean up any ore/special highlight tint on the tile
+                if let tileSprite = scene.tileAt(to) {
+                    tileSprite.clearHighlight()
+                }
+            },
+            SKAction.group([
+                SKAction.scale(to: 2.0, duration: 0.15),
+                SKAction.fadeOut(withDuration: 0.15)
+            ]),
+            SKAction.removeFromParent()
+        ]))
+
+        return flyDuration + 0.35
+    }
+
+    // MARK: - Encouragement Banner
+
+    private func createEncouragementBanner(_ text: String, at position: CGPoint, color: SKColor, large: Bool) -> SKNode {
+        let container = SKNode()
+        container.position = position
+        container.zPosition = 50
+
+        let label = SKLabelNode(text: text)
+        label.fontName = "AvenirNext-Heavy"
+        label.fontSize = large ? 32 : 22
+        label.fontColor = color
+        label.verticalAlignmentMode = .center
+        container.addChild(label)
+
+        // Background pill
+        let bg = SKShapeNode(rectOf: CGSize(width: label.frame.width + 40, height: label.frame.height + 20), cornerRadius: 12)
+        bg.fillColor = SKColor.black.withAlphaComponent(0.6)
+        bg.strokeColor = color.withAlphaComponent(0.5)
+        bg.lineWidth = 2.0
+        bg.glowWidth = 4.0
+        bg.zPosition = -1
+        container.addChild(bg)
+
+        // Animate: scale in, hold, float up and fade out
+        container.setScale(0.5)
+        container.alpha = 0
+        container.run(SKAction.sequence([
+            SKAction.group([
+                SKAction.scale(to: 1.1, duration: 0.2),
+                SKAction.fadeIn(withDuration: 0.15)
+            ]),
+            SKAction.scale(to: 1.0, duration: 0.1),
+            SKAction.wait(forDuration: large ? 1.0 : 0.6),
+            SKAction.group([
+                SKAction.moveBy(x: 0, y: 40, duration: 0.4),
+                SKAction.fadeOut(withDuration: 0.4)
+            ]),
+            SKAction.removeFromParent()
+        ]))
+
+        return container
     }
 
     // MARK: - Phase Grouping
@@ -368,13 +618,21 @@ class AnimationController {
                 if !currentPhase.isEmpty { phases.append(currentPhase); currentPhase = [] }
                 currentPhase.append(event)
 
+            case .specialActivated:
+                currentPhase.append(event)
+
+            case .specialCreated:
+                // Keep in same phase as preceding .matched to avoid color flash
+                currentPhase.append(event)
+
             case .gemsFell, .gemsAdded:
                 currentPhase.append(event)
                 phases.append(currentPhase)
                 currentPhase = []
 
-            case .specialActivated:
-                currentPhase.append(event)
+            case .boardShuffled:
+                if !currentPhase.isEmpty { phases.append(currentPhase); currentPhase = [] }
+                phases.append([event])
 
             case .levelComplete, .levelFailed:
                 if !currentPhase.isEmpty { phases.append(currentPhase); currentPhase = [] }

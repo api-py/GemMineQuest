@@ -5,6 +5,16 @@ struct PlayerProgress: Codable {
     var highScores: [Int: Int] = [:]     // level number -> best score
     var highestUnlocked: Int = 1
 
+    // Engagement properties
+    var coins: Int = 100
+    var gems: Int = 5
+    var lastDailyRewardDate: String? = nil
+    var dailyStreak: Int = 0
+    var lastSpinDate: String? = nil
+    var totalGamesPlayed: Int = 0
+    var unlockedAchievements: [String] = []
+    var claimedMilestones: [String] = []
+
     func isUnlocked(_ level: Int) -> Bool {
         level <= highestUnlocked
     }
@@ -27,5 +37,17 @@ struct PlayerProgress: Codable {
         if stars > 0 && level >= highestUnlocked {
             highestUnlocked = level + 1
         }
+    }
+
+    mutating func addCoins(_ amount: Int) {
+        coins = max(0, coins + amount)
+    }
+
+    var totalStars: Int {
+        levelStars.values.reduce(0, +)
+    }
+
+    var levelsCompleted: Int {
+        levelStars.values.filter { $0 > 0 }.count
     }
 }

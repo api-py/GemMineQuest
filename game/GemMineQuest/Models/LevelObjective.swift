@@ -12,13 +12,28 @@ enum LevelObjective: Codable, Equatable {
         case .reachScore(let target):
             return "Score \(target) points"
         case .clearAllOre:
-            return "Clear all ore veins"
+            return "Mine all ore tiles"
         case .dropTreasures(let count):
             return "Drop \(count) treasure\(count > 1 ? "s" : "") to mine cart"
         case .collectGems(let color, let count):
-            return "Collect \(count) \(color.displayName)\(count > 1 ? "s" : "")"
+            return "Collect \(count) \(color.displayName)\(count > 1 ? "s" : "") (\(color.colorHint))"
         case .collectSpecials(let type, let count):
             return "Create \(count) \(type.displayName)\(count > 1 ? "s" : "")"
+        }
+    }
+
+    var descriptionText: String {
+        switch self {
+        case .reachScore(let target):
+            return "Score at least \(target) points by matching gems"
+        case .clearAllOre:
+            return "Match gems on gold ore tiles to mine them. Boosters don't count!"
+        case .dropTreasures(let count):
+            return "Move \(count) treasure\(count > 1 ? "s" : "") to the mine cart at the bottom"
+        case .collectGems(let color, let count):
+            return "Match and collect \(count) \(color.displayName) gems (\(color.colorHint))"
+        case .collectSpecials(let type, let count):
+            return "Create \(count) \(type.displayName) gem\(count > 1 ? "s" : "") through special matches"
         }
     }
 
@@ -32,6 +47,22 @@ enum LevelObjective: Codable, Equatable {
             return "\(count) treasure\(count > 1 ? "s" : "")"
         case .collectGems(let color, let count):
             return "\(count) \(color.displayName)"
+        case .collectSpecials(let type, let count):
+            return "\(count) \(type.displayName)"
+        }
+    }
+
+    /// Short text with color hint for in-game display
+    var shortTextWithColor: String {
+        switch self {
+        case .reachScore(let target):
+            return "\(target) pts"
+        case .clearAllOre:
+            return "Clear all ore"
+        case .dropTreasures(let count):
+            return "\(count) treasure\(count > 1 ? "s" : "")"
+        case .collectGems(let color, let count):
+            return "\(count) \(color.displayName) (\(color.colorHint))"
         case .collectSpecials(let type, let count):
             return "\(count) \(type.displayName)"
         }
@@ -71,19 +102,31 @@ enum LevelObjective: Codable, Equatable {
         switch type {
         case "reachScore":
             let target = try container.decode(Int.self, forKey: .target)
+            guard target > 0 else {
+                throw DecodingError.dataCorruptedError(forKey: .target, in: container, debugDescription: "Target score must be positive")
+            }
             self = .reachScore(target: target)
         case "clearAllOre":
             self = .clearAllOre
         case "dropTreasures":
             let count = try container.decode(Int.self, forKey: .count)
+            guard count > 0 else {
+                throw DecodingError.dataCorruptedError(forKey: .count, in: container, debugDescription: "Treasure count must be positive")
+            }
             self = .dropTreasures(count: count)
         case "collectGems":
             let color = try container.decode(GemColor.self, forKey: .color)
             let count = try container.decode(Int.self, forKey: .count)
+            guard count > 0 else {
+                throw DecodingError.dataCorruptedError(forKey: .count, in: container, debugDescription: "Gem count must be positive")
+            }
             self = .collectGems(color: color, count: count)
         case "collectSpecials":
             let specialType = try container.decode(SpecialType.self, forKey: .specialType)
             let count = try container.decode(Int.self, forKey: .count)
+            guard count > 0 else {
+                throw DecodingError.dataCorruptedError(forKey: .count, in: container, debugDescription: "Special count must be positive")
+            }
             self = .collectSpecials(type: specialType, count: count)
         default:
             throw DecodingError.dataCorruptedError(forKey: .type, in: container, debugDescription: "Unknown objective type: \(type)")
