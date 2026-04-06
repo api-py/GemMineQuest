@@ -45,9 +45,9 @@ struct Level: Codable {
 
     func buildBoard() -> Board {
         let numRows = tileLayout.count
-        let numCols = tileLayout.first?.count ?? 8
+        let numCols = tileLayout.first?.count ?? Constants.defaultGridColumns
         guard numRows > 0 && numCols > 0 else {
-            return Board(numRows: 8, numColumns: 8)
+            return Board()
         }
         let board = Board(numRows: numRows, numColumns: numCols)
 

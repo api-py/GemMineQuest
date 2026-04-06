@@ -10,8 +10,8 @@ final class LevelGeneratorTests: XCTestCase {
         XCTAssertGreaterThan(level.maxMoves, 0)
         XCTAssertFalse(level.objectives.isEmpty)
         XCTAssertEqual(level.targetScores.count, 3)
-        XCTAssertEqual(level.tileLayout.count, 8)
-        XCTAssertEqual(level.tileLayout[0].count, 8)
+        XCTAssertEqual(level.tileLayout.count, Constants.defaultGridRows)
+        XCTAssertEqual(level.tileLayout[0].count, Constants.defaultGridColumns)
 
         // Target scores should be ascending
         XCTAssertLessThanOrEqual(level.targetScores[0], level.targetScores[1])

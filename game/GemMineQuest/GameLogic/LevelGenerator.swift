@@ -114,8 +114,8 @@ class LevelGenerator {
 
     private static func generateTileLayout(difficulty: Double, levelType: Level.LevelType,
                                             rng: inout SeededRandomNumberGenerator) -> [[Int]] {
-        let rows = 8
-        let cols = 8
+        let rows = Constants.defaultGridRows
+        let cols = Constants.defaultGridColumns
         var layout = Array(repeating: Array(repeating: 1, count: cols), count: rows)
 
         // Shape variety: always allow multiple shapes, more at higher difficulty
@@ -149,9 +149,11 @@ class LevelGenerator {
                     layout[Int.random(in: 0..<rows, using: &rng)][Int.random(in: 0..<cols, using: &rng)] = 0
                 }
             case 4: // Hourglass (narrow middle)
-                let narrowWidth = max(3, 8 - Int(difficulty * 4))
+                let narrowWidth = max(3, cols - Int(difficulty * 4))
                 let margin = (cols - narrowWidth) / 2
-                for r in 3...4 {
+                let midStart = rows / 2 - 1
+                let midEnd = rows / 2
+                for r in midStart...midEnd {
                     for c in 0..<margin { layout[r][c] = 0 }
                     for c in (cols-margin)..<cols { layout[r][c] = 0 }
                 }
@@ -165,7 +167,7 @@ class LevelGenerator {
                     for c in (cols-cut)..<cols { layout[r][c] = 0 }
                 }
             case 7: // Narrow corridor
-                let w = max(4, 8 - Int(difficulty * 4))
+                let w = max(4, cols - Int(difficulty * 4))
                 let offset = (cols-w)/2
                 for r in 0..<rows {
                     for c in 0..<offset { layout[r][c] = 0 }
@@ -177,8 +179,10 @@ class LevelGenerator {
                     else { layout[r][cols-1] = 0; layout[r][cols-2] = 0 }
                 }
             case 9: // Ring/donut (center hollow)
-                for r in 2...5 { for c in 2...5 {
-                    if r >= 3 && r <= 4 && c >= 3 && c <= 4 { layout[r][c] = 0 }
+                let cR = rows / 2
+                let cC = cols / 2
+                for r in (cR-2)...(cR+2) { for c in (cC-2)...(cC+2) {
+                    if r >= cR-1 && r <= cR && c >= cC-1 && c <= cC { layout[r][c] = 0 }
                 }}
             default: break
             }
@@ -202,7 +206,8 @@ class LevelGenerator {
         // For higher difficulty levels, add 2x2 gap blocks to increase strategic difficulty
         if difficulty >= 0.22 {
             let playableCount = layout.flatMap { $0 }.filter { $0 != 0 }.count
-            if playableCount > 58 {
+            let totalCells = rows * cols
+            if playableCount > totalCells * 9 / 10 {
                 let gapCount = difficulty >= 0.35 ? 2 : 1
                 var gapsPlaced = 0
                 for _ in 0..<50 {
@@ -271,7 +276,7 @@ class LevelGenerator {
                                           rng: inout SeededRandomNumberGenerator) -> [[Level.BlockerData?]]? {
         guard difficulty > 0.05 else { return nil }
 
-        let rows = tileLayout.count; let cols = tileLayout.first?.count ?? 8
+        let rows = tileLayout.count; let cols = tileLayout.first?.count ?? Constants.defaultGridColumns
         var layout: [[Level.BlockerData?]] = Array(repeating: Array(repeating: nil, count: cols), count: rows)
 
         // Gradual blocker increase: 1-2 at easy, up to 15 at hardest
@@ -308,7 +313,7 @@ class LevelGenerator {
 
     private static func generateTreasureColumns(tileLayout: [[Int]],
                                                  rng: inout SeededRandomNumberGenerator) -> [Int] {
-        let cols = tileLayout.first?.count ?? 8
+        let cols = tileLayout.first?.count ?? Constants.defaultGridColumns
         var valid: [Int] = []
         for c in 0..<cols { if tileLayout[0][c] != 0 { valid.append(c) } }
         let count = min(valid.count, Int.random(in: 1...3, using: &rng))

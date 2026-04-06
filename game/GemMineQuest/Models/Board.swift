@@ -7,7 +7,7 @@ class Board {
     var tiles: [[TileType]]
     var blockers: [[BlockerType?]]
 
-    init(numRows: Int = 8, numColumns: Int = 8) {
+    init(numRows: Int = Constants.defaultGridRows, numColumns: Int = Constants.defaultGridColumns) {
         self.numRows = numRows
         self.numColumns = numColumns
         self.grid = Array(repeating: Array(repeating: nil, count: numColumns), count: numRows)

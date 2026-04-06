@@ -24,25 +24,6 @@
       1,
       1,
       1,
-      1
-    ],
-    [
-      1,
-      2,
-      1,
-      1,
-      1,
-      1,
-      2,
-      1
-    ],
-    [
-      1,
-      1,
-      2,
-      1,
-      1,
-      2,
       1,
       1
     ],
@@ -50,8 +31,9 @@
       1,
       1,
       1,
-      2,
-      2,
+      1,
+      1,
+      1,
       1,
       1,
       1
@@ -60,8 +42,20 @@
       1,
       1,
       1,
-      2,
-      2,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
       1,
       1,
       1
@@ -69,24 +63,71 @@
     [
       1,
       1,
-      2,
       1,
       1,
-      2,
+      1,
+      1,
+      1,
       1,
       1
     ],
     [
       1,
-      2,
       1,
       1,
       1,
       1,
-      2,
+      1,
+      1,
+      1,
       1
     ],
     [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    [
+      1,
       1,
       1,
       1,
@@ -106,29 +147,11 @@
       null,
       null,
       null,
-      null
-    ],
-    [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
       null,
       null
     ],
     [
       null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
-      null
-    ],
-    [
       null,
       null,
       null,
@@ -146,15 +169,6 @@
       null,
       null,
       null,
-      null
-    ],
-    [
-      null,
-      null,
-      null,
-      null,
-      null,
-      null,
       null,
       null
     ],
@@ -166,23 +180,85 @@
       null,
       null,
       null,
+      null,
       null
     ],
     [
-      {
-        "type": "boulder",
-        "value": null
-      },
       null,
       null,
       null,
       null,
       null,
       null,
-      {
-        "type": "boulder",
-        "value": null
-      }
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
     ]
   ],
   "treasureColumns": null,

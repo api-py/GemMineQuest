@@ -75,6 +75,7 @@ class GemSprite: SKNode {
         bodyNode?.childNode(withName: "glowHalo")?.alpha = 0
         bodyNode?.childNode(withName: "sparkle")?.alpha = 0
         specialOverlay?.alpha = 0
+        bodyNode?.alpha = 0  // Hide the main gem texture immediately to prevent color bleed
     }
 
     /// Update visual when gem becomes special

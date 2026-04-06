@@ -458,7 +458,7 @@ class AnimationController {
         for (gem, pos) in gems {
             let sprite = GemSprite(gem: gem, size: layout.gemSize)
             sprite.position = layout.entryPositionFor(column: pos.column)
-            let rowsToFall = CGFloat(scene.gameState?.board.numRows ?? 8) - CGFloat(pos.row)
+            let rowsToFall = CGFloat(scene.gameState?.board.numRows ?? Constants.defaultGridRows) - CGFloat(pos.row)
             sprite.zPosition = 10.0 + CGFloat(pos.row) * 0.01
             scene.boardLayer.addChild(sprite)
             scene.setGemSprite(sprite, at: pos)
@@ -533,8 +533,19 @@ class AnimationController {
 
         let targetColor = scene.gameState?.board[to]?.color.primaryColor ?? .cyan
 
+        let hoverPause: TimeInterval = 0.6
         drone.run(SKAction.sequence([
             SKAction.scale(to: 1.0, duration: 0.15),
+            // Hover pause so user can see the drone before it flies
+            SKAction.group([
+                SKAction.wait(forDuration: hoverPause),
+                SKAction.sequence([
+                    SKAction.scale(to: 1.2, duration: 0.15),
+                    SKAction.scale(to: 1.0, duration: 0.15),
+                    SKAction.scale(to: 1.15, duration: 0.15),
+                    SKAction.scale(to: 1.0, duration: 0.15),
+                ])
+            ]),
             flyAction,
             SKAction.run { [weak scene] in
                 guard let scene = scene else { return }
@@ -564,7 +575,7 @@ class AnimationController {
             SKAction.removeFromParent()
         ]))
 
-        return flyDuration + 0.35
+        return flyDuration + 0.35 + hoverPause
     }
 
     // MARK: - Encouragement Banner

@@ -3,8 +3,8 @@ import CoreGraphics
 
 enum Constants {
     // MARK: - Grid
-    static let defaultGridRows = 8
-    static let defaultGridColumns = 8
+    static let defaultGridRows = 11
+    static let defaultGridColumns = 9
     static let numGemColors = 6
 
     // MARK: - Animation Durations (slowed for visibility)

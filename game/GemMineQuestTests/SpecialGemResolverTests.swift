@@ -6,37 +6,37 @@ final class SpecialGemResolverTests: XCTestCase {
     let resolver = SpecialGemResolver()
 
     func testHorizontalLaserClearsRow() {
-        let board = Board(numRows: 8, numColumns: 8)
+        let board = Board()
         let filler = BoardFiller()
         filler.initialFill(board: board, numColors: 6)
 
         let pos = GridPosition(row: 3, column: 4)
         let affected = resolver.resolve(special: .laserHorizontal, at: pos, on: board)
 
-        // Should affect all 8 columns in row 3
-        XCTAssertEqual(affected.count, 8)
-        for col in 0..<8 {
+        // Should affect all columns in row 3
+        XCTAssertEqual(affected.count, Constants.defaultGridColumns)
+        for col in 0..<Constants.defaultGridColumns {
             XCTAssertTrue(affected.contains(GridPosition(row: 3, column: col)))
         }
     }
 
     func testVerticalLaserClearsColumn() {
-        let board = Board(numRows: 8, numColumns: 8)
+        let board = Board()
         let filler = BoardFiller()
         filler.initialFill(board: board, numColors: 6)
 
         let pos = GridPosition(row: 3, column: 4)
         let affected = resolver.resolve(special: .laserVertical, at: pos, on: board)
 
-        // Should affect all 8 rows in column 4
-        XCTAssertEqual(affected.count, 8)
-        for row in 0..<8 {
+        // Should affect all rows in column 4
+        XCTAssertEqual(affected.count, Constants.defaultGridRows)
+        for row in 0..<Constants.defaultGridRows {
             XCTAssertTrue(affected.contains(GridPosition(row: row, column: 4)))
         }
     }
 
     func testVolatileClears3x3() {
-        let board = Board(numRows: 8, numColumns: 8)
+        let board = Board()
         let filler = BoardFiller()
         filler.initialFill(board: board, numColors: 6)
 
@@ -48,12 +48,12 @@ final class SpecialGemResolverTests: XCTestCase {
     }
 
     func testCrystalBallClearsColor() {
-        let board = Board(numRows: 8, numColumns: 8)
+        let board = Board()
 
         // Place 10 rubies and fill rest with sapphire
         var rubyCount = 0
-        for row in 0..<8 {
-            for col in 0..<8 {
+        for row in 0..<Constants.defaultGridRows {
+            for col in 0..<Constants.defaultGridColumns {
                 let pos = GridPosition(row: row, column: col)
                 if rubyCount < 10 && (row + col) % 3 == 0 {
                     board.setGem(Gem(color: .ruby, row: row, column: col), at: pos)
@@ -69,7 +69,7 @@ final class SpecialGemResolverTests: XCTestCase {
     }
 
     func testDoubleCrystalBallClearsAll() {
-        let board = Board(numRows: 8, numColumns: 8)
+        let board = Board()
         let filler = BoardFiller()
         filler.initialFill(board: board, numColors: 6)
 
@@ -88,7 +88,7 @@ final class SpecialGemResolverTests: XCTestCase {
     }
 
     func testLaserLaserComboMakesCross() {
-        let board = Board(numRows: 8, numColumns: 8)
+        let board = Board()
         let filler = BoardFiller()
         filler.initialFill(board: board, numColors: 6)
 
@@ -99,7 +99,7 @@ final class SpecialGemResolverTests: XCTestCase {
             on: board
         )
 
-        // Should cover entire row 3 + entire column 4 = 8 + 8 - 1 = 15
-        XCTAssertEqual(affected.count, 15)
+        // Should cover entire row 3 + entire column 4 = cols + rows - 1
+        XCTAssertEqual(affected.count, Constants.defaultGridColumns + Constants.defaultGridRows - 1)
     }
 }
