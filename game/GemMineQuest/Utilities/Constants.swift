@@ -44,7 +44,7 @@ enum Constants {
 
     // MARK: - Level Generation
     static let tutorialLevelCount = 10
-    static let baseMoves = 22
+    static let baseMoves = 20
     static let minMoves = 12
     static let difficultyScaleRate = 0.03
 

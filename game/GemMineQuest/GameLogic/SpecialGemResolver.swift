@@ -190,41 +190,42 @@ class SpecialGemResolver {
 
     /// Get drone target positions (random gems, prioritizing objectives)
     func getDroneTargets(count: Int, on board: Board, prioritizeOre: Bool = true) -> [GridPosition] {
-        var oreCandidates: [GridPosition] = []
+        var lavaCandidates: [GridPosition] = []
         var graniteCandidates: [GridPosition] = []
         var cageCandidates: [GridPosition] = []
+        var amberCandidates: [GridPosition] = []
         var boulderCandidates: [GridPosition] = []
-        var lavaCandidates: [GridPosition] = []
+        var oreCandidates: [GridPosition] = []
         var tntCandidates: [GridPosition] = []
         var normalGemCandidates: [GridPosition] = []
 
         for pos in board.allPlayablePositions() {
             if let blocker = board.blockerAt(pos) {
                 switch blocker {
-                case .granite: graniteCandidates.append(pos)
                 case .lava: lavaCandidates.append(pos)
-                case .boulder: boulderCandidates.append(pos)
+                case .granite: graniteCandidates.append(pos)
                 case .cage: cageCandidates.append(pos)
+                case .amber: amberCandidates.append(pos)
+                case .boulder: boulderCandidates.append(pos)
                 case .tnt: tntCandidates.append(pos)
-                default: break
                 }
             }
             if let gem = board[pos] {
                 if board.hasOreVein(at: pos) {
                     oreCandidates.append(pos)
                 }
-                // Only target normal gems — never target special/booster gems
                 if gem.special == .none && board.blockerAt(pos) == nil {
                     normalGemCandidates.append(pos)
                 }
             }
         }
 
-        // Priority: Ore → Granite → Cage → Boulder → Lava → TNT → Normal gems (no specials)
+        // Priority: Lava (urgent) → Obstacles → Ore → TNT → Normal gems (no specials)
         var targets: [GridPosition] = []
         let priorityLists = [
-            oreCandidates, graniteCandidates, cageCandidates,
-            boulderCandidates, lavaCandidates, tntCandidates,
+            lavaCandidates,
+            graniteCandidates, cageCandidates, amberCandidates, boulderCandidates,
+            oreCandidates, tntCandidates,
             normalGemCandidates
         ]
         for list in priorityLists {

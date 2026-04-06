@@ -401,12 +401,16 @@ class GameScene: SKScene {
         guard let state = gameState else { return }
         let board = state.board
 
-        // Remove ALL existing gem sprites
+        // Remove ALL existing gem sprites — both tracked and orphaned
         for row in 0..<gemSprites.count {
             for col in 0..<gemSprites[row].count {
                 gemSprites[row][col]?.removeFromParent()
                 gemSprites[row][col] = nil
             }
+        }
+        // Clean up any orphaned GemSprite nodes still in the scene tree
+        for child in boardLayer.children where child is GemSprite {
+            child.removeFromParent()
         }
 
         // Rebuild from model
@@ -435,11 +439,14 @@ class GameScene: SKScene {
 
     func rebuildAllGemSprites() {
         guard gameState != nil else { return }
-        // Remove old gem sprites
+        // Remove old gem sprites — tracked and orphaned
         for row in 0..<gemSprites.count {
             for col in 0..<gemSprites[row].count {
                 gemSprites[row][col]?.removeFromParent()
             }
+        }
+        for child in boardLayer.children where child is GemSprite {
+            child.removeFromParent()
         }
         buildGemSprites()
     }
