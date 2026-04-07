@@ -16,6 +16,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build
-      run: xcodebuild build -scheme GemMineQuest -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' | xcpretty || true
+      run: set -o pipefail && xcodebuild build -scheme GemMineQuest -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' | xcpretty
     - name: Run tests
       run: xcodebuild test -scheme GemMineQuestTests -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' | xcpretty

@@ -1,8 +1,8 @@
 import SwiftUI
-import CryptoKit
 
 class BoosterInventory: ObservableObject {
     @Published var counts: [BoosterType: Int]
+    @Published var didResetDueToCorruption = false
 
     private static let storageKey = "boosterInventory"
     private static let checksumKey = "boosterInventoryChecksum"
@@ -32,6 +32,7 @@ class BoosterInventory: ObservableObject {
                 return
             } else {
                 print("[BoosterInventory] Data integrity check failed — resetting to defaults")
+                self.didResetDueToCorruption = true
             }
         }
         // First launch or integrity failure: give initial count of each
@@ -163,8 +164,6 @@ class BoosterInventory: ObservableObject {
     }
 
     private static func checksum(for data: Data) -> String {
-        let key = SymmetricKey(data: Data("GemMineQuest.boosters.salt.v1".utf8))
-        let mac = HMAC<SHA256>.authenticationCode(for: data, using: key)
-        return Data(mac).base64EncodedString()
+        ChecksumUtility.hmac(for: data, salt: "GemMineQuest.boosters.salt.v1")
     }
 }

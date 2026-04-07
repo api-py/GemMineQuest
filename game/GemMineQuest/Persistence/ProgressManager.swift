@@ -1,8 +1,8 @@
 import SwiftUI
-import CryptoKit
 
 class ProgressManager: ObservableObject {
     @Published var progress: PlayerProgress
+    @Published var didResetDueToCorruption = false
 
     private static let storageKey = "playerProgress"
     private static let checksumKey = "playerProgressChecksum"
@@ -23,6 +23,7 @@ class ProgressManager: ObservableObject {
             } else {
                 print("[ProgressManager] Data integrity check failed — resetting to defaults")
             }
+            self.didResetDueToCorruption = true
         }
         self.progress = PlayerProgress()
     }
@@ -75,7 +76,8 @@ class ProgressManager: ObservableObject {
     // MARK: - Shop
 
     func purchaseShopItem(_ item: ShopItem, boosterInventory: BoosterInventory) -> Bool {
-        // God Mode: free purchases
+        #if DEBUG
+        // God Mode: free purchases (debug builds only)
         if UserDefaults.standard.bool(forKey: "godModeEnabled") {
             for _ in 0..<item.quantity {
                 boosterInventory.increment(item.boosterType)
@@ -83,6 +85,7 @@ class ProgressManager: ObservableObject {
             save()
             return true
         }
+        #endif
         guard progress.coins >= item.price else { return false }
         progress.addCoins(-item.price)
         for _ in 0..<item.quantity {
@@ -224,8 +227,6 @@ class ProgressManager: ObservableObject {
     }
 
     private static func checksum(for data: Data) -> String {
-        let key = SymmetricKey(data: Data("GemMineQuest.progress.salt.v1".utf8))
-        let mac = HMAC<SHA256>.authenticationCode(for: data, using: key)
-        return Data(mac).base64EncodedString()
+        ChecksumUtility.hmac(for: data, salt: "GemMineQuest.progress.salt.v1")
     }
 }
