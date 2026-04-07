@@ -8,7 +8,7 @@ class TextureFactory {
 
     private var gemTextureCache: [String: SKTexture] = [:]
     private var miscCache: [String: SKTexture] = [:]
-    private static let colorSpace = Self.colorSpace
+    private static let colorSpace = CGColorSpaceCreateDeviceRGB()
 
     // MARK: - Gem Textures
 
