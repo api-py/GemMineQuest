@@ -6,6 +6,7 @@ struct GameContainerView: View {
     @EnvironmentObject var progressManager: ProgressManager
     @EnvironmentObject var settingsManager: SettingsManager
     @EnvironmentObject var boosterInventory: BoosterInventory
+    @EnvironmentObject var localizationManager: LocalizationManager
     @StateObject private var viewModel: GameViewModel
     var onDismiss: () -> Void
     var onNextLevel: (Int) -> Void
@@ -59,7 +60,7 @@ struct GameContainerView: View {
                                 .background(Circle().fill(Color(hex: 0x3D2B1F)))
                                 .overlay(Circle().stroke(Color(hex: 0xC9A84C), lineWidth: 2))
                         }
-                        Text("Lv.\(levelNumber)")
+                        Text(localizationManager.t("game.lv", levelNumber))
                             .font(.system(size: 10, weight: .heavy, design: .rounded))
                             .foregroundColor(Color(hex: 0xFFD700))
                     }
@@ -99,7 +100,7 @@ struct GameContainerView: View {
 
                     // Moves badge (right) - large and clear
                     VStack(spacing: 0) {
-                        Text("Moves")
+                        Text(localizationManager.t("game.moves"))
                             .font(.system(size: 10, weight: .bold))
                             .foregroundColor(Color(hex: 0x8B7355))
                         Text(viewModel.godModeEnabled ? "\u{221E}" : "\(viewModel.displayMoves)")
@@ -123,7 +124,7 @@ struct GameContainerView: View {
                             .shadow(color: Color.black.opacity(0.2), radius: 4, y: 2)
                     )
                     .onLongPressGesture(minimumDuration: 0.4) {
-                        withAnimation { hudTooltipText = "Moves remaining. Match gems wisely before they run out!" }
+                        withAnimation { hudTooltipText = localizationManager.t("game.movesTooltip") }
                     }
                 }
                 .padding(.horizontal, 12)
@@ -157,7 +158,7 @@ struct GameContainerView: View {
                             .overlay(Capsule().stroke(Color(hex: 0xC9A84C).opacity(0.3), lineWidth: 1))
                     )
                     .onLongPressGesture(minimumDuration: 0.4) {
-                        withAnimation { hudTooltipText = "Your current score for this level. Earn points by matching gems and activating specials." }
+                        withAnimation { hudTooltipText = localizationManager.t("game.scoresTooltip") }
                     }
 
                     Spacer()
@@ -169,7 +170,7 @@ struct GameContainerView: View {
                             .foregroundColor(Color(hex: 0xFFD700))
                     }
                     .onLongPressGesture(minimumDuration: 0.4) {
-                        withAnimation { hudTooltipText = "Open the shop to buy boosters with coins." }
+                        withAnimation { hudTooltipText = localizationManager.t("game.shopTooltip") }
                     }
 
                     // Exit button
@@ -182,7 +183,7 @@ struct GameContainerView: View {
                     #if DEBUG
                     // God mode toggle
                     HStack(spacing: 3) {
-                        Text("GOD")
+                        Text(localizationManager.t("game.god"))
                             .font(.system(size: 8, weight: .bold))
                             .foregroundColor(viewModel.godModeEnabled ? Color(hex: 0xFFD700) : Color(hex: 0x6B5A40))
                         Toggle("", isOn: $viewModel.godModeEnabled)
@@ -242,7 +243,7 @@ struct GameContainerView: View {
                                     .foregroundColor(Color(hex: 0xC9A84C))
                                     .font(.system(size: 14, weight: .bold))
                             }
-                            Text(level.objectives[i].displayText)
+                            Text(level.objectives[i].localizedDisplayText(localizationManager))
                                 .font(.system(size: 14, weight: .semibold))
                                 .foregroundColor(Color(hex: 0xFFF8E8))
                         }
@@ -289,7 +290,7 @@ struct GameContainerView: View {
             // God Mode toast
             if viewModel.showGodModeToast {
                 VStack {
-                    Text(viewModel.godModeEnabled ? "Unlimited moves ON" : "Unlimited moves OFF")
+                    Text(viewModel.godModeEnabled ? localizationManager.t("game.godModeOn") : localizationManager.t("game.godModeOff"))
                         .font(.system(size: 13, weight: .semibold))
                         .foregroundColor(.white)
                         .padding(.horizontal, 16)
@@ -343,10 +344,10 @@ struct GameContainerView: View {
                     onRetry: {
                         if !viewModel.didWin {
                             if let awarded = progressManager.recordLevelLoss(level: levelNumber, boosterInventory: boosterInventory) {
-                                withAnimation { awardedBoosterMessage = "Free \(awarded.rawValue) booster! (10 attempts reward)" }
+                                withAnimation { awardedBoosterMessage = localizationManager.t("game.freeBooster", awarded.rawValue) }
                             }
                         }
-                        startTransition(text: "Retry — Level \(levelNumber)") {
+                        startTransition(text: localizationManager.t("game.retryLevel", levelNumber)) {
                             viewModel.retryLevel()
                         }
                     },
@@ -360,7 +361,7 @@ struct GameContainerView: View {
                         boosterInventory.checkMilestoneReward(levelCompleted: levelNumber)
                         let threeStarCount = progressManager.progress.levelStars.values.filter { $0 >= 3 }.count
                         boosterInventory.checkStarRewards(totalThreeStarLevels: threeStarCount)
-                        startTransition(text: "Level \(next) — \(WelshPlaceNames.name(for: next))") {
+                        startTransition(text: localizationManager.t("game.levelName", next, WelshPlaceNames.name(for: next))) {
                             onNextLevel(next)
                         }
                     },
@@ -398,16 +399,17 @@ struct GameContainerView: View {
                 showIntroBanner()
             }
         }
-        .alert("Leave Game?", isPresented: $showExitConfirmation) {
-            Button("Continue Playing", role: .cancel) {}
-            Button("Leave", role: .destructive) { onDismiss() }
+        .alert(localizationManager.t("game.leaveGame"), isPresented: $showExitConfirmation) {
+            Button(localizationManager.t("game.continuePlaying"), role: .cancel) {}
+            Button(localizationManager.t("game.leave"), role: .destructive) { onDismiss() }
         } message: {
-            Text("Progress on this level will be lost.")
+            Text(localizationManager.t("game.progressLost"))
         }
         .fullScreenCover(isPresented: $showShop) {
             ShopView(onDismiss: { showShop = false })
                 .environmentObject(progressManager)
                 .environmentObject(boosterInventory)
+                .environmentObject(localizationManager)
         }
     }
 
@@ -461,6 +463,7 @@ struct GameContainerView: View {
 struct LevelTransitionView: View {
     let levelNumber: Int
     let levelName: String
+    @EnvironmentObject var localizationManager: LocalizationManager
 
     @State private var bannerScale: CGFloat = 0.8
     @State private var bannerOpacity: Double = 0
@@ -503,7 +506,7 @@ struct LevelTransitionView: View {
                 }
 
                 // Level number
-                Text("Level \(levelNumber)")
+                Text(localizationManager.t("levelDetail.level", levelNumber))
                     .font(.system(size: 42, weight: .black, design: .rounded))
                     .foregroundStyle(
                         LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xE8A035)],
@@ -539,12 +542,12 @@ struct LevelTransitionView: View {
                             Circle()
                                 .fill(Color(hex: 0xE8A035))
                                 .frame(width: 5, height: 5)
-                            Text(level.objectives[i].displayText)
+                            Text(level.objectives[i].localizedDisplayText(localizationManager))
                                 .font(.system(size: 14))
                                 .foregroundColor(Color(hex: 0x8B7355))
                         }
                     }
-                    Text("\(level.maxMoves) moves")
+                    Text(localizationManager.t("levelDetail.moves", level.maxMoves))
                         .font(.system(size: 14, weight: .bold))
                         .foregroundColor(Color(hex: 0xE8A035))
                 }
@@ -553,7 +556,7 @@ struct LevelTransitionView: View {
 
                 Spacer()
 
-                Text("Get ready to dig...")
+                Text(localizationManager.t("game.getReady"))
                     .font(.system(size: 13, weight: .medium))
                     .foregroundColor(Color(hex: 0x5A4530))
                     .opacity(subtitleOpacity)
@@ -601,6 +604,7 @@ struct ObjectiveIconView: View {
     let objective: LevelObjective
     let current: Int
     let target: Int
+    @EnvironmentObject var localizationManager: LocalizationManager
     var onLongPress: ((String) -> Void)? = nil
 
     private var isComplete: Bool { current >= target }
@@ -686,7 +690,7 @@ struct ObjectiveIconView: View {
         }
         .frame(width: 48)
         .onLongPressGesture(minimumDuration: 0.4) {
-            onLongPress?(objective.descriptionText)
+            onLongPress?(objective.localizedDescriptionText(localizationManager))
         }
     }
 }

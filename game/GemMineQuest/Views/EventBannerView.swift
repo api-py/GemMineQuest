@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct EventBannerView: View {
+    @EnvironmentObject var localizationManager: LocalizationManager
     var onStart: () -> Void
     var onDismiss: () -> Void
 
@@ -9,11 +10,11 @@ struct EventBannerView: View {
     @State private var countdownTimer: Timer?
 
     private var eventTitle: String {
-        "Weekend Mining Rush"
+        localizationManager.t("event.weekendRush")
     }
 
     private var eventDescription: String {
-        "Double Gold on all levels!"
+        localizationManager.t("event.doubleGold")
     }
 
     // Event ends at midnight Sunday
@@ -84,7 +85,7 @@ struct EventBannerView: View {
                 VStack(spacing: 6) {
                     // Start button
                     Button(action: onStart) {
-                        Text("Start")
+                        Text(localizationManager.t("event.start"))
                             .font(.system(size: 13, weight: .bold))
                             .foregroundColor(.white)
                             .padding(.horizontal, 16)

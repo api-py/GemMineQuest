@@ -12,6 +12,7 @@ struct ContentView: View {
     @EnvironmentObject var progressManager: ProgressManager
     @EnvironmentObject var settingsManager: SettingsManager
     @EnvironmentObject var boosterInventory: BoosterInventory
+    @EnvironmentObject var localizationManager: LocalizationManager
     @State private var currentScreen: AppScreen = .menu
 
     // Engagement overlay states
@@ -20,6 +21,7 @@ struct ContentView: View {
     @State private var showMilestone: String? = nil
     @State private var showAchievementToast: Achievement? = nil
     @State private var showEventBanner = false
+    @State private var showLanguageSelection = false
 
     var body: some View {
         ZStack {
@@ -109,11 +111,24 @@ struct ContentView: View {
                     Spacer()
                 }.transition(.move(edge: .top).combined(with: .opacity)).zIndex(50)
             }
+
+            // Language selection overlay (shown on first launch)
+            if showLanguageSelection {
+                LanguageSelectionView(onDismiss: {
+                    withAnimation(.easeInOut(duration: 0.4)) {
+                        showLanguageSelection = false
+                    }
+                })
+                .transition(.opacity)
+                .zIndex(300)
+            }
         }
         .animation(.easeInOut(duration: 0.3), value: currentScreen)
         .onAppear {
             NotificationManager.shared.requestPermission()
-            if progressManager.hasDailyReward() {
+            if !localizationManager.hasSelectedLanguage {
+                showLanguageSelection = true
+            } else if progressManager.hasDailyReward() {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     withAnimation { showDailyReward = true }
                 }
