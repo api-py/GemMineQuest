@@ -7,7 +7,11 @@ struct LevelMapView: View {
     var onSelectLevel: (Int) -> Void
     var onBack: () -> Void
     var onSpinWheel: (() -> Void)? = nil
+    #if DEBUG
     @AppStorage("godModeEnabled") private var isGodMode = false
+    #else
+    private let isGodMode = false
+    #endif
     @State private var showLockedAlert = false
     @State private var spinPulse: CGFloat = 1.0
     @Environment(\.horizontalSizeClass) var sizeClass

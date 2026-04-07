@@ -6,7 +6,11 @@ struct ShopView: View {
     @EnvironmentObject var localizationManager: LocalizationManager
     var onDismiss: () -> Void
 
+    #if DEBUG
     @AppStorage("godModeEnabled") private var isGodMode = false
+    #else
+    private let isGodMode = false
+    #endif
     @State private var purchasedItemId: String?
     @State private var showPurchaseFlash = false
 

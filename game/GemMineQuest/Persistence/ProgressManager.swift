@@ -1,11 +1,19 @@
 import SwiftUI
-import CryptoKit
 
 class ProgressManager: ObservableObject {
     @Published var progress: PlayerProgress
+    @Published var didResetDueToCorruption = false
 
     private static let storageKey = "playerProgress"
     private static let checksumKey = "playerProgressChecksum"
+
+    private static let dateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM-dd"
+        return f
+    }()
+
+    private static let isoFormatter = ISO8601DateFormatter()
 
     init() {
         if let data = UserDefaults.standard.data(forKey: Self.storageKey) {
@@ -23,6 +31,7 @@ class ProgressManager: ObservableObject {
             } else {
                 print("[ProgressManager] Data integrity check failed — resetting to defaults")
             }
+            self.didResetDueToCorruption = true
         }
         self.progress = PlayerProgress()
     }
@@ -75,7 +84,8 @@ class ProgressManager: ObservableObject {
     // MARK: - Shop
 
     func purchaseShopItem(_ item: ShopItem, boosterInventory: BoosterInventory) -> Bool {
-        // God Mode: free purchases
+        #if DEBUG
+        // God Mode: free purchases (debug builds only)
         if UserDefaults.standard.bool(forKey: "godModeEnabled") {
             for _ in 0..<item.quantity {
                 boosterInventory.increment(item.boosterType)
@@ -83,6 +93,7 @@ class ProgressManager: ObservableObject {
             save()
             return true
         }
+        #endif
         guard progress.coins >= item.price else { return false }
         progress.addCoins(-item.price)
         for _ in 0..<item.quantity {
@@ -103,20 +114,16 @@ class ProgressManager: ObservableObject {
 
     func hasDailyReward() -> Bool {
         guard let lastDateStr = progress.lastDailyRewardDate else { return true }
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        guard let lastDate = formatter.date(from: lastDateStr) else { return true }
+        guard let lastDate = Self.dateFormatter.date(from: lastDateStr) else { return true }
         return !Calendar.current.isDateInToday(lastDate)
     }
 
     func claimDailyReward() -> DailyReward {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        let todayStr = formatter.string(from: Date())
+        let todayStr = Self.dateFormatter.string(from: Date())
 
         // Update streak
         if let lastDateStr = progress.lastDailyRewardDate,
-           let lastDate = formatter.date(from: lastDateStr) {
+           let lastDate = Self.dateFormatter.date(from: lastDateStr) {
             let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
             if Calendar.current.isDate(lastDate, inSameDayAs: yesterday) {
                 progress.dailyStreak = (progress.dailyStreak % 7) + 1
@@ -156,14 +163,12 @@ class ProgressManager: ObservableObject {
 
     func hasFreeSpin() -> Bool {
         guard let lastSpinStr = progress.lastSpinDate else { return true }
-        let formatter = ISO8601DateFormatter()
-        guard let lastDate = formatter.date(from: lastSpinStr) else { return true }
+        guard let lastDate = Self.isoFormatter.date(from: lastSpinStr) else { return true }
         return !Calendar.current.isDateInToday(lastDate)
     }
 
     func recordSpin() {
-        let formatter = ISO8601DateFormatter()
-        progress.lastSpinDate = formatter.string(from: Date())
+        progress.lastSpinDate = Self.isoFormatter.string(from: Date())
         save()
     }
 
@@ -218,14 +223,15 @@ class ProgressManager: ObservableObject {
     }
 
     private func save() {
-        guard let data = try? JSONEncoder().encode(progress) else { return }
+        guard let data = try? JSONEncoder().encode(progress) else {
+            assertionFailure("[ProgressManager] Failed to encode progress")
+            return
+        }
         UserDefaults.standard.set(data, forKey: Self.storageKey)
         UserDefaults.standard.set(Self.checksum(for: data), forKey: Self.checksumKey)
     }
 
     private static func checksum(for data: Data) -> String {
-        let key = SymmetricKey(data: Data("GemMineQuest.progress.salt.v1".utf8))
-        let mac = HMAC<SHA256>.authenticationCode(for: data, using: key)
-        return Data(mac).base64EncodedString()
+        ChecksumUtility.hmac(for: data, salt: "GemMineQuest.progress.salt.v1")
     }
 }
