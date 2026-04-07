@@ -7,6 +7,14 @@ class ProgressManager: ObservableObject {
     private static let storageKey = "playerProgress"
     private static let checksumKey = "playerProgressChecksum"
 
+    private static let dateFormatter: DateFormatter = {
+        let f = DateFormatter()
+        f.dateFormat = "yyyy-MM-dd"
+        return f
+    }()
+
+    private static let isoFormatter = ISO8601DateFormatter()
+
     init() {
         if let data = UserDefaults.standard.data(forKey: Self.storageKey) {
             let storedChecksum = UserDefaults.standard.string(forKey: Self.checksumKey)
@@ -106,20 +114,16 @@ class ProgressManager: ObservableObject {
 
     func hasDailyReward() -> Bool {
         guard let lastDateStr = progress.lastDailyRewardDate else { return true }
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        guard let lastDate = formatter.date(from: lastDateStr) else { return true }
+        guard let lastDate = Self.dateFormatter.date(from: lastDateStr) else { return true }
         return !Calendar.current.isDateInToday(lastDate)
     }
 
     func claimDailyReward() -> DailyReward {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        let todayStr = formatter.string(from: Date())
+        let todayStr = Self.dateFormatter.string(from: Date())
 
         // Update streak
         if let lastDateStr = progress.lastDailyRewardDate,
-           let lastDate = formatter.date(from: lastDateStr) {
+           let lastDate = Self.dateFormatter.date(from: lastDateStr) {
             let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
             if Calendar.current.isDate(lastDate, inSameDayAs: yesterday) {
                 progress.dailyStreak = (progress.dailyStreak % 7) + 1
@@ -159,14 +163,12 @@ class ProgressManager: ObservableObject {
 
     func hasFreeSpin() -> Bool {
         guard let lastSpinStr = progress.lastSpinDate else { return true }
-        let formatter = ISO8601DateFormatter()
-        guard let lastDate = formatter.date(from: lastSpinStr) else { return true }
+        guard let lastDate = Self.isoFormatter.date(from: lastSpinStr) else { return true }
         return !Calendar.current.isDateInToday(lastDate)
     }
 
     func recordSpin() {
-        let formatter = ISO8601DateFormatter()
-        progress.lastSpinDate = formatter.string(from: Date())
+        progress.lastSpinDate = Self.isoFormatter.string(from: Date())
         save()
     }
 
@@ -221,7 +223,10 @@ class ProgressManager: ObservableObject {
     }
 
     private func save() {
-        guard let data = try? JSONEncoder().encode(progress) else { return }
+        guard let data = try? JSONEncoder().encode(progress) else {
+            assertionFailure("[ProgressManager] Failed to encode progress")
+            return
+        }
         UserDefaults.standard.set(data, forKey: Self.storageKey)
         UserDefaults.standard.set(Self.checksum(for: data), forKey: Self.checksumKey)
     }

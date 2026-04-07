@@ -54,7 +54,8 @@ enum GameEvent: Equatable {
     // Encouragement popup
     case encouragement(text: String)
 
-    // Custom equality for associated values with tuples
+    // Custom equality required because some cases use tuple associated values
+    // which cannot be auto-synthesized by the compiler.
     static func == (lhs: GameEvent, rhs: GameEvent) -> Bool {
         switch (lhs, rhs) {
         case (.swap(let lf, let lt), .swap(let rf, let rt)):
@@ -65,14 +66,52 @@ enum GameEvent: Equatable {
             return lp == rp && lc == rc
         case (.specialCreated(let lt, let lc, let la), .specialCreated(let rt, let rc, let ra)):
             return lt == rt && lc == rc && la == ra
+        case (.specialActivated(let lt, let la, let laf), .specialActivated(let rt, let ra, let raf)):
+            return lt == rt && la == ra && laf == raf
+        case (.blockerDamaged(let la, let lt), .blockerDamaged(let ra, let rt)):
+            return la == ra && lt == rt
+        case (.blockerDestroyed(let la), .blockerDestroyed(let ra)):
+            return la == ra
+        case (.lavaSpread(let lf, let lt), .lavaSpread(let rf, let rt)):
+            return lf == rf && lt == rt
+        case (.tntWarning(let la, let lc), .tntWarning(let ra, let rc)):
+            return la == ra && lc == rc
+        case (.tntExploded(let la), .tntExploded(let ra)):
+            return la == ra
+        case (.oreCracked(let la, let lr), .oreCracked(let ra, let rr)):
+            return la == ra && lr == rr
+        case (.oreCleared(let la), .oreCleared(let ra)):
+            return la == ra
+        case (.gemsFell(let lm), .gemsFell(let rm)):
+            return lm.count == rm.count && zip(lm, rm).allSatisfy { $0.from == $1.from && $0.to == $1.to }
+        case (.gemsAdded(let lg), .gemsAdded(let rg)):
+            return lg.count == rg.count && zip(lg, rg).allSatisfy { $0.gem == $1.gem && $0.at == $1.at }
+        case (.treasureDropped(let la), .treasureDropped(let ra)):
+            return la == ra
+        case (.scoreUpdated(let ls, let ld, let la), .scoreUpdated(let rs, let rd, let ra)):
+            return ls == rs && ld == rd && la == ra
+        case (.objectiveProgress(let lt, let lc, let lta), .objectiveProgress(let rt, let rc, let rta)):
+            return lt == rt && lc == rc && lta == rta
         case (.levelComplete(let ls, let lsc), .levelComplete(let rs, let rsc)):
             return ls == rs && lsc == rsc
         case (.levelFailed, .levelFailed):
             return true
         case (.mineBlastStarted, .mineBlastStarted):
             return true
+        case (.mineBlastConvertedMove(let la), .mineBlastConvertedMove(let ra)):
+            return la == ra
+        case (.mineBlastFinished(let ls), .mineBlastFinished(let rs)):
+            return ls == rs
+        case (.boosterUsed(let lt), .boosterUsed(let rt)):
+            return lt == rt
         case (.boardShuffled, .boardShuffled):
             return true
+        case (.droneDeployed(let lf, let lt), .droneDeployed(let rf, let rt)):
+            return lf == rf && lt == rt
+        case (.wormAppeared(let la), .wormAppeared(let ra)):
+            return la == ra
+        case (.encouragement(let lt), .encouragement(let rt)):
+            return lt == rt
         default:
             return false
         }

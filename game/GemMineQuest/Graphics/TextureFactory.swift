@@ -8,6 +8,7 @@ class TextureFactory {
 
     private var gemTextureCache: [String: SKTexture] = [:]
     private var miscCache: [String: SKTexture] = [:]
+    private static let colorSpace = Self.colorSpace
 
     // MARK: - Gem Textures
 
@@ -38,7 +39,7 @@ class TextureFactory {
         let primary = color.primaryColor
         let light = color.lightColor
         let dark = color.darkColor
-        let colorSpace = CGColorSpaceCreateDeviceRGB()
+        let colorSpace = Self.colorSpace
 
         // 1) Drop shadow
         gc.saveGState()
@@ -247,7 +248,7 @@ class TextureFactory {
             let gc = ctx.cgContext
             let rect = CGRect(x: inset, y: inset, width: px - inset * 2, height: px - inset * 2)
             let path = UIBezierPath(roundedRect: rect, cornerRadius: cornerR).cgPath
-            let colorSpace = CGColorSpaceCreateDeviceRGB()
+            let colorSpace = Self.colorSpace
 
             // Rich warm gradient fill
             gc.saveGState()
@@ -319,7 +320,7 @@ class TextureFactory {
         let image = renderer.image { ctx in
             let gc = ctx.cgContext
             let center = CGPoint(x: px / 2, y: px / 2)
-            let colorSpace = CGColorSpaceCreateDeviceRGB()
+            let colorSpace = Self.colorSpace
             let colors = [
                 UIColor(white: 1.0, alpha: 1.0).cgColor,
                 UIColor(white: 1.0, alpha: 0.3).cgColor,

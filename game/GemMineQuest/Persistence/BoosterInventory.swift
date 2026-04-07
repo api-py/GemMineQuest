@@ -158,7 +158,10 @@ class BoosterInventory: ObservableObject {
         for (key, value) in counts {
             encoded[key.rawValue] = min(value, Self.maxBoosterCount)
         }
-        guard let data = try? JSONEncoder().encode(encoded) else { return }
+        guard let data = try? JSONEncoder().encode(encoded) else {
+            assertionFailure("[BoosterInventory] Failed to encode inventory")
+            return
+        }
         UserDefaults.standard.set(data, forKey: Self.storageKey)
         UserDefaults.standard.set(Self.checksum(for: data), forKey: Self.checksumKey)
     }

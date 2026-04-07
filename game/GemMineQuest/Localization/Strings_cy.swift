@@ -236,4 +236,17 @@ let welshStrings: [String: String] = [
     "shopItem.forge1": "Gefail Emau",
     "shopItem.forge3": "Gefail x3",
     "shopItem.cart1": "Cert Mwynglawdd",
+
+    // Objective Progress Labels
+    "progress.score": "Sgôr",
+    "progress.oreCleared": "Mwyn wedi'i glirio",
+    "progress.treasures": "Trysorau",
+
+    // Encouragement Messages
+    "encourage.almostThere": "Bron yna!",
+    "encourage.lastOre": "Gwythïen mwyn olaf!",
+    "encourage.oneMoreTreasure": "Un trysor arall!",
+    "encourage.gemsLeft": "%d %@ ar ôl!",
+    "encourage.oneMoreSpecial": "Un %@ arall!",
+    "encourage.movesLeft": "%d symudiad ar ôl!",
 ]

@@ -236,4 +236,17 @@ let englishStrings: [String: String] = [
     "shopItem.forge1": "Gem Forge",
     "shopItem.forge3": "Forge x3",
     "shopItem.cart1": "Mine Cart",
+
+    // Objective Progress Labels
+    "progress.score": "Score",
+    "progress.oreCleared": "Ore cleared",
+    "progress.treasures": "Treasures",
+
+    // Encouragement Messages
+    "encourage.almostThere": "Almost there!",
+    "encourage.lastOre": "Last ore vein!",
+    "encourage.oneMoreTreasure": "One more treasure!",
+    "encourage.gemsLeft": "%d %@ left!",
+    "encourage.oneMoreSpecial": "One more %@!",
+    "encourage.movesLeft": "%d moves left!",
 ]

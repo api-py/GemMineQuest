@@ -109,6 +109,11 @@ class GameScene: SKScene {
 
     override func didChangeSize(_ oldSize: CGSize) {
         guard let state = gameState, size.width > 0, size.height > 0 else { return }
+        hintTimer?.invalidate()
+        hintTimer = nil
+        longPressTimer?.invalidate()
+        longPressTimer = nil
+
         layout = BoardLayout(sceneSize: size,
                               numRows: state.board.numRows,
                               numColumns: state.board.numColumns)
@@ -498,7 +503,10 @@ class GameScene: SKScene {
     func setGemSprite(_ sprite: GemSprite, at pos: GridPosition) {
         guard pos.row >= 0 && pos.row < gemSprites.count,
               !gemSprites.isEmpty,
-              pos.column >= 0 && pos.column < gemSprites[pos.row].count else { return }
+              pos.column >= 0 && pos.column < gemSprites[pos.row].count else {
+            assertionFailure("setGemSprite called with invalid position: \(pos)")
+            return
+        }
         gemSprites[pos.row][pos.column] = sprite
     }
 
@@ -575,9 +583,7 @@ class GameScene: SKScene {
             longPressTimer?.invalidate()
             longPressPosition = pos
             longPressTimer = Timer.scheduledTimer(withTimeInterval: 0.5, repeats: false) { [weak self] _ in
-                DispatchQueue.main.async {
-                    self?.showGemTooltip(at: pos)
-                }
+                self?.showGemTooltip(at: pos)
             }
         }
     }
@@ -764,9 +770,7 @@ class GameScene: SKScene {
         clearHintHighlights()
         guard let state = gameState, !state.isComplete, !state.isFailed, !isAnimating else { return }
         hintTimer = Timer.scheduledTimer(withTimeInterval: Self.hintIdleDelay, repeats: false) { [weak self] _ in
-            DispatchQueue.main.async {
-                self?.showBestMoveHint()
-            }
+            self?.showBestMoveHint()
         }
     }
 
