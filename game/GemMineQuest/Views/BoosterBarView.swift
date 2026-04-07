@@ -2,6 +2,7 @@ import SwiftUI
 
 struct BoosterBarView: View {
     @ObservedObject var inventory: BoosterInventory
+    @EnvironmentObject var localizationManager: LocalizationManager
     var onBoosterSelected: (BoosterType) -> Void
     @State private var showingHint: BoosterType?
 
@@ -26,23 +27,23 @@ struct BoosterBarView: View {
             }
 
             HStack(spacing: 10) {
-                BoosterButton(icon: "hammer.fill", label: "Pickaxe", hint: "Break 1",
+                BoosterButton(icon: "hammer.fill", label: localizationManager.t("booster.pickaxeShort"), hint: localizationManager.t("booster.pickaxeHintShort"),
                               count: inventory.count(for: .pickaxe), godMode: inventory.godModeActive,
                               onTap: { onBoosterSelected(.pickaxe) },
                               onLongPress: { withAnimation { showingHint = .pickaxe }; dismissHint() })
-                BoosterButton(icon: "flame.fill", label: "Dynamite", hint: "Blast 3x3",
+                BoosterButton(icon: "flame.fill", label: localizationManager.t("booster.dynamiteShort"), hint: localizationManager.t("booster.dynamiteHintShort"),
                               count: inventory.count(for: .dynamite), godMode: inventory.godModeActive,
                               onTap: { onBoosterSelected(.dynamite) },
                               onLongPress: { withAnimation { showingHint = .dynamite }; dismissHint() })
-                BoosterButton(icon: "wand.and.stars", label: "Forge", hint: "Place specials",
+                BoosterButton(icon: "wand.and.stars", label: localizationManager.t("booster.forgeShort"), hint: localizationManager.t("booster.forgeHintShort"),
                               count: inventory.count(for: .gemForge), godMode: inventory.godModeActive,
                               onTap: { onBoosterSelected(.gemForge) },
                               onLongPress: { withAnimation { showingHint = .gemForge }; dismissHint() })
-                BoosterButton(icon: "scope", label: "Drone", hint: "Seek 5",
+                BoosterButton(icon: "scope", label: localizationManager.t("booster.droneShort"), hint: localizationManager.t("booster.droneHintShort"),
                               count: inventory.count(for: .droneStrike), godMode: inventory.godModeActive,
                               onTap: { onBoosterSelected(.droneStrike) },
                               onLongPress: { withAnimation { showingHint = .droneStrike }; dismissHint() })
-                BoosterButton(icon: "bolt.horizontal.fill", label: "Cart", hint: "Row clear",
+                BoosterButton(icon: "bolt.horizontal.fill", label: localizationManager.t("booster.cartShort"), hint: localizationManager.t("booster.cartHintShort"),
                               count: inventory.count(for: .mineCartRush), godMode: inventory.godModeActive,
                               onTap: { onBoosterSelected(.mineCartRush) },
                               onLongPress: { withAnimation { showingHint = .mineCartRush }; dismissHint() })
@@ -80,11 +81,11 @@ struct BoosterBarView: View {
 
     private func hintText(for type: BoosterType) -> String {
         switch type {
-        case .pickaxe: return "Pickaxe — Tap any gem to destroy it instantly"
-        case .dynamite: return "Dynamite — Tap to blast a 3x3 area"
-        case .gemForge: return "Gem Forge — Places a Crystal Ball and Volatile gem"
-        case .droneStrike: return "Drone Strike — 5 seekers target random gems"
-        case .mineCartRush: return "Mine Cart Rush — Converts a row to laser gems"
+        case .pickaxe: return localizationManager.t("booster.pickaxeHint")
+        case .dynamite: return localizationManager.t("booster.dynamiteHint")
+        case .gemForge: return localizationManager.t("booster.gemForgeHint")
+        case .droneStrike: return localizationManager.t("booster.droneStrikeHint")
+        case .mineCartRush: return localizationManager.t("booster.mineCartRushHint")
         default: return ""
         }
     }

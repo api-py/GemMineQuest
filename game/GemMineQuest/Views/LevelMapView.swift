@@ -3,6 +3,7 @@ import SwiftUI
 struct LevelMapView: View {
     @ObservedObject var viewModel: LevelMapViewModel
     @EnvironmentObject var progressManager: ProgressManager
+    @EnvironmentObject var localizationManager: LocalizationManager
     var onSelectLevel: (Int) -> Void
     var onBack: () -> Void
     var onSpinWheel: (() -> Void)? = nil
@@ -34,7 +35,7 @@ struct LevelMapView: View {
 
                 Spacer()
 
-                Text("Mine Shaft")
+                Text(localizationManager.t("levelMap.title"))
                     .font(.system(size: 22, weight: .bold, design: .rounded))
                     .foregroundColor(Color(hex: 0xFFD700))
 
@@ -121,7 +122,7 @@ struct LevelMapView: View {
                         Image(systemName: "arrow.trianglehead.2.clockwise.rotate.90")
                             .font(.system(size: 22, weight: .bold)).foregroundColor(.white)
                         if progressManager.hasFreeSpin() {
-                            Text("FREE").font(.system(size: 8, weight: .black)).foregroundColor(.white)
+                            Text(localizationManager.t("levelMap.free")).font(.system(size: 8, weight: .black)).foregroundColor(.white)
                                 .padding(.horizontal, 6).padding(.vertical, 2)
                                 .background(Capsule().fill(Color.green))
                                 .offset(x: 18, y: -22)
@@ -138,10 +139,10 @@ struct LevelMapView: View {
             }
         }
         .background(MineShaftBackground().ignoresSafeArea())
-        .alert("Level Locked", isPresented: $showLockedAlert) {
-            Button("OK", role: .cancel) {}
+        .alert(localizationManager.t("levelMap.levelLocked"), isPresented: $showLockedAlert) {
+            Button(localizationManager.t("levelMap.ok"), role: .cancel) {}
         } message: {
-            Text("Complete the previous levels first to dig deeper into the mine shaft!")
+            Text(localizationManager.t("levelMap.lockedMessage"))
         }
     }
 }

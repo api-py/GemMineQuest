@@ -10,6 +10,7 @@ struct GameOverView: View {
     var onNextLevel: () -> Void
     var onMenu: () -> Void
     var onBuyMoves: ((Int, Int) -> Void)? = nil
+    @EnvironmentObject var localizationManager: LocalizationManager
 
     // 4-phase win animation states
     @State private var showTitle = false
@@ -70,7 +71,7 @@ struct GameOverView: View {
                                 )
                         }
 
-                        Text("Level \(levelNumber) Complete!")
+                        Text(localizationManager.t("gameOver.levelComplete", levelNumber))
                             .font(.system(size: 30, weight: .bold, design: .rounded))
                             .foregroundStyle(
                                 LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xE8A035)],
@@ -119,7 +120,7 @@ struct GameOverView: View {
                     // Phase 4: Reward Summary
                     if showRewardSummary {
                         VStack(spacing: 8) {
-                            Text("\(score) points")
+                            Text(localizationManager.t("gameOver.points", score))
                                 .font(.system(size: 22, weight: .bold, design: .rounded))
                                 .foregroundColor(.white)
                                 .padding(.horizontal, 20)
@@ -134,7 +135,7 @@ struct GameOverView: View {
                                 )
 
                             HStack(spacing: 16) {
-                                Label("+\(coinReward) gold", systemImage: "dollarsign.circle.fill")
+                                Label(localizationManager.t("gameOver.goldReward", coinReward), systemImage: "dollarsign.circle.fill")
                                     .font(.system(size: 16, weight: .bold))
                                     .foregroundColor(Color(hex: 0xFFD700))
                             }
@@ -149,23 +150,23 @@ struct GameOverView: View {
                         .foregroundColor(Color(hex: 0xFF6347).opacity(0.6))
                         .padding(.bottom, 4)
 
-                    Text("Shaft Collapsed!")
+                    Text(localizationManager.t("gameOver.shaftCollapsed"))
                         .font(.system(size: 28, weight: .bold, design: .rounded))
                         .foregroundColor(Color(hex: 0xFF6347))
                         .shadow(color: Color(hex: 0xFF6347).opacity(0.3), radius: 6)
 
-                    Text("Out of moves")
+                    Text(localizationManager.t("gameOver.outOfMoves"))
                         .font(.body)
                         .foregroundColor(Color(hex: 0xCCBB99))
 
                     // "Need more moves?" purchase options
                     if showMoreMovesOffer {
                         VStack(spacing: 10) {
-                            Text("Need more moves?")
+                            Text(localizationManager.t("gameOver.needMoreMoves"))
                                 .font(.system(size: 18, weight: .bold, design: .rounded))
                                 .foregroundColor(.white)
 
-                            Text("\(playerCoins) gold available")
+                            Text(localizationManager.t("gameOver.goldAvailable", playerCoins))
                                 .font(.system(size: 12, weight: .medium))
                                 .foregroundColor(Color(hex: 0x8B7355))
 
@@ -176,7 +177,9 @@ struct GameOverView: View {
                                     HStack(spacing: 8) {
                                         Image(systemName: "plus.circle.fill")
                                             .foregroundColor(Color(hex: 0xFFD700))
-                                        Text("+\(moves) move\(moves > 1 ? "s" : "")")
+                                        Text(moves > 1
+                                             ? localizationManager.t("gameOver.plusMoves", moves)
+                                             : localizationManager.t("gameOver.plusMove", moves))
                                             .font(.system(size: 14, weight: .bold))
                                             .foregroundColor(.white)
                                         Spacer()
@@ -221,7 +224,7 @@ struct GameOverView: View {
                     VStack(spacing: 14) {
                         if didWin {
                             Button(action: onNextLevel) {
-                                Label("Next Level", systemImage: "arrow.right")
+                                Label(localizationManager.t("gameOver.nextLevel"), systemImage: "arrow.right")
                                     .font(.headline)
                                     .foregroundColor(.white)
                                     .frame(maxWidth: 250)
@@ -252,7 +255,7 @@ struct GameOverView: View {
                         }
 
                         Button(action: onRetry) {
-                            Label("Retry", systemImage: "arrow.counterclockwise")
+                            Label(localizationManager.t("gameOver.retry"), systemImage: "arrow.counterclockwise")
                                 .font(.headline)
                                 .foregroundColor(.white)
                                 .frame(maxWidth: 250)
@@ -268,7 +271,7 @@ struct GameOverView: View {
                         }
 
                         Button(action: onMenu) {
-                            Text("Back to Map")
+                            Text(localizationManager.t("gameOver.backToMap"))
                                 .font(.subheadline)
                                 .foregroundColor(Color(hex: 0x8B7355))
                         }
@@ -282,16 +285,13 @@ struct GameOverView: View {
         }
         .onAppear {
             if didWin {
-                // Phase 1: Title (0.2s)
                 withAnimation(.spring(response: 0.5, dampingFraction: 0.7).delay(0.2)) {
                     showTitle = true
                     bannerScale = 1.0
                 }
-                // Phase 2: Stars (0.6s)
                 withAnimation(.easeOut(duration: 0.5).delay(0.6)) {
                     showStars = true
                 }
-                // Phase 3: Treasure chest (1.0s)
                 withAnimation(.spring(response: 0.4, dampingFraction: 0.6).delay(1.0)) {
                     showTreasureChest = true
                     chestScale = 1.0
@@ -299,16 +299,13 @@ struct GameOverView: View {
                 withAnimation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true).delay(1.2)) {
                     chestBounce = true
                 }
-                // Phase 4: Reward summary (1.5s)
                 withAnimation(.easeOut(duration: 0.4).delay(1.5)) {
                     showRewardSummary = true
                 }
-                // Buttons (2.0s)
                 withAnimation(.easeOut(duration: 0.4).delay(2.0)) {
                     showContent = true
                 }
             } else {
-                // Lose state: show more moves offer
                 withAnimation(.easeOut(duration: 0.4).delay(0.8)) {
                     showMoreMovesOffer = true
                 }

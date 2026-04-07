@@ -51,6 +51,14 @@ enum Achievement: String, CaseIterable {
         }
     }
 
+    func localizedDisplayName(_ lm: LocalizationManager) -> String {
+        return lm.t("achievement.\(self.rawValue)")
+    }
+
+    func localizedDescription(_ lm: LocalizationManager) -> String {
+        return lm.t("achievement.\(self.rawValue)Desc")
+    }
+
     var iconName: String {
         switch self {
         case .firstDig: return "hammer.fill"

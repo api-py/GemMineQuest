@@ -4,6 +4,7 @@ struct SettingsView: View {
     @EnvironmentObject var settingsManager: SettingsManager
     @EnvironmentObject var progressManager: ProgressManager
     @EnvironmentObject var boosterInventory: BoosterInventory
+    @EnvironmentObject var localizationManager: LocalizationManager
     @State private var showResetConfirmation = false
     var onDismiss: () -> Void
 
@@ -21,7 +22,7 @@ struct SettingsView: View {
                             .padding(12)
                     }
                     Spacer()
-                    Text("Settings")
+                    Text(localizationManager.t("settings.title"))
                         .font(.title2.weight(.bold))
                         .foregroundColor(Color(hex: 0xFFD700))
                     Spacer()
@@ -30,6 +31,79 @@ struct SettingsView: View {
                 .padding(.horizontal)
 
                 List {
+                    // Language section
+                    Section {
+                        HStack {
+                            Image(systemName: "globe")
+                                .foregroundColor(Color(hex: 0xFFD700))
+                                .frame(width: 30)
+                            Text(localizationManager.t("settings.language"))
+                                .foregroundColor(.white)
+                            Spacer()
+                            HStack(spacing: 8) {
+                                Button {
+                                    localizationManager.setLanguage(.english)
+                                } label: {
+                                    HStack(spacing: 4) {
+                                        CartoonEnglishFlag()
+                                            .frame(width: 24, height: 16)
+                                            .clipShape(RoundedRectangle(cornerRadius: 3))
+                                        Text("EN")
+                                            .font(.system(size: 12, weight: .bold))
+                                    }
+                                    .foregroundColor(localizationManager.currentLanguage == .english ? Color(hex: 0xFFD700) : Color(hex: 0x8B7355))
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 6)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .fill(localizationManager.currentLanguage == .english
+                                                  ? Color(hex: 0xE8A035).opacity(0.2)
+                                                  : Color.clear)
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 8)
+                                                    .stroke(localizationManager.currentLanguage == .english
+                                                            ? Color(hex: 0xE8A035).opacity(0.5)
+                                                            : Color(hex: 0x5A4530).opacity(0.3), lineWidth: 1)
+                                            )
+                                    )
+                                }
+                                .buttonStyle(.plain)
+
+                                Button {
+                                    localizationManager.setLanguage(.welsh)
+                                } label: {
+                                    HStack(spacing: 4) {
+                                        CartoonWelshFlag()
+                                            .frame(width: 24, height: 16)
+                                            .clipShape(RoundedRectangle(cornerRadius: 3))
+                                        Text("CY")
+                                            .font(.system(size: 12, weight: .bold))
+                                    }
+                                    .foregroundColor(localizationManager.currentLanguage == .welsh ? Color(hex: 0xFFD700) : Color(hex: 0x8B7355))
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 6)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .fill(localizationManager.currentLanguage == .welsh
+                                                  ? Color(hex: 0xE8A035).opacity(0.2)
+                                                  : Color.clear)
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 8)
+                                                    .stroke(localizationManager.currentLanguage == .welsh
+                                                            ? Color(hex: 0xE8A035).opacity(0.5)
+                                                            : Color(hex: 0x5A4530).opacity(0.3), lineWidth: 1)
+                                            )
+                                    )
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                    } header: {
+                        Text(localizationManager.t("settings.language"))
+                            .foregroundColor(Color(hex: 0xE8A035))
+                    }
+                    .listRowBackground(Color(hex: 0x0D1A0C))
+
                     #if DEBUG
                     Section {
                         // God Mode toggle
@@ -37,17 +111,17 @@ struct SettingsView: View {
                             Image(systemName: "infinity")
                                 .foregroundColor(Color(hex: 0xFFD700))
                                 .frame(width: 30)
-                            Toggle("God Mode", isOn: $settingsManager.godModeEnabled)
+                            Toggle(localizationManager.t("settings.godMode"), isOn: $settingsManager.godModeEnabled)
                                 .tint(Color(hex: 0xE8A035))
                         }
 
                         if settingsManager.godModeEnabled {
-                            Text("Unlimited moves - for casual play")
+                            Text(localizationManager.t("settings.godModeDesc"))
                                 .font(.caption)
                                 .foregroundColor(Color(hex: 0x8B7355))
                         }
                     } header: {
-                        Text("Gameplay")
+                        Text(localizationManager.t("settings.gameplay"))
                             .foregroundColor(Color(hex: 0xE8A035))
                     }
                     .listRowBackground(Color(hex: 0x0D1A0C))
@@ -58,11 +132,11 @@ struct SettingsView: View {
                             Image(systemName: "iphone.radiowaves.left.and.right")
                                 .foregroundColor(Color(hex: 0xCCBB99))
                                 .frame(width: 30)
-                            Toggle("Haptic Feedback", isOn: $settingsManager.hapticsEnabled)
+                            Toggle(localizationManager.t("settings.hapticFeedback"), isOn: $settingsManager.hapticsEnabled)
                                 .tint(Color(hex: 0xE8A035))
                         }
                     } header: {
-                        Text("Feedback")
+                        Text(localizationManager.t("settings.feedback"))
                             .foregroundColor(Color(hex: 0xE8A035))
                     }
                     .listRowBackground(Color(hex: 0x0D1A0C))
@@ -71,16 +145,16 @@ struct SettingsView: View {
                         ForEach(BoosterInventory.allInGameBoosters, id: \.self) { booster in
                             BoosterSettingsRow(booster: booster, inventory: boosterInventory)
                         }
-                        Text("+1 of each every 25 levels").font(.caption).foregroundColor(Color(hex: 0x8B7355))
+                        Text(localizationManager.t("settings.boosterNote")).font(.caption).foregroundColor(Color(hex: 0x8B7355))
                     } header: {
-                        Text("Boosters").foregroundColor(Color(hex: 0xE8A035))
+                        Text(localizationManager.t("settings.boosters")).foregroundColor(Color(hex: 0xE8A035))
                     }
                     .listRowBackground(Color(hex: 0x0D1A0C))
 
                     Section {
                         // Progress info
                         HStack {
-                            Text("Highest Level")
+                            Text(localizationManager.t("settings.highestLevel"))
                                 .foregroundColor(.white)
                             Spacer()
                             Text("\(progressManager.progress.highestUnlocked)")
@@ -88,7 +162,7 @@ struct SettingsView: View {
                         }
 
                         HStack {
-                            Text("Levels Completed")
+                            Text(localizationManager.t("settings.levelsCompleted"))
                                 .foregroundColor(.white)
                             Spacer()
                             Text("\(progressManager.progress.levelStars.count)")
@@ -96,7 +170,7 @@ struct SettingsView: View {
                         }
 
                         HStack {
-                            Text("Total Stars")
+                            Text(localizationManager.t("settings.totalStars"))
                                 .foregroundColor(.white)
                             Spacer()
                             let totalStars = progressManager.progress.levelStars.values.reduce(0, +)
@@ -104,7 +178,7 @@ struct SettingsView: View {
                                 .foregroundColor(Color(hex: 0xFFD700))
                         }
                     } header: {
-                        Text("Progress")
+                        Text(localizationManager.t("settings.progress"))
                             .foregroundColor(Color(hex: 0xE8A035))
                     }
                     .listRowBackground(Color(hex: 0x0D1A0C))
@@ -113,7 +187,7 @@ struct SettingsView: View {
                         Button(action: { showResetConfirmation = true }) {
                             HStack {
                                 Image(systemName: "exclamationmark.triangle")
-                                Text("Reset All Progress")
+                                Text(localizationManager.t("settings.resetAllProgress"))
                             }
                             .foregroundColor(.red)
                         }
@@ -124,14 +198,14 @@ struct SettingsView: View {
                 .listStyle(.insetGrouped)
             }
         }
-        .alert("Reset Progress?", isPresented: $showResetConfirmation) {
-            Button("Cancel", role: .cancel) {}
-            Button("Reset", role: .destructive) {
+        .alert(localizationManager.t("settings.resetProgress"), isPresented: $showResetConfirmation) {
+            Button(localizationManager.t("settings.cancel"), role: .cancel) {}
+            Button(localizationManager.t("settings.reset"), role: .destructive) {
                 progressManager.resetProgress()
                 boosterInventory.reset()
             }
         } message: {
-            Text("This will erase all your level progress and scores. This cannot be undone.")
+            Text(localizationManager.t("settings.resetMessage"))
         }
     }
 }
@@ -141,6 +215,7 @@ struct SettingsView: View {
 struct BoosterSettingsRow: View {
     let booster: BoosterType
     @ObservedObject var inventory: BoosterInventory
+    @EnvironmentObject var localizationManager: LocalizationManager
 
     private var icon: String {
         switch booster {
@@ -155,11 +230,11 @@ struct BoosterSettingsRow: View {
 
     private var label: String {
         switch booster {
-        case .pickaxe: return "Pickaxe"
-        case .dynamite: return "Dynamite"
-        case .gemForge: return "Gem Forge"
-        case .droneStrike: return "Drone Strike"
-        case .mineCartRush: return "Mine Cart Rush"
+        case .pickaxe: return localizationManager.t("booster.pickaxe")
+        case .dynamite: return localizationManager.t("booster.dynamite")
+        case .gemForge: return localizationManager.t("booster.gemForge")
+        case .droneStrike: return localizationManager.t("booster.droneStrike")
+        case .mineCartRush: return localizationManager.t("booster.mineCartRush")
         default: return booster.rawValue
         }
     }
@@ -197,7 +272,7 @@ struct BoosterSettingsRow: View {
                 .disabled(inventory.count(for: booster) >= 5)
                 .buttonStyle(.plain)
 
-                Text("Max: 5")
+                Text(localizationManager.t("settings.max5"))
                     .font(.system(size: 9, weight: .medium))
                     .foregroundColor(Color(hex: 0x8B7355))
             }

@@ -64,6 +64,28 @@ enum GemColor: Int, CaseIterable, Codable {
         }
     }
 
+    func localizedDisplayName(_ lm: LocalizationManager) -> String {
+        switch self {
+        case .ruby: return lm.t("gem.ruby")
+        case .gold: return lm.t("gem.gold")
+        case .silver: return lm.t("gem.silver")
+        case .emerald: return lm.t("gem.emerald")
+        case .sapphire: return lm.t("gem.sapphire")
+        case .amethyst: return lm.t("gem.amethyst")
+        }
+    }
+
+    func localizedColorHint(_ lm: LocalizationManager) -> String {
+        switch self {
+        case .ruby: return lm.t("gem.hintRed")
+        case .gold: return lm.t("gem.hintGold")
+        case .silver: return lm.t("gem.hintSilver")
+        case .emerald: return lm.t("gem.hintGreen")
+        case .sapphire: return lm.t("gem.hintBlue")
+        case .amethyst: return lm.t("gem.hintPurple")
+        }
+    }
+
     var isMetal: Bool {
         self == .gold || self == .silver
     }
@@ -99,6 +121,17 @@ enum SpecialType: Int, Codable, Equatable {
         case .volatile: return "Volatile Gem"
         case .crystalBall: return "Crystal Ball"
         case .miningDrone: return "Mining Drone"
+        }
+    }
+
+    func localizedDisplayName(_ lm: LocalizationManager) -> String {
+        switch self {
+        case .none: return lm.t("special.normal")
+        case .laserHorizontal: return lm.t("special.laserH")
+        case .laserVertical: return lm.t("special.laserV")
+        case .volatile: return lm.t("special.volatile")
+        case .crystalBall: return lm.t("special.crystalBall")
+        case .miningDrone: return lm.t("special.miningDrone")
         }
     }
 }
