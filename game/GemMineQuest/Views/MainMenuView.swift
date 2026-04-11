@@ -108,13 +108,10 @@ struct MainMenuView: View {
                 // Play button
                 Button(action: onPlay) {
                     HStack(spacing: 12) {
-                        if let _ = UIImage(named: "booster_icons_sheet") {
-                            Image(systemName: "hammer.fill")
-                                .font(.title2)
-                        } else {
-                            Image(systemName: "hammer.fill")
-                                .font(.title2)
-                        }
+                        Image("booster_pickaxe")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 28, height: 28)
                         Text(progressManager.progress.highestUnlocked > 1 ? "CONTINUE MINING" : "START MINING")
                             .font(.title3.weight(.bold))
                     }

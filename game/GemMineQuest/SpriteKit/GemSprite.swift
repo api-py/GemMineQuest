@@ -62,7 +62,7 @@ class GemSprite: SKNode {
         case .volatile:
             specialOverlay = GemRenderer.createVolatileOverlay(size: gemSize, color: gem.color)
             if let overlay = specialOverlay {
-                overlay.zPosition = 1
+                overlay.zPosition = -1  // Behind gem body
                 addChild(overlay)
             }
         default:

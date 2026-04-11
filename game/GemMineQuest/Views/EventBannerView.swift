@@ -51,9 +51,10 @@ struct EventBannerView: View {
                         )
                         .frame(width: 48, height: 48)
 
-                    Image(systemName: "hammer.fill")
-                        .font(.system(size: 22, weight: .bold))
-                        .foregroundColor(Color(hex: 0xFFD700))
+                    Image("booster_pickaxe")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 28, height: 28)
                 }
 
                 VStack(alignment: .leading, spacing: 4) {

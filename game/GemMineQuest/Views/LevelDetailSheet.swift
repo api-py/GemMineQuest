@@ -163,7 +163,10 @@ struct LevelDetailSheet: View {
             // Play button - fixed at bottom, outside ScrollView
             Button(action: onPlay) {
                 HStack {
-                    Image(systemName: "hammer.fill")
+                    Image("booster_pickaxe")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 24, height: 24)
                     Text(progressManager.progress.stars(for: levelNumber) > 0 ? "DIG AGAIN" : "START DIG")
                         .font(.title3.weight(.bold))
                 }

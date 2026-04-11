@@ -26,23 +26,23 @@ struct BoosterBarView: View {
             }
 
             HStack(spacing: 10) {
-                BoosterButton(icon: "hammer.fill", label: "Pickaxe", hint: "Break 1",
+                BoosterButton(icon: BoosterType.pickaxe.iconAssetName, label: "Pickaxe", hint: "Break 1",
                               count: inventory.count(for: .pickaxe), godMode: inventory.godModeActive,
                               onTap: { onBoosterSelected(.pickaxe) },
                               onLongPress: { withAnimation { showingHint = .pickaxe }; dismissHint() })
-                BoosterButton(icon: "flame.fill", label: "Dynamite", hint: "Blast 3x3",
+                BoosterButton(icon: BoosterType.dynamite.iconAssetName, label: "Dynamite", hint: "Blast 3x3",
                               count: inventory.count(for: .dynamite), godMode: inventory.godModeActive,
                               onTap: { onBoosterSelected(.dynamite) },
                               onLongPress: { withAnimation { showingHint = .dynamite }; dismissHint() })
-                BoosterButton(icon: "wand.and.stars", label: "Forge", hint: "Place specials",
+                BoosterButton(icon: BoosterType.gemForge.iconAssetName, label: "Forge", hint: "Place specials",
                               count: inventory.count(for: .gemForge), godMode: inventory.godModeActive,
                               onTap: { onBoosterSelected(.gemForge) },
                               onLongPress: { withAnimation { showingHint = .gemForge }; dismissHint() })
-                BoosterButton(icon: "scope", label: "Drone", hint: "Seek 5",
+                BoosterButton(icon: BoosterType.droneStrike.iconAssetName, label: "Drone", hint: "Seek 5",
                               count: inventory.count(for: .droneStrike), godMode: inventory.godModeActive,
                               onTap: { onBoosterSelected(.droneStrike) },
                               onLongPress: { withAnimation { showingHint = .droneStrike }; dismissHint() })
-                BoosterButton(icon: "bolt.horizontal.fill", label: "Cart", hint: "Row clear",
+                BoosterButton(icon: BoosterType.mineCartRush.iconAssetName, label: "Cart", hint: "Row clear",
                               count: inventory.count(for: .mineCartRush), godMode: inventory.godModeActive,
                               onTap: { onBoosterSelected(.mineCartRush) },
                               onLongPress: { withAnimation { showingHint = .mineCartRush }; dismissHint() })
@@ -139,15 +139,11 @@ struct BoosterButton: View {
                                     )
                             )
 
-                        Image(systemName: icon)
-                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundStyle(
-                                isAvailable
-                                    ? LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xE8A035)],
-                                                     startPoint: .top, endPoint: .bottom)
-                                    : LinearGradient(colors: [Color(hex: 0x5A4530), Color(hex: 0x3D2B1F)],
-                                                     startPoint: .top, endPoint: .bottom)
-                            )
+                        Image(icon)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 24, height: 24)
+                            .opacity(isAvailable ? 1.0 : 0.4)
 
                         // Shine sweep (top highlight)
                         if isAvailable {

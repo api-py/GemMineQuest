@@ -116,7 +116,9 @@ class GemRenderer {
         let container = SKNode()
 
         if let texture = loadTexture(named: "special_volatile") {
-            let sprite = SKSpriteNode(texture: texture, size: CGSize(width: size, height: size))
+            let sprite = SKSpriteNode(texture: texture, size: CGSize(width: size * 1.3, height: size * 1.3))
+            sprite.color = color.primaryColor
+            sprite.colorBlendFactor = 0.6
             container.addChild(sprite)
         }
 

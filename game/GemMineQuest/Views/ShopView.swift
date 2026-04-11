@@ -93,9 +93,10 @@ struct ShopView: View {
                     ))
                     .frame(width: 50, height: 50)
 
-                Image(systemName: item.iconName)
-                    .font(.system(size: 24))
-                    .foregroundColor(Color(hex: 0xFFD700))
+                Image(item.iconName)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 36, height: 36)
             }
 
             // Name

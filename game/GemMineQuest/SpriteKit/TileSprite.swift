@@ -118,66 +118,40 @@ class TileSprite: SKNode {
 
     private func createOreOverlay(double: Bool) -> SKNode {
         let container = SKNode()
-        let rect = CGSize(width: tileSize - 2, height: tileSize - 2)
+        let halfSize = tileSize * 0.47
 
-        // Bright gold fill - very visible
-        let ore = SKShapeNode(rectOf: rect, cornerRadius: 4)
-        ore.fillColor = double
-            ? SKColor(red: 0.85, green: 0.65, blue: 0.10, alpha: 0.70)
-            : SKColor(red: 0.75, green: 0.55, blue: 0.10, alpha: 0.60)
-        ore.strokeColor = SKColor(hex: 0xFFD700)
-        ore.lineWidth = double ? 3.5 : 3.0
-        ore.glowWidth = double ? 4.0 : 2.5
-        container.addChild(ore)
+        // Diagonal gold lines at 45° angle
+        let linePath = CGMutablePath()
+        let spacing: CGFloat = tileSize * (double ? 0.10 : 0.14)
+        let extent = halfSize * 2.5  // extend beyond tile for full coverage at 45°
+        var offset = -extent
+        while offset <= extent {
+            // Lines going ↘
+            linePath.move(to: CGPoint(x: -halfSize, y: offset))
+            linePath.addLine(to: CGPoint(x: halfSize, y: offset - halfSize * 2))
+            offset += spacing
+        }
 
-        // Thin gold border stroke
-        let border = SKShapeNode(rectOf: rect, cornerRadius: 4)
+        let lines = SKShapeNode(path: linePath)
+        lines.strokeColor = SKColor(hex: 0xFFD700, alpha: double ? 0.8 : 0.6)
+        lines.lineWidth = double ? 2.0 : 1.5
+        lines.glowWidth = double ? 1.5 : 1.0
+        lines.fillColor = .clear
+
+        // Crop lines to tile bounds
+        let mask = SKShapeNode(rectOf: CGSize(width: tileSize - 2, height: tileSize - 2), cornerRadius: 4)
+        mask.fillColor = .white
+        let crop = SKCropNode()
+        crop.maskNode = mask
+        crop.addChild(lines)
+        container.addChild(crop)
+
+        // Thin gold border
+        let border = SKShapeNode(rectOf: CGSize(width: tileSize - 2, height: tileSize - 2), cornerRadius: 4)
         border.fillColor = .clear
-        border.strokeColor = SKColor(hex: 0xFFD700)
+        border.strokeColor = SKColor(hex: 0xFFD700, alpha: 0.5)
         border.lineWidth = 1.5
         container.addChild(border)
-
-        // Gold sparkle flecks - bigger and brighter
-        let numFlecks = double ? 6 : 4
-        for i in 0..<numFlecks {
-            let fleck = SKShapeNode(circleOfRadius: tileSize * 0.04)
-            fleck.fillColor = SKColor(hex: 0xFFD700, alpha: 0.9)
-            fleck.strokeColor = .clear
-            fleck.glowWidth = 2.5
-            let angle = CGFloat(i) / CGFloat(numFlecks) * .pi * 2 + 0.5
-            let dist = tileSize * CGFloat.random(in: 0.12...0.30)
-            fleck.position = CGPoint(x: cos(angle) * dist, y: sin(angle) * dist)
-            container.addChild(fleck)
-        }
-
-        // Corner gold nuggets for extra visibility
-        let nuggetPositions: [CGPoint] = [
-            CGPoint(x: -tileSize * 0.28, y: tileSize * 0.28),
-            CGPoint(x: tileSize * 0.28, y: -tileSize * 0.28),
-        ]
-        for pos in nuggetPositions {
-            let nugget = SKShapeNode(circleOfRadius: tileSize * 0.06)
-            nugget.fillColor = SKColor(hex: 0xFFD700)
-            nugget.strokeColor = SKColor(hex: 0xDAA520)
-            nugget.lineWidth = 1.0
-            nugget.glowWidth = 2.0
-            nugget.position = pos
-            container.addChild(nugget)
-        }
-
-        // Pickaxe icon - bigger
-        let icon = SKLabelNode(text: double ? "\u{26CF}\u{26CF}" : "\u{26CF}")
-        icon.fontSize = tileSize * 0.28
-        icon.verticalAlignmentMode = .center
-        icon.position = CGPoint(x: 0, y: -tileSize * 0.30)
-        container.addChild(icon)
-
-        // Pulsing glow animation
-        let pulse = SKAction.sequence([
-            SKAction.fadeAlpha(to: 0.7, duration: 0.6),
-            SKAction.fadeAlpha(to: 1.0, duration: 0.6)
-        ])
-        container.run(SKAction.repeatForever(pulse))
 
         return container
     }
@@ -263,6 +237,7 @@ class TileSprite: SKNode {
         case .cage:
             if let texture = loadBlockerTexture(named: "blocker_cage") {
                 let sprite = SKSpriteNode(texture: texture, size: spriteSize)
+                sprite.alpha = 0.9  // Slightly transparent so gem beneath is visible
                 container.addChild(sprite)
             }
 
@@ -271,16 +246,10 @@ class TileSprite: SKNode {
                 let sprite = SKSpriteNode(texture: texture, size: spriteSize)
                 container.addChild(sprite)
             }
-            // Pulsing glow animation
+            // Subtle scale pulse — fully opaque
             let pulse = SKAction.sequence([
-                SKAction.group([
-                    SKAction.scale(to: 1.04, duration: 0.7),
-                    SKAction.fadeAlpha(to: 0.5, duration: 0.7)
-                ]),
-                SKAction.group([
-                    SKAction.scale(to: 1.0, duration: 0.7),
-                    SKAction.fadeAlpha(to: 0.7, duration: 0.7)
-                ])
+                SKAction.scale(to: 1.04, duration: 0.7),
+                SKAction.scale(to: 1.0, duration: 0.7)
             ])
             container.run(SKAction.repeatForever(pulse))
 
