@@ -31,6 +31,13 @@ class GameViewModel: ObservableObject {
     func createScene(size: CGSize, godMode: Bool) -> GameScene {
         if let existing = scene { return existing }
 
+        // Guard against zero size to prevent CAMetalLayer warning
+        guard size.width > 0 && size.height > 0 else {
+            let fallback = GameScene(size: CGSize(width: 390, height: 844))
+            fallback.scaleMode = .resizeFill
+            return fallback
+        }
+
         let state = LevelGenerator.createGameState(levelNumber: levelNumber)
         let engine = GameEngine(state: state)
         self.godModeEnabled = godMode

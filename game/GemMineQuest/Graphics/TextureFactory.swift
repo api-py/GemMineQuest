@@ -55,6 +55,8 @@ class TextureFactory {
     // MARK: - Gemstone Rendering
 
     private func drawGemstone(gc: CGContext, center: CGPoint, radius: CGFloat, px: CGFloat, color: GemColor) {
+        guard radius > 0 else { return }  // Prevent empty path / clip warnings
+
         let primary = color.primaryColor
         let light = color.lightColor
         let dark = color.darkColor
@@ -65,6 +67,7 @@ class TextureFactory {
         gc.setShadow(offset: CGSize(width: 3, height: 5), blur: 12,
                       color: UIColor(white: 0, alpha: 0.55).cgColor)
         let shapePath = gemShapePath(for: color, center: center, radius: radius)
+        guard !shapePath.isEmpty else { gc.restoreGState(); return }
         gc.addPath(shapePath)
         gc.setFillColor(dark.cgColor)
         gc.fillPath()
