@@ -109,13 +109,10 @@ struct MainMenuView: View {
                 // Play button
                 Button(action: onPlay) {
                     HStack(spacing: 12) {
-                        if let _ = UIImage(named: "booster_icons_sheet") {
-                            Image(systemName: "hammer.fill")
-                                .font(.title2)
-                        } else {
-                            Image(systemName: "hammer.fill")
-                                .font(.title2)
-                        }
+                        Image("booster_pickaxe")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 28, height: 28)
                         Text(progressManager.progress.highestUnlocked > 1
                              ? localizationManager.t("menu.continueMining")
                              : localizationManager.t("menu.startMining"))
@@ -152,7 +149,9 @@ struct MainMenuView: View {
                 // Shop button
                 Button(action: { showShop = true }) {
                     HStack(spacing: 10) {
-                        Image(systemName: "cart.fill")
+                        Image("booster_mine_cart")
+                            .resizable()
+                            .frame(width: 28, height: 28)
                         Text(localizationManager.t("menu.shop"))
                             .font(.body.weight(.semibold))
                     }

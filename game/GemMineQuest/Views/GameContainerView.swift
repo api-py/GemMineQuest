@@ -165,9 +165,9 @@ struct GameContainerView: View {
 
                     // Shop button
                     Button { showShop = true } label: {
-                        Image(systemName: "bag.fill")
-                            .font(.system(size: 22))
-                            .foregroundColor(Color(hex: 0xFFD700))
+                        Image("booster_mine_cart")
+                            .resizable()
+                            .frame(width: 28, height: 28)
                     }
                     .onLongPressGesture(minimumDuration: 0.4) {
                         withAnimation { hudTooltipText = localizationManager.t("game.shopTooltip") }
@@ -175,9 +175,9 @@ struct GameContainerView: View {
 
                     // Exit button
                     Button { showExitConfirmation = true } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 22))
-                            .foregroundColor(Color(hex: 0xC71414))
+                        Image("btn_close")
+                            .resizable()
+                            .frame(width: 28, height: 28)
                     }
 
                     #if DEBUG

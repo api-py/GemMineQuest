@@ -127,4 +127,15 @@ enum BoosterType: String {
     case extraMoves
     case crystalBallBoost
     case powerGems
+
+    var iconAssetName: String {
+        switch self {
+        case .pickaxe: return "booster_pickaxe"
+        case .dynamite: return "booster_dynamite"
+        case .gemForge: return "booster_gem_forge"
+        case .droneStrike: return "booster_drone"
+        case .mineCartRush: return "booster_mine_cart"
+        default: return "booster_pickaxe"
+        }
+    }
 }

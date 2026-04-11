@@ -109,8 +109,14 @@ struct DailyRewardView: View {
                                     .foregroundColor(Color(hex: 0x00BFFF))
                             }
                             if let booster = reward.boosterType {
-                                Label("+1", systemImage: boosterIcon(booster))
-                                    .foregroundColor(Color(hex: 0xFF6347))
+                                HStack(spacing: 4) {
+                                    Image(boosterIcon(booster))
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 18, height: 18)
+                                    Text("+1")
+                                }
+                                .foregroundColor(Color(hex: 0xFF6347))
                             }
                         }
                         .font(.system(size: 16, weight: .semibold))
@@ -175,12 +181,6 @@ struct DailyRewardView: View {
     }
 
     private func boosterIcon(_ type: BoosterType) -> String {
-        switch type {
-        case .pickaxe: return "hammer.fill"
-        case .dynamite: return "flame.fill"
-        case .droneStrike: return "bolt.fill"
-        case .gemForge: return "wand.and.stars"
-        default: return "star.fill"
-        }
+        type.iconAssetName
     }
 }

@@ -27,23 +27,23 @@ struct BoosterBarView: View {
             }
 
             HStack(spacing: 10) {
-                BoosterButton(icon: "hammer.fill", label: localizationManager.t("booster.pickaxeShort"), hint: localizationManager.t("booster.pickaxeHintShort"),
+                BoosterButton(icon: BoosterType.pickaxe.iconAssetName, label: localizationManager.t("booster.pickaxeShort"), hint: localizationManager.t("booster.pickaxeHintShort"),
                               count: inventory.count(for: .pickaxe), godMode: inventory.godModeActive,
                               onTap: { onBoosterSelected(.pickaxe) },
                               onLongPress: { withAnimation { showingHint = .pickaxe }; dismissHint() })
-                BoosterButton(icon: "flame.fill", label: localizationManager.t("booster.dynamiteShort"), hint: localizationManager.t("booster.dynamiteHintShort"),
+                BoosterButton(icon: BoosterType.dynamite.iconAssetName, label: localizationManager.t("booster.dynamiteShort"), hint: localizationManager.t("booster.dynamiteHintShort"),
                               count: inventory.count(for: .dynamite), godMode: inventory.godModeActive,
                               onTap: { onBoosterSelected(.dynamite) },
                               onLongPress: { withAnimation { showingHint = .dynamite }; dismissHint() })
-                BoosterButton(icon: "wand.and.stars", label: localizationManager.t("booster.forgeShort"), hint: localizationManager.t("booster.forgeHintShort"),
+                BoosterButton(icon: BoosterType.gemForge.iconAssetName, label: localizationManager.t("booster.forgeShort"), hint: localizationManager.t("booster.forgeHintShort"),
                               count: inventory.count(for: .gemForge), godMode: inventory.godModeActive,
                               onTap: { onBoosterSelected(.gemForge) },
                               onLongPress: { withAnimation { showingHint = .gemForge }; dismissHint() })
-                BoosterButton(icon: "scope", label: localizationManager.t("booster.droneShort"), hint: localizationManager.t("booster.droneHintShort"),
+                BoosterButton(icon: BoosterType.droneStrike.iconAssetName, label: localizationManager.t("booster.droneShort"), hint: localizationManager.t("booster.droneHintShort"),
                               count: inventory.count(for: .droneStrike), godMode: inventory.godModeActive,
                               onTap: { onBoosterSelected(.droneStrike) },
                               onLongPress: { withAnimation { showingHint = .droneStrike }; dismissHint() })
-                BoosterButton(icon: "bolt.horizontal.fill", label: localizationManager.t("booster.cartShort"), hint: localizationManager.t("booster.cartHintShort"),
+                BoosterButton(icon: BoosterType.mineCartRush.iconAssetName, label: localizationManager.t("booster.cartShort"), hint: localizationManager.t("booster.cartHintShort"),
                               count: inventory.count(for: .mineCartRush), godMode: inventory.godModeActive,
                               onTap: { onBoosterSelected(.mineCartRush) },
                               onLongPress: { withAnimation { showingHint = .mineCartRush }; dismissHint() })
@@ -140,15 +140,11 @@ struct BoosterButton: View {
                                     )
                             )
 
-                        Image(systemName: icon)
-                            .font(.system(size: 16, weight: .semibold))
-                            .foregroundStyle(
-                                isAvailable
-                                    ? LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xE8A035)],
-                                                     startPoint: .top, endPoint: .bottom)
-                                    : LinearGradient(colors: [Color(hex: 0x5A4530), Color(hex: 0x3D2B1F)],
-                                                     startPoint: .top, endPoint: .bottom)
-                            )
+                        Image(icon)
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 24, height: 24)
+                            .opacity(isAvailable ? 1.0 : 0.4)
 
                         // Shine sweep (top highlight)
                         if isAvailable {

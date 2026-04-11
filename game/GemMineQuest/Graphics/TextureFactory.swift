@@ -12,14 +12,33 @@ class TextureFactory {
 
     // MARK: - Gem Textures
 
+    /// Asset name mapping for each gem color
+    private func gemAssetName(for color: GemColor) -> String {
+        "gem_\(color.displayName.lowercased())"
+    }
+
     func gemTexture(for color: GemColor, size: CGFloat) -> SKTexture {
         let key = "\(color.rawValue)_\(Int(size))"
         if let cached = gemTextureCache[key] { return cached }
 
         let scale: CGFloat = 3.0
         let px = size * scale
-        let renderer = UIGraphicsImageRenderer(size: CGSize(width: px, height: px))
+        let targetSize = CGSize(width: px, height: px)
 
+        // Try loading from asset catalog first
+        if let assetImage = UIImage(named: gemAssetName(for: color)) {
+            let renderer = UIGraphicsImageRenderer(size: targetSize)
+            let scaled = renderer.image { ctx in
+                assetImage.draw(in: CGRect(origin: .zero, size: targetSize))
+            }
+            let texture = SKTexture(image: scaled)
+            texture.filteringMode = .linear
+            gemTextureCache[key] = texture
+            return texture
+        }
+
+        // Fallback to procedural rendering
+        let renderer = UIGraphicsImageRenderer(size: targetSize)
         let image = renderer.image { ctx in
             let gc = ctx.cgContext
             let center = CGPoint(x: px / 2, y: px / 2)

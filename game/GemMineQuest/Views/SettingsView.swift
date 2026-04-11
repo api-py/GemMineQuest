@@ -218,14 +218,7 @@ struct BoosterSettingsRow: View {
     @EnvironmentObject var localizationManager: LocalizationManager
 
     private var icon: String {
-        switch booster {
-        case .pickaxe: return "hammer.fill"
-        case .dynamite: return "flame.fill"
-        case .gemForge: return "wand.and.stars"
-        case .droneStrike: return "scope"
-        case .mineCartRush: return "bolt.horizontal.fill"
-        default: return "questionmark"
-        }
+        booster.iconAssetName
     }
 
     private var label: String {
@@ -241,9 +234,10 @@ struct BoosterSettingsRow: View {
 
     var body: some View {
         HStack {
-            Image(systemName: icon)
-                .foregroundColor(Color(hex: 0xE8A035))
-                .frame(width: 24)
+            Image(icon)
+                .resizable()
+                .scaledToFit()
+                .frame(width: 24, height: 24)
             Text(label).foregroundColor(.white)
             Spacer()
             HStack(spacing: 12) {
