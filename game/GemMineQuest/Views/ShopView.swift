@@ -28,9 +28,9 @@ struct ShopView: View {
                 HStack {
                     Spacer()
                     Button(action: onDismiss) {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 28))
-                            .foregroundColor(Color(hex: 0x8B7355))
+                        Image("btn_close")
+                            .resizable()
+                            .frame(width: 34, height: 34)
                     }
                 }
                 .padding(.horizontal, 20)

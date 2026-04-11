@@ -174,9 +174,9 @@ struct GameContainerView: View {
 
                     // Exit button
                     Button { showExitConfirmation = true } label: {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 22))
-                            .foregroundColor(Color(hex: 0xC71414))
+                        Image("btn_close")
+                            .resizable()
+                            .frame(width: 28, height: 28)
                     }
 
                     #if DEBUG
