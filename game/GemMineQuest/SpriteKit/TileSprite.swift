@@ -242,8 +242,9 @@ class TileSprite: SKNode {
             }
 
         case .lava:
+            let lavaSize = CGSize(width: tileSize, height: tileSize)
             if let texture = loadBlockerTexture(named: "blocker_lava") {
-                let sprite = SKSpriteNode(texture: texture, size: spriteSize)
+                let sprite = SKSpriteNode(texture: texture, size: lavaSize)
                 container.addChild(sprite)
             }
             // Subtle scale pulse — fully opaque
@@ -254,17 +255,40 @@ class TileSprite: SKNode {
             container.run(SKAction.repeatForever(pulse))
 
         case .tnt(let countdown):
+            let tntSize = CGSize(width: tileSize, height: tileSize)
             if let texture = loadBlockerTexture(named: "blocker_tnt") {
-                let sprite = SKSpriteNode(texture: texture, size: spriteSize)
+                let sprite = SKSpriteNode(texture: texture, size: tntSize)
                 container.addChild(sprite)
             }
-            // Countdown number overlay
+            // Countdown number with dark grey outline
+            let outline = SKLabelNode(text: "\(countdown)")
+            outline.fontName = "AvenirNext-Heavy"
+            outline.fontSize = tileSize * 0.38
+            outline.fontColor = SKColor(hex: 0x333333)
+            outline.verticalAlignmentMode = .center
+            outline.zPosition = 1
+            container.addChild(outline)
+            // Offset copies for stroke effect
+            for dx: CGFloat in [-1, 0, 1] {
+                for dy: CGFloat in [-1, 0, 1] {
+                    if dx == 0 && dy == 0 { continue }
+                    let strokeLabel = SKLabelNode(text: "\(countdown)")
+                    strokeLabel.fontName = "AvenirNext-Heavy"
+                    strokeLabel.fontSize = tileSize * 0.38
+                    strokeLabel.fontColor = SKColor(hex: 0x333333)
+                    strokeLabel.verticalAlignmentMode = .center
+                    strokeLabel.position = CGPoint(x: dx * 1.2, y: dy * 1.2)
+                    strokeLabel.zPosition = 1
+                    container.addChild(strokeLabel)
+                }
+            }
+            // White number on top
             let label = SKLabelNode(text: "\(countdown)")
             label.fontName = "AvenirNext-Heavy"
-            label.fontSize = tileSize * 0.34
+            label.fontSize = tileSize * 0.38
             label.fontColor = .white
             label.verticalAlignmentMode = .center
-            label.zPosition = 1
+            label.zPosition = 2
             container.addChild(label)
             // Fuse spark
             let spark = SKShapeNode(circleOfRadius: 3.0)
@@ -281,7 +305,7 @@ class TileSprite: SKNode {
             spark.run(SKAction.repeatForever(sparkPulse))
 
         case .amber:
-            if let texture = loadBlockerTexture(named: "blocker_amber") {
+            if let texture = loadBlockerTexture(named: "blocker_topaz") {
                 let sprite = SKSpriteNode(texture: texture, size: spriteSize)
                 container.addChild(sprite)
             }

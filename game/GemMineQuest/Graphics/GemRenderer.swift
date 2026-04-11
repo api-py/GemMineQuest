@@ -47,7 +47,73 @@ class GemRenderer {
         // Idle animations
         addIdleAnimations(to: container, size: size)
 
+        // Gem-specific effects
+        addGemEffects(to: container, color: color, size: size)
+
         return container
+    }
+
+    // MARK: - Gem-Specific Effects
+
+    private static func addGemEffects(to container: SKNode, color: GemColor, size: CGFloat) {
+        switch color {
+        case .silver:
+            // Random shine sweep — a bright highlight that flashes across the gem
+            let shine = SKShapeNode(ellipseOf: CGSize(width: size * 0.3, height: size * 0.08))
+            shine.fillColor = SKColor(white: 1.0, alpha: 0.7)
+            shine.strokeColor = .clear
+            shine.glowWidth = 4.0
+            shine.alpha = 0.0
+            shine.zPosition = 2
+            shine.position = CGPoint(x: -size * 0.3, y: size * 0.1)
+            container.addChild(shine)
+
+            let shineSweep = SKAction.sequence([
+                SKAction.wait(forDuration: Double.random(in: 3.0...7.0)),
+                SKAction.fadeAlpha(to: 0.8, duration: 0.1),
+                SKAction.move(to: CGPoint(x: size * 0.3, y: size * 0.1), duration: 0.3),
+                SKAction.fadeAlpha(to: 0.0, duration: 0.1),
+                SKAction.move(to: CGPoint(x: -size * 0.3, y: size * 0.1), duration: 0.0)
+            ])
+            shine.run(SKAction.repeatForever(shineSweep))
+
+        case .gold, .emerald:
+            // Random crystal glitter — small sparkle dots that flash at random positions
+            for _ in 0..<3 {
+                let glitter = SKShapeNode(circleOfRadius: size * 0.025)
+                glitter.fillColor = color == .gold
+                    ? SKColor(red: 1.0, green: 0.95, blue: 0.6, alpha: 1.0)
+                    : SKColor(red: 0.6, green: 1.0, blue: 0.7, alpha: 1.0)
+                glitter.strokeColor = .clear
+                glitter.glowWidth = 2.5
+                glitter.alpha = 0.0
+                glitter.zPosition = 2
+                let rx = CGFloat.random(in: -size * 0.25...size * 0.25)
+                let ry = CGFloat.random(in: -size * 0.25...size * 0.25)
+                glitter.position = CGPoint(x: rx, y: ry)
+                container.addChild(glitter)
+
+                let flash = SKAction.sequence([
+                    SKAction.wait(forDuration: Double.random(in: 2.0...6.0)),
+                    SKAction.fadeAlpha(to: 1.0, duration: 0.08),
+                    SKAction.scale(to: 2.0, duration: 0.1),
+                    SKAction.group([
+                        SKAction.fadeAlpha(to: 0.0, duration: 0.2),
+                        SKAction.scale(to: 1.0, duration: 0.2)
+                    ]),
+                    SKAction.run {
+                        glitter.position = CGPoint(
+                            x: CGFloat.random(in: -size * 0.25...size * 0.25),
+                            y: CGFloat.random(in: -size * 0.25...size * 0.25)
+                        )
+                    }
+                ])
+                glitter.run(SKAction.repeatForever(flash))
+            }
+
+        default:
+            break
+        }
     }
 
     // MARK: - Idle Animations
@@ -139,47 +205,37 @@ class GemRenderer {
             let sprite = SKSpriteNode(texture: texture, size: CGSize(width: size, height: size))
             sprite.name = "crystalBallBody"
             container.addChild(sprite)
-
-            // Gentle scale pulse
-            let breathe = SKAction.sequence([
-                SKAction.scale(to: 1.05, duration: 1.2),
-                SKAction.scale(to: 1.0, duration: 1.2)
-            ])
-            breathe.timingMode = .easeInEaseOut
-            sprite.run(SKAction.repeatForever(breathe))
         }
 
-        // Sparkle twinkle on top
-        let sparkle = SKShapeNode(circleOfRadius: size * 0.04)
-        sparkle.fillColor = SKColor(white: 1.0, alpha: 0.9)
-        sparkle.strokeColor = .clear
-        sparkle.glowWidth = 3.0
-        sparkle.position = CGPoint(x: -size * 0.1, y: size * 0.15)
-        sparkle.name = "crystalSparkle"
-        container.addChild(sparkle)
+        // Slow random rotation
+        let rotate = SKAction.repeatForever(SKAction.rotate(byAngle: .pi * 2, duration: 12.0))
+        container.run(rotate)
 
-        // Sparkle twinkle animation
-        let twinkle = SKAction.sequence([
+        // Heartbeat glow — random interval pulse
+        let heartbeat = SKAction.sequence([
             SKAction.wait(forDuration: Double.random(in: 2.0...5.0)),
-            SKAction.group([
-                SKAction.scale(to: 2.5, duration: 0.15),
-                SKAction.fadeAlpha(to: 1.0, duration: 0.15)
-            ]),
-            SKAction.group([
-                SKAction.scale(to: 1.0, duration: 0.25),
-                SKAction.fadeAlpha(to: 0.4, duration: 0.25)
-            ])
+            SKAction.scale(to: 1.08, duration: 0.15),
+            SKAction.scale(to: 1.0, duration: 0.1),
+            SKAction.scale(to: 1.05, duration: 0.12),
+            SKAction.scale(to: 1.0, duration: 0.2)
         ])
-        sparkle.run(SKAction.repeatForever(twinkle))
+        container.run(SKAction.repeatForever(heartbeat))
 
-        // Faint glow halo with slow rotation
-        let glow = TextureFactory.shared.softGlowTexture(size: size * 1.2)
-        let glowSprite = SKSpriteNode(texture: glow, size: CGSize(width: size * 1.2, height: size * 1.2))
-        glowSprite.alpha = 0.15
+        // Glow halo behind with slow rotation
+        let glow = TextureFactory.shared.softGlowTexture(size: size * 1.3)
+        let glowSprite = SKSpriteNode(texture: glow, size: CGSize(width: size * 1.3, height: size * 1.3))
+        glowSprite.alpha = 0.2
         glowSprite.blendMode = .add
         glowSprite.zPosition = -1
         container.addChild(glowSprite)
-        glowSprite.run(SKAction.repeatForever(SKAction.rotate(byAngle: .pi * 2, duration: 8.0)))
+
+        // Random glow brightness pulse
+        let glowPulse = SKAction.sequence([
+            SKAction.wait(forDuration: Double.random(in: 1.5...4.0)),
+            SKAction.fadeAlpha(to: 0.4, duration: 0.3),
+            SKAction.fadeAlpha(to: 0.15, duration: 0.5)
+        ])
+        glowSprite.run(SKAction.repeatForever(glowPulse))
 
         return container
     }
@@ -191,6 +247,26 @@ class GemRenderer {
             let sprite = SKSpriteNode(texture: texture, size: CGSize(width: size, height: size))
             container.addChild(sprite)
         }
+
+        // Red blinking LED in center
+        let led = SKShapeNode(circleOfRadius: size * 0.04)
+        led.fillColor = SKColor(red: 1.0, green: 0.1, blue: 0.1, alpha: 1.0)
+        led.strokeColor = .clear
+        led.glowWidth = 3.0
+        led.zPosition = 1
+        container.addChild(led)
+
+        let ledBlink = SKAction.sequence([
+            SKAction.wait(forDuration: Double.random(in: 1.0...3.0)),
+            SKAction.fadeAlpha(to: 1.0, duration: 0.05),
+            SKAction.wait(forDuration: 0.15),
+            SKAction.fadeAlpha(to: 0.0, duration: 0.1),
+            SKAction.wait(forDuration: 0.2),
+            SKAction.fadeAlpha(to: 1.0, duration: 0.05),
+            SKAction.wait(forDuration: 0.1),
+            SKAction.fadeAlpha(to: 0.0, duration: 0.15)
+        ])
+        led.run(SKAction.repeatForever(ledBlink))
 
         // Hover animation (±2pt Y bob)
         let hover = SKAction.sequence([
