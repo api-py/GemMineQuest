@@ -149,7 +149,9 @@ struct MainMenuView: View {
                 // Shop button
                 Button(action: { showShop = true }) {
                     HStack(spacing: 10) {
-                        Image(systemName: "cart.fill")
+                        Image("booster_mine_cart")
+                            .resizable()
+                            .frame(width: 28, height: 28)
                         Text("Shop")
                             .font(.body.weight(.semibold))
                     }

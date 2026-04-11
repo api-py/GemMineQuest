@@ -164,9 +164,9 @@ struct GameContainerView: View {
 
                     // Shop button
                     Button { showShop = true } label: {
-                        Image(systemName: "bag.fill")
-                            .font(.system(size: 22))
-                            .foregroundColor(Color(hex: 0xFFD700))
+                        Image("booster_mine_cart")
+                            .resizable()
+                            .frame(width: 28, height: 28)
                     }
                     .onLongPressGesture(minimumDuration: 0.4) {
                         withAnimation { hudTooltipText = "Open the shop to buy boosters with coins." }
