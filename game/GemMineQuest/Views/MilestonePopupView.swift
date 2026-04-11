@@ -2,6 +2,7 @@ import SwiftUI
 
 struct MilestonePopupView: View {
     let milestoneId: String
+    @EnvironmentObject var localizationManager: LocalizationManager
     var onDismiss: () -> Void
 
     @State private var scale: CGFloat = 0.8
@@ -18,15 +19,15 @@ struct MilestonePopupView: View {
     private var title: String {
         if milestoneId.hasPrefix("stars_") {
             let count = milestoneId.replacingOccurrences(of: "stars_", with: "")
-            return "\(count) Stars Earned!"
+            return localizationManager.t("milestone.starsEarned", count)
         } else {
             let count = milestoneId.replacingOccurrences(of: "levels_", with: "")
-            return "\(count) Levels Completed!"
+            return localizationManager.t("milestone.levelsCompleted", count)
         }
     }
 
     private var rewardText: String {
-        "+200 Gold & 3 gems"
+        localizationManager.t("milestone.reward")
     }
 
     var body: some View {
@@ -60,7 +61,7 @@ struct MilestonePopupView: View {
                 }
 
                 // Title
-                Text("MILESTONE REACHED!")
+                Text(localizationManager.t("milestone.reached"))
                     .font(.system(size: 14, weight: .bold))
                     .foregroundColor(Color(hex: 0xCCBB99))
                     .tracking(2)
@@ -88,7 +89,7 @@ struct MilestonePopupView: View {
 
                 // Claim button
                 Button(action: onDismiss) {
-                    Text("AWESOME!")
+                    Text(localizationManager.t("milestone.awesome"))
                         .font(.system(size: 20, weight: .black, design: .rounded))
                         .foregroundColor(.white)
                         .frame(maxWidth: 220)

@@ -34,10 +34,10 @@ class ObjectiveTracker {
             switch objective {
             case .reachScore(let target):
                 events.append(.objectiveProgress(
-                    text: "Score", current: state.score, target: target
+                    text: "progress.score", current: state.score, target: target
                 ))
                 if state.score >= Int(Double(target) * 0.85) && state.score < target {
-                    let msg = "Almost there!"
+                    let msg = "encourage.almostThere"
                     if !state.shownEncouragements.contains(msg) {
                         state.shownEncouragements.insert(msg)
                         events.append(.encouragement(text: msg))
@@ -45,10 +45,10 @@ class ObjectiveTracker {
                 }
             case .clearAllOre:
                 events.append(.objectiveProgress(
-                    text: "Ore cleared", current: state.oreCleared, target: state.totalOre
+                    text: "progress.oreCleared", current: state.oreCleared, target: state.totalOre
                 ))
                 if state.totalOre > 0 && state.oreCleared == state.totalOre - 1 {
-                    let msg = "Last ore vein!"
+                    let msg = "encourage.lastOre"
                     if !state.shownEncouragements.contains(msg) {
                         state.shownEncouragements.insert(msg)
                         events.append(.encouragement(text: msg))
@@ -56,10 +56,10 @@ class ObjectiveTracker {
                 }
             case .dropTreasures(let count):
                 events.append(.objectiveProgress(
-                    text: "Treasures", current: state.treasuresDropped, target: count
+                    text: "progress.treasures", current: state.treasuresDropped, target: count
                 ))
                 if state.treasuresDropped == count - 1 {
-                    let msg = "One more treasure!"
+                    let msg = "encourage.oneMoreTreasure"
                     if !state.shownEncouragements.contains(msg) {
                         state.shownEncouragements.insert(msg)
                         events.append(.encouragement(text: msg))
@@ -71,7 +71,7 @@ class ObjectiveTracker {
                     text: color.displayName, current: current, target: count
                 ))
                 if current >= count - 2 && current < count {
-                    let msg = "\(count - current) \(color.displayName) left!"
+                    let msg = "encourage.gemsLeft.\(count - current).\(color.displayName)"
                     if !state.shownEncouragements.contains(msg) {
                         state.shownEncouragements.insert(msg)
                         events.append(.encouragement(text: msg))
@@ -83,7 +83,7 @@ class ObjectiveTracker {
                     text: type.displayName, current: current, target: count
                 ))
                 if current == count - 1 {
-                    let msg = "One more \(type.displayName)!"
+                    let msg = "encourage.oneMoreSpecial.\(type.displayName)"
                     if !state.shownEncouragements.contains(msg) {
                         state.shownEncouragements.insert(msg)
                         events.append(.encouragement(text: msg))
@@ -94,7 +94,7 @@ class ObjectiveTracker {
 
         // Low moves warning (show once per threshold)
         if state.movesRemaining <= 3 && state.movesRemaining > 0 && !state.godModeEnabled {
-            let msg = "\(state.movesRemaining) moves left!"
+            let msg = "encourage.movesLeft.\(state.movesRemaining)"
             if !state.shownEncouragements.contains(msg) {
                 state.shownEncouragements.insert(msg)
                 events.append(.encouragement(text: msg))

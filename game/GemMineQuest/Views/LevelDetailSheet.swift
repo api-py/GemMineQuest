@@ -5,6 +5,7 @@ struct LevelDetailSheet: View {
     let levelNumber: Int
     @EnvironmentObject var progressManager: ProgressManager
     @EnvironmentObject var boosterInventory: BoosterInventory
+    @EnvironmentObject var localizationManager: LocalizationManager
     var onPlay: () -> Void
     var onDismiss: () -> Void
 
@@ -18,9 +19,9 @@ struct LevelDetailSheet: View {
 
     private var difficultyBadge: (text: String, color: UInt32)? {
         if levelNumber >= 50 {
-            return ("Super Hard", 0xFF4444)
+            return (localizationManager.t("levelDetail.superHard"), 0xFF4444)
         } else if levelNumber >= 25 {
-            return ("Hard", 0xFF6347)
+            return (localizationManager.t("levelDetail.hard"), 0xFF6347)
         }
         return nil
     }
@@ -54,7 +55,7 @@ struct LevelDetailSheet: View {
                         .padding(.horizontal)
 
                         // Level number and Welsh name
-                        Text("Level \(levelNumber)")
+                        Text(localizationManager.t("levelDetail.level", levelNumber))
                             .font(.system(size: 32, weight: .bold, design: .rounded))
                             .foregroundColor(Color(hex: 0xFFD700))
 
@@ -97,7 +98,7 @@ struct LevelDetailSheet: View {
                         if progressManager.progress.highScore(for: levelNumber) > 0 {
                             VStack(spacing: 4) {
                                 StarRatingView(stars: progressManager.progress.stars(for: levelNumber), size: 24)
-                                Text("Best: \(progressManager.progress.highScore(for: levelNumber))")
+                                Text(localizationManager.t("levelDetail.best", progressManager.progress.highScore(for: levelNumber)))
                                     .font(.caption)
                                     .foregroundColor(Color(hex: 0xCCBB99))
                             }
@@ -107,7 +108,7 @@ struct LevelDetailSheet: View {
 
                         // Objectives
                         VStack(spacing: 12) {
-                            Text("Objectives")
+                            Text(localizationManager.t("levelDetail.objectives"))
                                 .font(.headline)
                                 .foregroundColor(Color(hex: 0xE8A035))
 
@@ -116,11 +117,11 @@ struct LevelDetailSheet: View {
                                     HStack {
                                         Image(systemName: objectiveIcon(level.objectives[i]))
                                             .foregroundColor(Color(hex: 0xFFD700))
-                                        Text(level.objectives[i].displayText)
+                                        Text(level.objectives[i].localizedDisplayText(localizationManager))
                                             .foregroundColor(.white)
                                         Spacer()
                                     }
-                                    Text(level.objectives[i].descriptionText)
+                                    Text(level.objectives[i].localizedDescriptionText(localizationManager))
                                         .font(.caption)
                                         .foregroundColor(Color(hex: 0x8B7355))
                                         .padding(.leading, 28)
@@ -133,7 +134,7 @@ struct LevelDetailSheet: View {
                         HStack {
                             Image(systemName: "figure.walk")
                                 .foregroundColor(Color(hex: 0xCCBB99))
-                            Text("\(level.maxMoves) moves")
+                            Text(localizationManager.t("levelDetail.moves", level.maxMoves))
                                 .foregroundColor(Color(hex: 0xCCBB99))
                         }
 
@@ -142,7 +143,7 @@ struct LevelDetailSheet: View {
                             HStack(spacing: 6) {
                                 Image(systemName: "arrow.triangle.2.circlepath")
                                     .foregroundColor(Color(hex: 0xFF6347))
-                                Text("Gems shuffle every 3 moves!")
+                                Text(localizationManager.t("levelDetail.shuffleWarning"))
                                     .font(.system(size: 13, weight: .semibold))
                                     .foregroundColor(Color(hex: 0xFF6347))
                             }
@@ -167,7 +168,9 @@ struct LevelDetailSheet: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: 24, height: 24)
-                    Text(progressManager.progress.stars(for: levelNumber) > 0 ? "DIG AGAIN" : "START DIG")
+                    Text(progressManager.progress.stars(for: levelNumber) > 0
+                         ? localizationManager.t("levelDetail.digAgain")
+                         : localizationManager.t("levelDetail.startDig"))
                         .font(.title3.weight(.bold))
                 }
                 .foregroundColor(.white)

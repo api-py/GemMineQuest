@@ -2,6 +2,7 @@ import SwiftUI
 
 struct AchievementToastView: View {
     let achievement: Achievement
+    @EnvironmentObject var localizationManager: LocalizationManager
     var onDismiss: () -> Void
 
     @State private var offsetY: CGFloat = -120
@@ -26,15 +27,15 @@ struct AchievementToastView: View {
 
                 // Text
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Achievement Unlocked!")
+                    Text(localizationManager.t("achievement.unlocked"))
                         .font(.system(size: 11, weight: .bold))
                         .foregroundColor(Color(hex: 0xFFD700))
 
-                    Text(achievement.displayName)
+                    Text(achievement.localizedDisplayName(localizationManager))
                         .font(.system(size: 16, weight: .heavy, design: .rounded))
                         .foregroundColor(.white)
 
-                    Text("+\(achievement.coinReward) Gold")
+                    Text(localizationManager.t("achievement.gold", achievement.coinReward))
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundColor(Color(hex: 0xCCBB99))
                 }

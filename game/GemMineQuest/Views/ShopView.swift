@@ -3,9 +3,14 @@ import SwiftUI
 struct ShopView: View {
     @EnvironmentObject var progressManager: ProgressManager
     @EnvironmentObject var boosterInventory: BoosterInventory
+    @EnvironmentObject var localizationManager: LocalizationManager
     var onDismiss: () -> Void
 
+    #if DEBUG
     @AppStorage("godModeEnabled") private var isGodMode = false
+    #else
+    private let isGodMode = false
+    #endif
     @State private var purchasedItemId: String?
     @State private var showPurchaseFlash = false
 
@@ -36,7 +41,7 @@ struct ShopView: View {
                 .padding(.horizontal, 20)
 
                 // Title
-                Text("MINE SHOP")
+                Text(localizationManager.t("shop.title"))
                     .font(.system(size: 32, weight: .black, design: .rounded))
                     .foregroundStyle(
                         LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xE8A035)],
@@ -100,7 +105,7 @@ struct ShopView: View {
             }
 
             // Name
-            Text(item.displayName)
+            Text(item.localizedDisplayName(localizationManager))
                 .font(.system(size: 14, weight: .bold, design: .rounded))
                 .foregroundColor(.white)
                 .lineLimit(1)
@@ -108,7 +113,7 @@ struct ShopView: View {
 
             // Current stock
             let owned = boosterInventory.count(for: item.boosterType)
-            Text("Owned: \(owned)")
+            Text(localizationManager.t("shop.owned", owned))
                 .font(.system(size: 10, weight: .medium))
                 .foregroundColor(Color(hex: 0x8B7355))
 

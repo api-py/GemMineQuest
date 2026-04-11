@@ -3,6 +3,7 @@ import SwiftUI
 struct MainMenuView: View {
     @EnvironmentObject var progressManager: ProgressManager
     @EnvironmentObject var boosterInventory: BoosterInventory
+    @EnvironmentObject var localizationManager: LocalizationManager
 
     var onPlay: () -> Void
     var onSettings: () -> Void
@@ -79,7 +80,7 @@ struct MainMenuView: View {
                 // Game title (shown when no logo asset)
                 if UIImage(named: "game_logo") == nil {
                     VStack(spacing: 6) {
-                        Text("GemMine")
+                        Text(localizationManager.t("menu.title1"))
                             .font(.system(size: 48, weight: .black, design: .rounded))
                             .foregroundStyle(
                                 LinearGradient(
@@ -89,7 +90,7 @@ struct MainMenuView: View {
                             )
                             .shadow(color: Color(hex: 0xFF8C00).opacity(0.3), radius: 12)
 
-                        Text("QUEST")
+                        Text(localizationManager.t("menu.title2"))
                             .font(.system(size: 32, weight: .bold, design: .rounded))
                             .foregroundColor(Color(hex: 0xE8A035))
                             .tracking(8)
@@ -97,7 +98,7 @@ struct MainMenuView: View {
                     .shadow(color: .black.opacity(0.6), radius: 10)
                 }
 
-                Text("Mine precious gems deep underground")
+                Text(localizationManager.t("menu.tagline"))
                     .font(.callout)
                     .foregroundColor(Color(hex: 0xFFE8C0))
                     .shadow(color: .black.opacity(0.8), radius: 4, x: 0, y: 2)
@@ -112,7 +113,9 @@ struct MainMenuView: View {
                             .resizable()
                             .scaledToFit()
                             .frame(width: 28, height: 28)
-                        Text(progressManager.progress.highestUnlocked > 1 ? "CONTINUE MINING" : "START MINING")
+                        Text(progressManager.progress.highestUnlocked > 1
+                             ? localizationManager.t("menu.continueMining")
+                             : localizationManager.t("menu.startMining"))
                             .font(.title3.weight(.bold))
                     }
                     .foregroundColor(.white)
@@ -149,7 +152,7 @@ struct MainMenuView: View {
                         Image("booster_mine_cart")
                             .resizable()
                             .frame(width: 28, height: 28)
-                        Text("Shop")
+                        Text(localizationManager.t("menu.shop"))
                             .font(.body.weight(.semibold))
                     }
                     .foregroundColor(Color(hex: 0xFFD700))
@@ -173,7 +176,7 @@ struct MainMenuView: View {
                 Button(action: onSettings) {
                     HStack(spacing: 10) {
                         Image(systemName: "gearshape.fill")
-                        Text("Settings")
+                        Text(localizationManager.t("menu.settings"))
                             .font(.body.weight(.semibold))
                     }
                     .foregroundColor(Color(hex: 0xCCBB99))
@@ -205,7 +208,7 @@ struct MainMenuView: View {
                                         LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xE8A035)],
                                                        startPoint: .top, endPoint: .bottom)
                                     )
-                                Text("LEVEL")
+                                Text(localizationManager.t("menu.level"))
                                     .font(.system(size: 9, weight: .bold))
                                     .foregroundColor(Color(hex: 0x8B7355))
                                     .tracking(1)
@@ -227,7 +230,7 @@ struct MainMenuView: View {
                                             .foregroundColor(Color(hex: 0xFFD700))
                                     }
                                 }
-                                Text("STARS")
+                                Text(localizationManager.t("menu.stars"))
                                     .font(.system(size: 9, weight: .bold))
                                     .foregroundColor(Color(hex: 0x8B7355))
                                     .tracking(1)
@@ -240,7 +243,7 @@ struct MainMenuView: View {
                                     .foregroundColor(Color(hex: 0xE8A035))
                                     .minimumScaleFactor(0.6)
                                     .lineLimit(1)
-                                Text("TOTAL SCORE")
+                                Text(localizationManager.t("menu.totalScore"))
                                     .font(.system(size: 9, weight: .bold))
                                     .foregroundColor(Color(hex: 0x8B7355))
                                     .tracking(1)
@@ -272,7 +275,7 @@ struct MainMenuView: View {
                 }) {
                     HStack(spacing: 6) {
                         Image(systemName: "rectangle.portrait.and.arrow.right")
-                        Text("Exit")
+                        Text(localizationManager.t("menu.exit"))
                             .font(.subheadline.weight(.medium))
                     }
                     .foregroundColor(Color(hex: 0xBBA88A))
@@ -297,6 +300,7 @@ struct MainMenuView: View {
             ShopView(onDismiss: { showShop = false })
                 .environmentObject(progressManager)
                 .environmentObject(boosterInventory)
+                .environmentObject(localizationManager)
         }
     }
 }

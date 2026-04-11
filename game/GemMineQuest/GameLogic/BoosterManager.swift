@@ -120,27 +120,15 @@ class BoosterManager {
 
         for target in affected {
             board.removeGem(at: target)
-            if let blocker = board.blockerAt(target) {
-                switch blocker {
-                case .granite(let layers):
-                    if layers > 1 {
-                        board.setBlocker(.granite(layers: layers - 1), at: target)
-                        events.append(.blockerDamaged(at: target, type: blocker))
-                    } else {
-                        board.setBlocker(nil, at: target)
-                        events.append(.blockerDestroyed(at: target))
-                    }
-                default:
-                    board.setBlocker(nil, at: target)
-                    events.append(.blockerDestroyed(at: target))
-                }
+            if let event = blockerManager.damageBlocker(at: target, on: board) {
+                events.append(event)
             }
         }
         events.append(contentsOf: blockerManager.processMatchAdjacent(
             matchedPositions: affected, on: board
         ))
 
-        let delta = affected.count * 60
+        let delta = affected.count * Constants.baseMatchScore
         state.score += delta
         events.append(.scoreUpdated(newScore: state.score, delta: delta, at: pos))
 
@@ -176,7 +164,7 @@ class BoosterManager {
         }
 
         // Score
-        let delta = 60
+        let delta = Constants.baseMatchScore
         state.score += delta
         events.append(.scoreUpdated(newScore: state.score, delta: delta, at: pos))
 
@@ -198,26 +186,14 @@ class BoosterManager {
             let center = board.allPlayablePositions().filter { board[$0] != nil }.randomElement() ?? target
             events.append(.droneDeployed(from: center, to: target))
 
-            if let blocker = board.blockerAt(target) {
-                switch blocker {
-                case .granite(let layers):
-                    if layers > 1 {
-                        board.setBlocker(.granite(layers: layers - 1), at: target)
-                        events.append(.blockerDamaged(at: target, type: blocker))
-                    } else {
-                        board.setBlocker(nil, at: target)
-                        events.append(.blockerDestroyed(at: target))
-                    }
-                default:
-                    board.setBlocker(nil, at: target)
-                    events.append(.blockerDestroyed(at: target))
-                }
+            if let event = blockerManager.damageBlocker(at: target, on: board) {
+                events.append(event)
             }
 
             board.removeGem(at: target)
             allTargets.insert(target)
 
-            let delta = 60
+            let delta = Constants.baseMatchScore
             state.score += delta
             events.append(.scoreUpdated(newScore: state.score, delta: delta, at: target))
         }

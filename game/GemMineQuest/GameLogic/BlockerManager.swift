@@ -8,6 +8,52 @@ class BlockerManager {
         lavaCooldownTurns = 1
     }
 
+    /// Apply one hit of damage to the blocker at the given position.
+    /// Granite loses a layer; other destructible blockers are removed entirely.
+    func damageBlocker(at pos: GridPosition, on board: Board) -> GameEvent? {
+        guard let blocker = board.blockerAt(pos) else { return nil }
+        switch blocker {
+        case .granite(let layers):
+            if layers > 1 {
+                board.setBlocker(.granite(layers: layers - 1), at: pos)
+                return .blockerDamaged(at: pos, type: blocker)
+            } else {
+                board.setBlocker(nil, at: pos)
+                return .blockerDestroyed(at: pos)
+            }
+        default:
+            board.setBlocker(nil, at: pos)
+            return .blockerDestroyed(at: pos)
+        }
+    }
+
+    /// Damage blockers directly on the affected positions (e.g. laser/volatile paths).
+    /// Only handles granite, cage, and amber to match direct-path damage semantics.
+    func damageBlockersInPath(_ positions: Set<GridPosition>,
+                              on board: Board,
+                              alreadyDamaged: Set<GridPosition> = []) -> [GameEvent] {
+        var events: [GameEvent] = []
+        for pos in positions where !alreadyDamaged.contains(pos) {
+            guard let blocker = board.blockerAt(pos) else { continue }
+            switch blocker {
+            case .granite(let layers):
+                if layers > 1 {
+                    board.setBlocker(.granite(layers: layers - 1), at: pos)
+                    events.append(.blockerDamaged(at: pos, type: blocker))
+                } else {
+                    board.setBlocker(nil, at: pos)
+                    events.append(.blockerDestroyed(at: pos))
+                }
+            case .cage, .amber:
+                board.setBlocker(nil, at: pos)
+                events.append(.blockerDestroyed(at: pos))
+            default:
+                break
+            }
+        }
+        return events
+    }
+
     /// Process blockers adjacent to matched positions.
     /// Returns events for blocker damage/destruction.
     func processMatchAdjacent(matchedPositions: Set<GridPosition>,

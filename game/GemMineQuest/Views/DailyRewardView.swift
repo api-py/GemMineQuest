@@ -3,6 +3,7 @@ import SwiftUI
 struct DailyRewardView: View {
     @EnvironmentObject var progressManager: ProgressManager
     @EnvironmentObject var boosterInventory: BoosterInventory
+    @EnvironmentObject var localizationManager: LocalizationManager
     var onDismiss: () -> Void
 
     @State private var claimedReward: ProgressManager.DailyReward?
@@ -29,7 +30,7 @@ struct DailyRewardView: View {
                 Spacer()
 
                 // Title
-                Text("DAILY MINING BONUS")
+                Text(localizationManager.t("daily.title"))
                     .font(.system(size: 28, weight: .black, design: .rounded))
                     .foregroundStyle(
                         LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xE8A035)],
@@ -38,7 +39,7 @@ struct DailyRewardView: View {
                     .shadow(color: Color(hex: 0xFFD700).opacity(0.4), radius: 8)
 
                 // Streak counter
-                Text("Day \(progressManager.progress.dailyStreak)/7")
+                Text(localizationManager.t("daily.dayStreak", progressManager.progress.dailyStreak))
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundColor(Color(hex: 0xCCBB99))
 
@@ -51,7 +52,7 @@ struct DailyRewardView: View {
                             let isPast = day < progressManager.progress.dailyStreak
 
                             VStack(spacing: 4) {
-                                Text("Day \(day)")
+                                Text(localizationManager.t("daily.day", day))
                                     .font(.system(size: 10, weight: .bold))
                                     .foregroundColor(isCurrent ? Color(hex: 0xFFD700) : .white)
 
@@ -94,7 +95,7 @@ struct DailyRewardView: View {
                 // Claim / Claimed state
                 if showClaimed, let reward = claimedReward {
                     VStack(spacing: 8) {
-                        Text("Claimed!")
+                        Text(localizationManager.t("daily.claimed"))
                             .font(.system(size: 22, weight: .bold, design: .rounded))
                             .foregroundColor(Color(hex: 0x4CAF50))
 
@@ -123,7 +124,7 @@ struct DailyRewardView: View {
                     .transition(.scale.combined(with: .opacity))
                 } else {
                     Button(action: claimReward) {
-                        Text("CLAIM")
+                        Text(localizationManager.t("daily.claim"))
                             .font(.system(size: 20, weight: .black, design: .rounded))
                             .foregroundColor(.white)
                             .frame(maxWidth: 220)
@@ -141,7 +142,7 @@ struct DailyRewardView: View {
 
                 // Close button
                 Button(action: onDismiss) {
-                    Text(showClaimed ? "Continue" : "Skip")
+                    Text(showClaimed ? localizationManager.t("daily.continue") : localizationManager.t("daily.skip"))
                         .font(.subheadline)
                         .foregroundColor(Color(hex: 0x8B7355))
                 }

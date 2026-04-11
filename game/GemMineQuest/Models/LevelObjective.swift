@@ -22,6 +22,24 @@ enum LevelObjective: Codable, Equatable {
         }
     }
 
+    func localizedDisplayText(_ lm: LocalizationManager) -> String {
+        switch self {
+        case .reachScore(let target):
+            return lm.t("objective.reachScore", target)
+        case .clearAllOre:
+            return lm.t("objective.clearAllOre")
+        case .dropTreasures(let count):
+            let key = count > 1 ? "objective.dropTreasures" : "objective.dropTreasure1"
+            return lm.t(key, count)
+        case .collectGems(let color, let count):
+            let key = count > 1 ? "objective.collectGems" : "objective.collectGem1"
+            return lm.t(key, count, color.localizedDisplayName(lm), color.localizedColorHint(lm))
+        case .collectSpecials(let type, let count):
+            let key = count > 1 ? "objective.collectSpecials" : "objective.collectSpecial1"
+            return lm.t(key, count, type.localizedDisplayName(lm))
+        }
+    }
+
     var descriptionText: String {
         switch self {
         case .reachScore(let target):
@@ -34,6 +52,23 @@ enum LevelObjective: Codable, Equatable {
             return "Match and collect \(count) \(color.displayName) gems (\(color.colorHint))"
         case .collectSpecials(let type, let count):
             return "Create \(count) \(type.displayName) gem\(count > 1 ? "s" : "") through special matches"
+        }
+    }
+
+    func localizedDescriptionText(_ lm: LocalizationManager) -> String {
+        switch self {
+        case .reachScore(let target):
+            return lm.t("objective.reachScoreDesc", target)
+        case .clearAllOre:
+            return lm.t("objective.clearAllOreDesc")
+        case .dropTreasures(let count):
+            let key = count > 1 ? "objective.dropTreasuresDesc" : "objective.dropTreasure1Desc"
+            return lm.t(key, count)
+        case .collectGems(let color, let count):
+            return lm.t("objective.collectGemsDesc", count, color.localizedDisplayName(lm), color.localizedColorHint(lm))
+        case .collectSpecials(let type, let count):
+            let key = count > 1 ? "objective.collectSpecialsDesc" : "objective.collectSpecial1Desc"
+            return lm.t(key, count, type.localizedDisplayName(lm))
         }
     }
 

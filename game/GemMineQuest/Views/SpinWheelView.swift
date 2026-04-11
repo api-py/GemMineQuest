@@ -3,6 +3,7 @@ import SwiftUI
 struct SpinWheelView: View {
     @EnvironmentObject var progressManager: ProgressManager
     @EnvironmentObject var boosterInventory: BoosterInventory
+    @EnvironmentObject var localizationManager: LocalizationManager
     var onDismiss: () -> Void
 
     @State private var rotation: Double = 0
@@ -10,16 +11,18 @@ struct SpinWheelView: View {
     @State private var showResult = false
     @State private var wonPrize: SpinPrize?
 
-    private let segments: [SpinPrize] = [
-        SpinPrize(label: "100 Gold", coins: 100, gems: 0, booster: nil),
-        SpinPrize(label: "Pickaxe", coins: 0, gems: 0, booster: .pickaxe),
-        SpinPrize(label: "100 Gold", coins: 100, gems: 0, booster: nil),
-        SpinPrize(label: "Dynamite", coins: 0, gems: 0, booster: .dynamite),
-        SpinPrize(label: "2 Gems", coins: 0, gems: 2, booster: nil),
-        SpinPrize(label: "Drone", coins: 0, gems: 0, booster: .droneStrike),
-        SpinPrize(label: "500 Gold", coins: 500, gems: 0, booster: nil),
-        SpinPrize(label: "Gem Forge", coins: 0, gems: 0, booster: .gemForge)
-    ]
+    private var segments: [SpinPrize] {
+        [
+            SpinPrize(label: localizationManager.t("spin.gold100"), coins: 100, gems: 0, booster: nil),
+            SpinPrize(label: localizationManager.t("spin.pickaxe"), coins: 0, gems: 0, booster: .pickaxe),
+            SpinPrize(label: localizationManager.t("spin.gold100"), coins: 100, gems: 0, booster: nil),
+            SpinPrize(label: localizationManager.t("spin.dynamite"), coins: 0, gems: 0, booster: .dynamite),
+            SpinPrize(label: localizationManager.t("spin.gems2"), coins: 0, gems: 2, booster: nil),
+            SpinPrize(label: localizationManager.t("spin.drone"), coins: 0, gems: 0, booster: .droneStrike),
+            SpinPrize(label: localizationManager.t("spin.gold500"), coins: 500, gems: 0, booster: nil),
+            SpinPrize(label: localizationManager.t("spin.gemForge"), coins: 0, gems: 0, booster: .gemForge),
+        ]
+    }
 
     private let segmentColors: [UInt32] = [
         0xC0392B,  // Dark red
@@ -43,7 +46,7 @@ struct SpinWheelView: View {
                 Spacer()
 
                 // Title
-                Text("LUCKY MINE SPIN")
+                Text(localizationManager.t("spin.title"))
                     .font(.system(size: 28, weight: .black, design: .rounded))
                     .foregroundStyle(
                         LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xE8A035)],
@@ -98,7 +101,7 @@ struct SpinWheelView: View {
                 if showResult, let prize = wonPrize {
                     // Result display
                     VStack(spacing: 8) {
-                        Text("YOU WON!")
+                        Text(localizationManager.t("spin.youWon"))
                             .font(.system(size: 24, weight: .black, design: .rounded))
                             .foregroundColor(Color(hex: 0xFFD700))
 
@@ -107,7 +110,7 @@ struct SpinWheelView: View {
                             .foregroundColor(.white)
 
                         Button(action: collectPrize) {
-                            Text("COLLECT")
+                            Text(localizationManager.t("spin.collect"))
                                 .font(.system(size: 18, weight: .black, design: .rounded))
                                 .foregroundColor(.white)
                                 .frame(maxWidth: 200)
@@ -126,7 +129,7 @@ struct SpinWheelView: View {
                 } else {
                     // Spin button
                     Button(action: spinWheel) {
-                        Text("SPIN!")
+                        Text(localizationManager.t("spin.spin"))
                             .font(.system(size: 22, weight: .black, design: .rounded))
                             .foregroundColor(.white)
                             .frame(maxWidth: 200)
@@ -147,7 +150,7 @@ struct SpinWheelView: View {
 
                 // Close button
                 Button(action: onDismiss) {
-                    Text("Close")
+                    Text(localizationManager.t("spin.close"))
                         .font(.subheadline)
                         .foregroundColor(Color(hex: 0x8B7355))
                 }

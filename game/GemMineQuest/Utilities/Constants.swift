@@ -51,4 +51,9 @@ enum Constants {
     // MARK: - Boosters
     static let extraMovesCount = 5
     static let droneStrikeCount = 5
+
+    // MARK: - Game Engine
+    static let maxCascadeRounds = 50
+    static let maxChainActivationRounds = 10
+    static let defaultDroneCount = 3
 }
