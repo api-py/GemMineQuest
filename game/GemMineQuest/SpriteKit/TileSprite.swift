@@ -59,8 +59,8 @@ class TileSprite: SKNode {
         if let blocker = blocker {
             let blockerNode = createBlockerOverlay(blocker)
             switch blocker {
-            case .lava:
-                blockerNode.zPosition = 0.5  // Between tile (0) and gem (1.0+)
+            case .lava, .amber:
+                blockerNode.zPosition = 0.5  // Below gem — gem shows through
             default:
                 blockerNode.zPosition = 2    // Above gem for cage, granite, etc.
             }
@@ -104,7 +104,12 @@ class TileSprite: SKNode {
         if let blocker = blocker {
             let node = createBlockerOverlay(blocker)
             node.name = "blocker"
-            node.zPosition = 2
+            switch blocker {
+            case .lava, .amber:
+                node.zPosition = 0.5  // Below gem — gem shows through
+            default:
+                node.zPosition = 2    // Above gem for cage, granite, etc.
+            }
             addChild(node)
         }
     }
