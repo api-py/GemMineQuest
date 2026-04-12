@@ -6,7 +6,7 @@ enum Constants {
     // MARK: - iPad Adaptive Scaling
     /// Scale factor: 1.0 on iPhone, 1.5 on iPad
     static let isIPad = UIDevice.current.userInterfaceIdiom == .pad
-    static let uiScale: CGFloat = isIPad ? 1.5 : 1.0
+    static let uiScale: CGFloat = isIPad ? 2.0 : 1.0
     // MARK: - Grid
     static let defaultGridRows = 11
     static let defaultGridColumns = 9

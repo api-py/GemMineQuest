@@ -61,7 +61,7 @@ struct GameOverView: View {
                             Image(victoryCharacterImage)
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(width: 100, height: 100)
+                                .frame(width: 100 * Constants.uiScale, height: 100 * Constants.uiScale)
                                 .clipShape(Circle())
                                 .overlay(Circle().stroke(Color(hex: 0xFFD700), lineWidth: 3))
                                 .shadow(color: Color(hex: 0xFFD700).opacity(0.4), radius: 12)
@@ -105,7 +105,7 @@ struct GameOverView: View {
 
                     // Phase 2: Stars
                     if showStars {
-                        StarRatingView(stars: stars, size: 40)
+                        StarRatingView(stars: stars, size: 40 * Constants.uiScale)
                             .transition(.scale)
                             .shadow(color: Color(hex: 0xFFD700).opacity(0.4), radius: 6)
                     }

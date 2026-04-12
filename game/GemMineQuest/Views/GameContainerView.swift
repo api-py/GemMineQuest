@@ -29,6 +29,8 @@ struct GameContainerView: View {
         _viewModel = StateObject(wrappedValue: GameViewModel(levelNumber: levelNumber))
     }
 
+    private let s = Constants.uiScale
+
     var body: some View {
         ZStack {
             Color(hex: 0x1A0E05).ignoresSafeArea()
@@ -50,7 +52,7 @@ struct GameContainerView: View {
                             Image("character_miner_king")
                                 .resizable()
                                 .aspectRatio(contentMode: .fill)
-                                .frame(width: 48, height: 48)
+                                .frame(width: 48 * s, height: 48 * s)
                                 .clipShape(Circle())
                                 .overlay(Circle().stroke(Color(hex: 0xC9A84C), lineWidth: 2))
                                 .shadow(color: Color(hex: 0xC9A84C).opacity(0.3), radius: 4)
@@ -58,12 +60,12 @@ struct GameContainerView: View {
                             Image(systemName: "person.fill")
                                 .font(.system(size: 22))
                                 .foregroundColor(Color(hex: 0xFFD700))
-                                .frame(width: 42, height: 42)
+                                .frame(width: 42 * s, height: 42 * s)
                                 .background(Circle().fill(Color(hex: 0x3D2B1F)))
                                 .overlay(Circle().stroke(Color(hex: 0xC9A84C), lineWidth: 2))
                         }
                         Text(localizationManager.t("game.lv", levelNumber))
-                            .font(.system(size: 10, weight: .heavy, design: .rounded))
+                            .font(.system(size: 10 * s, weight: .heavy, design: .rounded))
                             .foregroundColor(Color(hex: 0xFFD700))
                     }
 
@@ -103,14 +105,14 @@ struct GameContainerView: View {
                     // Moves badge (right) - large and clear
                     VStack(spacing: 0) {
                         Text(localizationManager.t("game.moves"))
-                            .font(.system(size: 10, weight: .bold))
+                            .font(.system(size: 10 * s, weight: .bold))
                             .foregroundColor(Color(hex: 0x8B7355))
                         Text(viewModel.godModeEnabled ? "\u{221E}" : "\(viewModel.displayMoves)")
-                            .font(.system(size: 28, weight: .black, design: .rounded))
+                            .font(.system(size: 28 * s, weight: .black, design: .rounded))
                             .foregroundColor(viewModel.displayMoves <= 3 && !viewModel.godModeEnabled
                                 ? Color(hex: 0xFF4444) : Color(hex: 0x3D2B1F))
                     }
-                    .frame(width: 62, height: 62)
+                    .frame(width: 62 * s, height: 62 * s)
                     .background(
                         RoundedRectangle(cornerRadius: 14)
                             .fill(Color(hex: 0xFFF8E8).opacity(0.95))
@@ -143,10 +145,10 @@ struct GameContainerView: View {
                     // Score with star icon
                     HStack(spacing: 4) {
                         Image(systemName: "star.fill")
-                            .font(.system(size: 14))
+                            .font(.system(size: 14 * s))
                             .foregroundColor(Color(hex: 0xFFD700))
                         Text("\(viewModel.displayScore)")
-                            .font(.system(size: 18, weight: .black, design: .rounded))
+                            .font(.system(size: 18 * s, weight: .black, design: .rounded))
                             .foregroundStyle(
                                 LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xE8A035)],
                                                startPoint: .top, endPoint: .bottom)
@@ -169,7 +171,7 @@ struct GameContainerView: View {
                     Button { showShop = true } label: {
                         Image(BoosterType.mineCartRush.iconAssetName)
                             .resizable()
-                            .frame(width: 28, height: 28)
+                            .frame(width: 28 * s, height: 28 * s)
                     }
                     .onLongPressGesture(minimumDuration: 0.4) {
                         withAnimation { hudTooltipText = localizationManager.t("game.shopTooltip") }
@@ -179,14 +181,14 @@ struct GameContainerView: View {
                     Button { showExitConfirmation = true } label: {
                         Image("btn_close")
                             .resizable()
-                            .frame(width: 28, height: 28)
+                            .frame(width: 28 * s, height: 28 * s)
                     }
 
                     #if DEBUG
                     // God mode toggle
                     HStack(spacing: 3) {
                         Text(localizationManager.t("game.god"))
-                            .font(.system(size: 8, weight: .bold))
+                            .font(.system(size: 8 * s, weight: .bold))
                             .foregroundColor(viewModel.godModeEnabled ? Color(hex: 0xFFD700) : Color(hex: 0x6B5A40))
                         Toggle("", isOn: $viewModel.godModeEnabled)
                             .toggleStyle(CompactToggleStyle())

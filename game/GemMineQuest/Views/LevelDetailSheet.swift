@@ -89,7 +89,7 @@ struct LevelDetailSheet: View {
                                 .tint(.red)
                         }
                         .mapStyle(.hybrid(elevation: .realistic))
-                        .frame(height: 250)
+                        .frame(height: 250 * Constants.uiScale)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                         .padding(.horizontal)
                         .allowsHitTesting(false)
@@ -110,7 +110,7 @@ struct LevelDetailSheet: View {
                                         .foregroundColor(currentZone.accentColor)
                                 }
                                 Text(localizationManager.t(currentZone.displayNameKey))
-                                    .font(.system(size: 12, weight: .bold, design: .rounded))
+                                    .font(.system(size: max(14, 12 * Constants.uiScale), weight: .bold, design: .rounded))
                                     .foregroundColor(currentZone.accentColor)
                             }
                             .padding(.horizontal, 12)
@@ -128,7 +128,7 @@ struct LevelDetailSheet: View {
                             let loreTip = WelshLoreTips.tip(for: levelNumber)
                             if !loreTip.isEmpty {
                                 Text(loreTip)
-                                    .font(.system(size: 12, weight: .regular, design: .serif))
+                                    .font(.system(size: max(14, 12 * Constants.uiScale), weight: .regular, design: .serif))
                                     .italic()
                                     .foregroundColor(Color(hex: 0xCCBB99).opacity(0.8))
                                     .multilineTextAlignment(.center)
