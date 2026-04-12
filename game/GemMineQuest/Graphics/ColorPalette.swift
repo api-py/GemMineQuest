@@ -10,9 +10,9 @@ enum ColorPalette {
     static let background = SKColor(red: 0.10, green: 0.06, blue: 0.03, alpha: 1.0)       // Warm dark brown
     static let backgroundGradientTop = SKColor(red: 0.15, green: 0.10, blue: 0.05, alpha: 1.0)
     static let backgroundGradientBottom = SKColor(red: 0.06, green: 0.04, blue: 0.02, alpha: 1.0)
-    static let boardBackground = SKColor(red: 0.18, green: 0.14, blue: 0.08, alpha: 1.0)   // Solid dark brown
-    static let tileNormal = SKColor(red: 0.35, green: 0.55, blue: 0.82, alpha: 1.0)       // Uniform blue
-    static let tileAlternate = SKColor(red: 0.35, green: 0.55, blue: 0.82, alpha: 1.0)    // Identical blue
+    static let boardBackground = SKColor(red: 0.12, green: 0.10, blue: 0.07, alpha: 1.0)   // Deep mine darkness
+    static let tileNormal = SKColor(red: 0.29, green: 0.25, blue: 0.22, alpha: 1.0)       // Torch-lit stone (light)
+    static let tileAlternate = SKColor(red: 0.23, green: 0.20, blue: 0.17, alpha: 1.0)    // Deep mine stone (dark)
     static let tileHighlight = SKColor(red: 0.55, green: 0.48, blue: 0.36, alpha: 0.70)
 
     // MARK: - Board Frame
@@ -24,25 +24,31 @@ enum ColorPalette {
     static let tileBevelLight = SKColor(white: 1.0, alpha: 0.28)    // Strong highlight
     static let tileBevelDark = SKColor(white: 0.0, alpha: 0.28)     // Strong shadow
 
-    // MARK: - Ore & Blockers
+    // MARK: - Ore & Blockers (Welsh-themed)
     static let oreVein = SKColor(hex: 0xB8860B)
     static let oreVeinDouble = SKColor(hex: 0xDAA520)
-    static let granite = SKColor(hex: 0x808080)
-    static let graniteCracked = SKColor(hex: 0xA0A0A0)
-    static let graniteLight = SKColor(hex: 0xB0B0B0)
-    static let graniteDark = SKColor(hex: 0x505050)
-    static let boulder = SKColor(hex: 0x5C4033)
-    static let boulderLight = SKColor(hex: 0x8B7355)
-    static let cage = SKColor(hex: 0x8B8589)
-    static let cageMetallic = SKColor(hex: 0xA0A0B0)
-    static let cageRivet = SKColor(hex: 0xD0D0E0)
-    static let lava = SKColor(hex: 0xFF4500)
-    static let lavaGlow = SKColor(hex: 0xFF6347)
-    static let lavaYellow = SKColor(hex: 0xFFCC00)
+    // Slate (was granite) — Welsh slate blue-grey
+    static let granite = SKColor(red: 0.42, green: 0.48, blue: 0.55, alpha: 1.0)       // Slate blue-grey
+    static let graniteCracked = SKColor(red: 0.55, green: 0.60, blue: 0.66, alpha: 1.0)
+    static let graniteLight = SKColor(red: 0.62, green: 0.67, blue: 0.73, alpha: 1.0)
+    static let graniteDark = SKColor(red: 0.28, green: 0.32, blue: 0.38, alpha: 1.0)
+    // Bluestone (was boulder) — Preseli bluestone tone
+    static let boulder = SKColor(red: 0.30, green: 0.38, blue: 0.48, alpha: 1.0)       // Preseli blue
+    static let boulderLight = SKColor(red: 0.45, green: 0.52, blue: 0.62, alpha: 1.0)
+    // Iron Cage — unchanged but darker
+    static let cage = SKColor(hex: 0x6B6569)
+    static let cageMetallic = SKColor(hex: 0x909098)
+    static let cageRivet = SKColor(hex: 0xC0C0D0)
+    // Dragon Fire (was lava) — more intense dragon flame
+    static let lava = SKColor(red: 0.95, green: 0.30, blue: 0.05, alpha: 1.0)          // Dragon fire orange
+    static let lavaGlow = SKColor(red: 1.00, green: 0.45, blue: 0.15, alpha: 1.0)
+    static let lavaYellow = SKColor(red: 1.00, green: 0.85, blue: 0.10, alpha: 1.0)    // Brighter dragon flame
+    // Blasting Charge (TNT) — unchanged
     static let tnt = SKColor(hex: 0xCC0000)
     static let tntBand = SKColor(hex: 0x8B4513)
-    static let amber = SKColor(hex: 0xFFBF00)
-    static let amberLight = SKColor(hex: 0xFFE066)
+    // Awen Crystal (was amber) — golden inspiration glow
+    static let amber = SKColor(red: 1.00, green: 0.78, blue: 0.10, alpha: 1.0)         // Awen golden
+    static let amberLight = SKColor(red: 1.00, green: 0.90, blue: 0.45, alpha: 1.0)
 
     // MARK: - UI Elements
     static let hudBackground = SKColor(red: 0.12, green: 0.09, blue: 0.05, alpha: 0.92)    // Warm brown
@@ -59,4 +65,76 @@ enum ColorPalette {
     static let sparkleGold = SKColor(hex: 0xFFD700)
     static let dustBrown = SKColor(hex: 0x8B7355)
     static let mineBlastOrange = SKColor(hex: 0xFF8C00)
+
+    // MARK: - Zone Color Palettes
+    // Each zone has a distinct color atmosphere reflecting the real Welsh mining region
+
+    struct ZoneColors {
+        let backgroundTop: SKColor
+        let backgroundBottom: SKColor
+        let accent: SKColor
+        let tileOverlay: SKColor  // subtle tint over tile background
+    }
+
+    /// Returns the color palette for a given mining zone
+    static func zoneColors(for zone: MiningZone) -> ZoneColors {
+        switch zone {
+        case .greatOrme:
+            // Warm copper-brown (Bronze Age)
+            return ZoneColors(
+                backgroundTop: SKColor(red: 0.18, green: 0.12, blue: 0.06, alpha: 1.0),
+                backgroundBottom: SKColor(red: 0.10, green: 0.06, blue: 0.03, alpha: 1.0),
+                accent: SKColor(red: 0.72, green: 0.45, blue: 0.20, alpha: 1.0),
+                tileOverlay: SKColor(red: 0.72, green: 0.45, blue: 0.20, alpha: 0.05)
+            )
+        case .southWalesCoalfields:
+            // Coal-dark grey with amber lamplight
+            return ZoneColors(
+                backgroundTop: SKColor(red: 0.10, green: 0.10, blue: 0.10, alpha: 1.0),
+                backgroundBottom: SKColor(red: 0.05, green: 0.04, blue: 0.03, alpha: 1.0),
+                accent: SKColor(red: 0.85, green: 0.65, blue: 0.13, alpha: 1.0),
+                tileOverlay: SKColor(red: 0.85, green: 0.65, blue: 0.13, alpha: 0.04)
+            )
+        case .parysMountain:
+            // Vivid copper-green and burnt orange (Mars landscape)
+            return ZoneColors(
+                backgroundTop: SKColor(red: 0.12, green: 0.10, blue: 0.05, alpha: 1.0),
+                backgroundBottom: SKColor(red: 0.08, green: 0.06, blue: 0.03, alpha: 1.0),
+                accent: SKColor(red: 0.40, green: 0.70, blue: 0.40, alpha: 1.0),
+                tileOverlay: SKColor(red: 0.40, green: 0.70, blue: 0.40, alpha: 0.04)
+            )
+        case .llechweddSlate:
+            // Blue-grey and purple (slate caverns)
+            return ZoneColors(
+                backgroundTop: SKColor(red: 0.10, green: 0.11, blue: 0.15, alpha: 1.0),
+                backgroundBottom: SKColor(red: 0.05, green: 0.05, blue: 0.08, alpha: 1.0),
+                accent: SKColor(red: 0.45, green: 0.52, blue: 0.68, alpha: 1.0),
+                tileOverlay: SKColor(red: 0.45, green: 0.52, blue: 0.68, alpha: 0.05)
+            )
+        case .dolgellauGold:
+            // Rich golden amber
+            return ZoneColors(
+                backgroundTop: SKColor(red: 0.15, green: 0.12, blue: 0.05, alpha: 1.0),
+                backgroundBottom: SKColor(red: 0.08, green: 0.06, blue: 0.02, alpha: 1.0),
+                accent: SKColor(red: 1.00, green: 0.84, blue: 0.00, alpha: 1.0),
+                tileOverlay: SKColor(red: 1.00, green: 0.84, blue: 0.00, alpha: 0.04)
+            )
+        case .dolaucothiRoman:
+            // Imperial purple-gold
+            return ZoneColors(
+                backgroundTop: SKColor(red: 0.12, green: 0.08, blue: 0.14, alpha: 1.0),
+                backgroundBottom: SKColor(red: 0.06, green: 0.04, blue: 0.08, alpha: 1.0),
+                accent: SKColor(red: 0.60, green: 0.40, blue: 0.70, alpha: 1.0),
+                tileOverlay: SKColor(red: 0.60, green: 0.40, blue: 0.70, alpha: 0.04)
+            )
+        case .dinasEmrys:
+            // Dragon-red with mystical blue-white
+            return ZoneColors(
+                backgroundTop: SKColor(red: 0.15, green: 0.05, blue: 0.05, alpha: 1.0),
+                backgroundBottom: SKColor(red: 0.08, green: 0.03, blue: 0.03, alpha: 1.0),
+                accent: SKColor(red: 0.85, green: 0.12, blue: 0.12, alpha: 1.0),
+                tileOverlay: SKColor(red: 0.85, green: 0.12, blue: 0.12, alpha: 0.05)
+            )
+        }
+    }
 }

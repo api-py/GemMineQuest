@@ -130,12 +130,12 @@ enum BoosterType: String {
 
     var iconAssetName: String {
         switch self {
-        case .pickaxe: return "booster_pickaxe"
-        case .dynamite: return "booster_dynamite"
-        case .gemForge: return "booster_gem_forge"
-        case .droneStrike: return "booster_drone"
-        case .mineCartRush: return "booster_mine_cart"
-        default: return "booster_pickaxe"
+        case .pickaxe: return "booster_miners_pick"
+        case .dynamite: return "booster_wildfire"
+        case .gemForge: return "booster_ceridwen_cauldron"
+        case .droneStrike: return "booster_cwn_annwn"
+        case .mineCartRush: return "booster_railway_rush"
+        default: return "booster_miners_pick"
         }
     }
 }

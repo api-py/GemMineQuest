@@ -9,16 +9,16 @@ class LevelGenerator {
     static func generateLevel(number: Int) -> Level {
         var rng = SeededRandomNumberGenerator(seed: UInt64(number) &* 2654435761)
 
-        // Floor bumps every 20 levels for step difficulty increases
+        // Floor bumps aligned to Welsh mining zone boundaries
         let levelFloor: Double
         switch number {
-        case 30..<50: levelFloor = 0.25
-        case 50..<70: levelFloor = 0.40
-        case 70..<90: levelFloor = 0.55
-        case 90..<110: levelFloor = 0.65
-        case 110..<130: levelFloor = 0.75
-        case 130...: levelFloor = 0.82
-        default: levelFloor = 0.0
+        case 31..<61: levelFloor = 0.25    // Zone 2: South Wales Coalfields
+        case 61..<91: levelFloor = 0.40    // Zone 3: Parys Mountain
+        case 91..<121: levelFloor = 0.55   // Zone 4: Llechwedd Slate
+        case 121..<151: levelFloor = 0.65  // Zone 5: Dolgellau Gold
+        case 151..<181: levelFloor = 0.75  // Zone 6: Dolaucothi Roman
+        case 181...: levelFloor = 0.82     // Zone 7: Dinas Emrys / Annwn
+        default: levelFloor = 0.0          // Zone 1: Great Orme
         }
         let difficulty = max(levelFloor, min(1.0 - exp(-Double(number) / 60.0), 0.98))
 
@@ -27,7 +27,7 @@ class LevelGenerator {
         let numColors = determineNumColors(difficulty: difficulty, number: number, rng: &rng)
         let tileLayout = generateTileLayout(difficulty: difficulty, levelType: levelType, rng: &rng)
         let objectives = generateObjectives(levelType: levelType, difficulty: difficulty, rng: &rng)
-        let blockerLayout = generateBlockers(difficulty: difficulty, tileLayout: tileLayout, rng: &rng)
+        let blockerLayout = generateBlockers(difficulty: difficulty, tileLayout: tileLayout, levelNumber: number, rng: &rng)
         let treasureColumns = levelType == .treasureDrop ? generateTreasureColumns(tileLayout: tileLayout, rng: &rng) : nil
 
         // Solvability taxes: tight safety net without making levels too easy
@@ -261,12 +261,35 @@ class LevelGenerator {
 
     // MARK: - Blockers
 
+    /// Zone-specific blocker probability weights.
+    /// Order: [granite, boulder, cage, lava, tnt, amber]
+    private static func blockerWeights(for zone: MiningZone) -> [Int] {
+        switch zone {
+        case .greatOrme:           return [40, 25, 10,  5, 10, 10] // Heavy slate, minimal dragon fire
+        case .southWalesCoalfields: return [30, 20, 15, 10, 15, 10] // Balanced industrial
+        case .parysMountain:       return [15, 15, 15, 25, 10, 20] // Heavy dragon fire + Awen
+        case .llechweddSlate:      return [50, 10, 10, 10, 10, 10] // Dominant multi-layer slate
+        case .dolgellauGold:       return [20, 15, 15, 15, 10, 25] // Heavy Awen crystal
+        case .dolaucothiRoman:     return [20, 20, 15, 15, 15, 15] // Ancient variety
+        case .dinasEmrys:          return [15, 10, 15, 30, 15, 15] // Maximum dragon fire
+        }
+    }
+
     private static func generateBlockers(difficulty: Double, tileLayout: [[Int]],
+                                          levelNumber: Int,
                                           rng: inout SeededRandomNumberGenerator) -> [[Level.BlockerData?]]? {
         guard difficulty > 0.05 else { return nil }
 
         let rows = tileLayout.count; let cols = tileLayout.first?.count ?? Constants.defaultGridColumns
         var layout: [[Level.BlockerData?]] = Array(repeating: Array(repeating: nil, count: cols), count: rows)
+
+        let zone = MiningZone.zone(for: levelNumber)
+        let weights = blockerWeights(for: zone)
+        // Build cumulative thresholds from weights
+        let total = weights.reduce(0, +)
+        var cumulative: [Int] = []
+        var sum = 0
+        for w in weights { sum += w * 100 / total; cumulative.append(sum) }
 
         // Gradual blocker increase: 1-2 at easy, up to 20+ at hardest
         let blockerCount = max(2, Int(difficulty * 30))
@@ -278,16 +301,16 @@ class LevelGenerator {
             guard tileLayout[r][c] == 1, layout[r][c] == nil else { continue }
 
             let roll = Int.random(in: 0..<100, using: &rng)
-            if roll < 30 {
+            if roll < cumulative[0] {
                 let layers = min(Int(difficulty * 4) + 1, 3)
                 layout[r][c] = Level.BlockerData(type: "granite", value: layers)
-            } else if roll < 50 {
+            } else if roll < cumulative[1] {
                 layout[r][c] = Level.BlockerData(type: "boulder", value: nil)
-            } else if roll < 65 && difficulty > 0.12 {
+            } else if roll < cumulative[2] && difficulty > 0.12 {
                 layout[r][c] = Level.BlockerData(type: "cage", value: nil)
-            } else if roll < 75 && difficulty > 0.18 {
+            } else if roll < cumulative[3] && difficulty > 0.18 {
                 layout[r][c] = Level.BlockerData(type: "lava", value: nil)
-            } else if roll < 85 && difficulty > 0.30 {
+            } else if roll < cumulative[4] && difficulty > 0.30 {
                 layout[r][c] = Level.BlockerData(type: "tnt", value: max(5, 15 - Int(difficulty * 10)))
             } else if difficulty > 0.15 {
                 layout[r][c] = Level.BlockerData(type: "amber", value: nil)

@@ -23,6 +23,7 @@ class GameViewModel: ObservableObject {
     @Published var showGodModeToast = false
 
     private(set) var scene: GameScene?
+    var localizationManager: LocalizationManager?
 
     init(levelNumber: Int) {
         self.levelNumber = levelNumber
@@ -48,6 +49,7 @@ class GameViewModel: ObservableObject {
         scene.godModeEnabled = godMode
         scene.configure(state: state, engine: engine)
         scene.gameSceneDelegate = self
+        scene.localizationManager = self.localizationManager
         self.scene = scene
         self.sceneReady = true
         refreshDisplay()

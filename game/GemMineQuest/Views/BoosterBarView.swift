@@ -101,10 +101,11 @@ struct BoosterButton: View {
     let onLongPress: () -> Void
 
     private var isAvailable: Bool { count > 0 || godMode }
+    private let s = Constants.uiScale  // iPad: 1.5, iPhone: 1.0
 
     var body: some View {
         Button(action: onTap) {
-            VStack(spacing: 2) {
+            VStack(spacing: 2 * s) {
                 ZStack(alignment: .topTrailing) {
                     ZStack {
                         // Outer ring
@@ -117,7 +118,7 @@ struct BoosterButton: View {
                                     startPoint: .top, endPoint: .bottom
                                 )
                             )
-                            .frame(width: 40, height: 40)
+                            .frame(width: 40 * s, height: 40 * s)
 
                         // Inner circle with icon
                         Circle()
@@ -126,10 +127,10 @@ struct BoosterButton: View {
                                     colors: isAvailable
                                         ? [Color(hex: 0x2A4E28).opacity(0.8), Color(hex: 0x1A2E18)]
                                         : [Color(hex: 0x151F12), Color(hex: 0x0A150A)],
-                                    center: .center, startRadius: 0, endRadius: 18
+                                    center: .center, startRadius: 0, endRadius: 18 * s
                                 )
                             )
-                            .frame(width: 36, height: 36)
+                            .frame(width: 36 * s, height: 36 * s)
                             .overlay(
                                 Circle()
                                     .stroke(
@@ -143,23 +144,23 @@ struct BoosterButton: View {
                         Image(icon)
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 24, height: 24)
+                            .frame(width: 24 * s, height: 24 * s)
                             .opacity(isAvailable ? 1.0 : 0.4)
 
                         // Shine sweep (top highlight)
                         if isAvailable {
                             Ellipse()
                                 .fill(Color.white.opacity(0.12))
-                                .frame(width: 22, height: 8)
-                                .offset(y: -10)
+                                .frame(width: 22 * s, height: 8 * s)
+                                .offset(y: -10 * s)
                         }
                     }
 
                     // Count badge
                     Text(godMode ? "\u{221E}" : "\(count)")
-                        .font(.system(size: 8, weight: .bold))
+                        .font(.system(size: 8 * s, weight: .bold))
                         .foregroundColor(.white)
-                        .frame(minWidth: 16, minHeight: 16)
+                        .frame(minWidth: 16 * s, minHeight: 16 * s)
                         .background(
                             Circle()
                                 .fill(
@@ -171,15 +172,15 @@ struct BoosterButton: View {
                                         .stroke(Color.black.opacity(0.3), lineWidth: 0.5)
                                 )
                         )
-                        .offset(x: 4, y: -4)
+                        .offset(x: 4 * s, y: -4 * s)
                 }
 
                 Text(label)
-                    .font(.system(size: 8, weight: .semibold))
+                    .font(.system(size: 8 * s, weight: .semibold))
                     .foregroundColor(isAvailable ? Color(hex: 0xCCDDCC) : Color(hex: 0x5A4530))
 
                 Text(hint)
-                    .font(.system(size: 6))
+                    .font(.system(size: 6 * s))
                     .foregroundColor(Color(hex: 0x8B7355))
             }
         }

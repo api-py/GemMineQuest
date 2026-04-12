@@ -40,7 +40,7 @@ struct ShopView: View {
                 }
                 .padding(.horizontal, 20)
 
-                // Title
+                // Title with Celtic knotwork frame
                 Text(localizationManager.t("shop.title"))
                     .font(.system(size: 32, weight: .black, design: .rounded))
                     .foregroundStyle(
@@ -48,6 +48,9 @@ struct ShopView: View {
                                        startPoint: .top, endPoint: .bottom)
                     )
                     .shadow(color: Color(hex: 0xFFD700).opacity(0.4), radius: 8)
+                    .padding(.horizontal, 24)
+                    .padding(.vertical, 12)
+                    .celticBorder(cornerSize: 36)
 
                 // Coin balance
                 HStack(spacing: 6) {

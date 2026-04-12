@@ -478,7 +478,7 @@ class GameEngine {
         let blockerEvents = blockerManager.processEndOfTurn(on: board)
         events.append(contentsOf: blockerEvents)
 
-        if blockerManager.hasTNTExploded(events: blockerEvents) {
+        if blockerManager.hasTNTExploded(events: blockerEvents) && !state.godModeEnabled {
             state.isFailed = true; events.append(.levelFailed); return events
         }
 

@@ -12,8 +12,8 @@ struct BoardLayout {
     let sceneSize: CGSize
 
     // Reserve space for SwiftUI overlays (safe area + top bar + bottom booster bar)
-    static let topMargin: CGFloat = 100
-    static let bottomMargin: CGFloat = 80
+    static let topMargin: CGFloat = Constants.isIPad ? 140 : 100
+    static let bottomMargin: CGFloat = Constants.isIPad ? 120 : 80
 
     init(sceneSize: CGSize, numRows: Int = Constants.defaultGridRows, numColumns: Int = Constants.defaultGridColumns) {
         self.sceneSize = sceneSize

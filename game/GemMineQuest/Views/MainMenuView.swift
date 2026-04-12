@@ -12,6 +12,7 @@ struct MainMenuView: View {
     @State private var titleOpacity: Double = 0
     @State private var gemRotation: Double = 0
     @State private var showShop = false
+    private let s = Constants.uiScale  // iPad: 1.5, iPhone: 1.0
 
     var body: some View {
         ZStack {
@@ -35,10 +36,10 @@ struct MainMenuView: View {
                 )
                 .clipped()
 
-            // Ambient glow in center
+            // Dragon-red ambient glow
             RadialGradient(
-                colors: [Color(hex: 0xFFAA00).opacity(0.08), Color.clear],
-                center: .center, startRadius: 50, endRadius: 300
+                colors: [Color(hex: 0xCC1111).opacity(0.10), Color(hex: 0xFFAA00).opacity(0.05), Color.clear],
+                center: .center, startRadius: 30, endRadius: 350
             )
             .ignoresSafeArea()
 
@@ -52,13 +53,13 @@ struct MainMenuView: View {
                             colors: [Color(hex: 0xFFD700).opacity(0.2), Color.clear],
                             center: .center, startRadius: 5, endRadius: 80
                         ))
-                        .frame(width: 160, height: 160)
+                        .frame(width: 160 * s, height: 160 * s)
 
                     if let _ = UIImage(named: "game_logo") {
                         Image("game_logo")
                             .resizable()
                             .aspectRatio(contentMode: .fit)
-                            .frame(height: 120)
+                            .frame(height: 120 * s)
                             .shadow(color: Color(hex: 0xFFD700).opacity(0.4), radius: 12)
                             .shadow(color: .black, radius: 3)
                             .compositingGroup()
@@ -109,7 +110,7 @@ struct MainMenuView: View {
                 // Play button
                 Button(action: onPlay) {
                     HStack(spacing: 12) {
-                        Image("booster_pickaxe")
+                        Image(BoosterType.pickaxe.iconAssetName)
                             .resizable()
                             .scaledToFit()
                             .frame(width: 28, height: 28)
@@ -119,8 +120,8 @@ struct MainMenuView: View {
                             .font(.title3.weight(.bold))
                     }
                     .foregroundColor(.white)
-                    .frame(maxWidth: 280)
-                    .padding(.vertical, 18)
+                    .frame(maxWidth: 280 * s)
+                    .padding(.vertical, 18 * s)
                     .background(
                         ZStack {
                             LinearGradient(
@@ -149,14 +150,14 @@ struct MainMenuView: View {
                 // Shop button
                 Button(action: { showShop = true }) {
                     HStack(spacing: 10) {
-                        Image("booster_mine_cart")
+                        Image(BoosterType.mineCartRush.iconAssetName)
                             .resizable()
-                            .frame(width: 28, height: 28)
+                            .frame(width: 28 * s, height: 28 * s)
                         Text(localizationManager.t("menu.shop"))
                             .font(.body.weight(.semibold))
                     }
                     .foregroundColor(Color(hex: 0xFFD700))
-                    .frame(maxWidth: 200)
+                    .frame(maxWidth: 200 * s)
                     .padding(.vertical, 14)
                     .background(
                         LinearGradient(
@@ -180,7 +181,7 @@ struct MainMenuView: View {
                             .font(.body.weight(.semibold))
                     }
                     .foregroundColor(Color(hex: 0xCCBB99))
-                    .frame(maxWidth: 200)
+                    .frame(maxWidth: 200 * s)
                     .padding(.vertical, 14)
                     .background(
                         LinearGradient(

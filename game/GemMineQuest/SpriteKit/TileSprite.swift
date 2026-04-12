@@ -211,7 +211,8 @@ class TileSprite: SKNode {
 
         switch blocker {
         case .granite(let layers):
-            let assetName = "blocker_granite_\(layers)"
+            // Try Welsh slate asset first, fall back to numbered granite
+            let assetName = UIImage(named: "blocker_slate") != nil ? "blocker_slate" : "blocker_granite_\(layers)"
             if let texture = loadBlockerTexture(named: assetName) {
                 let sprite = SKSpriteNode(texture: texture, size: spriteSize)
                 container.addChild(sprite)
@@ -229,7 +230,7 @@ class TileSprite: SKNode {
             }
 
         case .boulder:
-            if let texture = loadBlockerTexture(named: "blocker_boulder") {
+            if let texture = loadBlockerTexture(named: "blocker_bluestone") {
                 let sprite = SKSpriteNode(texture: texture, size: spriteSize)
                 container.addChild(sprite)
             }
@@ -243,7 +244,7 @@ class TileSprite: SKNode {
 
         case .lava:
             let lavaSize = CGSize(width: tileSize, height: tileSize)
-            if let texture = loadBlockerTexture(named: "blocker_lava") {
+            if let texture = loadBlockerTexture(named: "blocker_dragon_fire") {
                 let sprite = SKSpriteNode(texture: texture, size: lavaSize)
                 container.addChild(sprite)
             }
@@ -305,7 +306,7 @@ class TileSprite: SKNode {
             spark.run(SKAction.repeatForever(sparkPulse))
 
         case .amber:
-            if let texture = loadBlockerTexture(named: "blocker_topaz") {
+            if let texture = loadBlockerTexture(named: "blocker_awen_crystal") {
                 let sprite = SKSpriteNode(texture: texture, size: spriteSize)
                 container.addChild(sprite)
             }

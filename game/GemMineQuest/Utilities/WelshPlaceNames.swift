@@ -15,6 +15,11 @@ enum WelshPlaceNames {
         return allNames[index]
     }
 
+    /// Returns the mining zone for a given level
+    static func zone(for level: Int) -> MiningZone {
+        return MiningZone.zone(for: level)
+    }
+
     static func place(for level: Int) -> Place {
         let name = self.name(for: level)
         if let coord = knownCoordinates[name] {

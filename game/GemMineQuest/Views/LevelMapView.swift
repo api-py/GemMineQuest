@@ -79,9 +79,18 @@ struct LevelMapView: View {
                             horizontalPadding: horizontalPadding
                         )
 
-                        // Level nodes
+                        // Level nodes with zone headers
                         VStack(spacing: 0) {
                             ForEach(viewModel.levels.reversed()) { level in
+                                // Insert zone header at zone boundaries
+                                if MiningZone.isZoneStart(level: level.number) {
+                                    ZoneHeaderView(
+                                        zone: MiningZone.zone(for: level.number),
+                                        localizationManager: localizationManager
+                                    )
+                                    .padding(.bottom, 8)
+                                }
+
                                 LevelNodeView(
                                     item: level,
                                     nodeSize: nodeSize,
@@ -114,6 +123,12 @@ struct LevelMapView: View {
                 }
             }
         }
+        .overlay(alignment: .bottomLeading) {
+            // Coblynau companion sprite
+            CoblynauMapSprite(levelNumber: progressManager.progress.highestUnlocked)
+                .padding(.leading, 16)
+                .padding(.bottom, 20)
+        }
         .overlay(alignment: .bottomTrailing) {
             if let spinAction = onSpinWheel {
                 Button(action: spinAction) {
@@ -142,7 +157,7 @@ struct LevelMapView: View {
                 withAnimation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) { spinPulse = 1.1 }
             }
         }
-        .background(MineShaftBackground().ignoresSafeArea())
+        .background(MineShaftBackground(currentZone: MiningZone.zone(for: progressManager.progress.highestUnlocked)).ignoresSafeArea())
         .alert(localizationManager.t("levelMap.levelLocked"), isPresented: $showLockedAlert) {
             Button(localizationManager.t("levelMap.ok"), role: .cancel) {}
         } message: {
@@ -162,6 +177,24 @@ struct TrackConnectionsView: View {
     var body: some View {
         GeometryReader { geo in
             let width = geo.size.width
+
+            // Celtic silver knotwork decoration along edges
+            if let _ = UIImage(named: "celtic_border_silver") {
+                // Left edge strip
+                Image("celtic_border_silver")
+                    .resizable()
+                    .frame(width: 12, height: geo.size.height)
+                    .opacity(0.15)
+                    .position(x: 16, y: geo.size.height / 2)
+
+                // Right edge strip
+                Image("celtic_border_silver")
+                    .resizable()
+                    .frame(width: 12, height: geo.size.height)
+                    .opacity(0.15)
+                    .position(x: width - 16, y: geo.size.height / 2)
+            }
+
             Path { path in
                 let reversed = levels.reversed()
                 let items = Array(reversed)
@@ -196,12 +229,20 @@ struct TrackConnectionsView: View {
 // MARK: - Mine Shaft Background
 
 struct MineShaftBackground: View {
+    var currentZone: MiningZone = .greatOrme
+
     var body: some View {
         ZStack {
             Color.black
                 .overlay(
                     Group {
-                        if let _ = UIImage(named: "bg_level_map") {
+                        // Try zone-specific background first
+                        if let _ = UIImage(named: currentZone.backgroundImageName) {
+                            Image(currentZone.backgroundImageName)
+                                .resizable()
+                                .aspectRatio(contentMode: .fill)
+                                .opacity(0.55)
+                        } else if let _ = UIImage(named: "bg_level_map") {
                             Image("bg_level_map")
                                 .resizable()
                                 .aspectRatio(contentMode: .fill)
@@ -216,7 +257,84 @@ struct MineShaftBackground: View {
                     .clipped()
                 )
                 .clipped()
+
+            // Zone-tinted overlay
+            currentZone.accentColor.opacity(0.06)
         }
+    }
+}
+
+// MARK: - Zone Header
+
+struct ZoneHeaderView: View {
+    let zone: MiningZone
+    let localizationManager: LocalizationManager
+
+    var body: some View {
+        VStack(spacing: 6) {
+            // Decorative line
+            Rectangle()
+                .fill(
+                    LinearGradient(
+                        colors: [.clear, zone.accentColor.opacity(0.5), .clear],
+                        startPoint: .leading, endPoint: .trailing
+                    )
+                )
+                .frame(height: 1)
+                .padding(.horizontal, 30)
+
+            HStack(spacing: 8) {
+                // Triskele decoration (left)
+                TriskeleView(size: 16, color: zone.accentColor.opacity(0.5))
+
+                // Zone icon
+                if let img = UIImage(named: zone.iconName) {
+                    Image(uiImage: img)
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 28, height: 28)
+                } else {
+                    Image(systemName: zone.fallbackSystemImage)
+                        .font(.system(size: 16))
+                        .foregroundColor(zone.accentColor)
+                }
+
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(localizationManager.t(zone.displayNameKey))
+                        .font(.system(size: 13, weight: .bold, design: .rounded))
+                        .foregroundColor(zone.accentColor)
+                    Text(localizationManager.t(zone.taglineKey))
+                        .font(.system(size: 10, weight: .regular, design: .serif))
+                        .foregroundColor(Color(hex: 0xCCBB99).opacity(0.7))
+                        .italic()
+                }
+
+                // Triskele decoration (right)
+                TriskeleView(size: 16, color: zone.accentColor.opacity(0.5))
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color.black.opacity(0.5))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(zone.accentColor.opacity(0.25), lineWidth: 0.5)
+                    )
+            )
+
+            // Bottom decorative line
+            Rectangle()
+                .fill(
+                    LinearGradient(
+                        colors: [.clear, zone.accentColor.opacity(0.3), .clear],
+                        startPoint: .leading, endPoint: .trailing
+                    )
+                )
+                .frame(height: 1)
+                .padding(.horizontal, 30)
+        }
+        .padding(.vertical, 8)
     }
 }
 

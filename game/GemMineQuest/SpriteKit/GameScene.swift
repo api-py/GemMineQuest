@@ -15,6 +15,7 @@ class GameScene: SKScene {
     var gameState: GameState?
     var gameEngine: GameEngine?
     var godModeEnabled: Bool = false
+    var localizationManager: LocalizationManager?
 
     let boardLayer = SKNode()
     var hud: HUDNode!
@@ -130,8 +131,20 @@ class GameScene: SKScene {
         let centerX = size.width / 2
         let centerY = size.height / 2
 
-        // Background: try Firefly asset, fall back to procedural
-        if let _ = UIImage(named: "bg_game_board") {
+        // Zone-specific colors
+        let levelNum = gameState?.level.number ?? 1
+        let zone = MiningZone.zone(for: levelNum)
+        let zoneColors = ColorPalette.zoneColors(for: zone)
+
+        // Background: try zone-specific Firefly asset, then generic, then procedural
+        if let _ = UIImage(named: zone.backgroundImageName) {
+            let bgSprite = SKSpriteNode(imageNamed: zone.backgroundImageName)
+            bgSprite.size = size
+            bgSprite.position = CGPoint(x: centerX, y: centerY)
+            bgSprite.zPosition = -10
+            bgSprite.alpha = 0.6
+            addChild(bgSprite)
+        } else if let _ = UIImage(named: "bg_game_board") {
             let bgSprite = SKSpriteNode(imageNamed: "bg_game_board")
             bgSprite.size = size
             bgSprite.position = CGPoint(x: centerX, y: centerY)
@@ -140,14 +153,14 @@ class GameScene: SKScene {
         } else {
             let bg = SKShapeNode(rectOf: size)
             bg.position = CGPoint(x: centerX, y: centerY)
-            bg.fillColor = ColorPalette.background
+            bg.fillColor = zoneColors.backgroundBottom
             bg.strokeColor = .clear
             bg.zPosition = -10
             addChild(bg)
 
             let topGrad = SKShapeNode(rectOf: CGSize(width: size.width, height: size.height * 0.4))
             topGrad.position = CGPoint(x: centerX, y: size.height * 0.8)
-            topGrad.fillColor = ColorPalette.backgroundGradientTop.withAlphaComponent(0.3)
+            topGrad.fillColor = zoneColors.backgroundTop.withAlphaComponent(0.3)
             topGrad.strokeColor = .clear
             topGrad.zPosition = -9
             addChild(topGrad)
@@ -240,6 +253,27 @@ class GameScene: SKScene {
         accentFrame.position = boardCenter
         accentFrame.zPosition = -4
         boardLayer.addChild(accentFrame)
+
+        // Celtic knotwork gold strips along left and right edges of the frame
+        if let borderImage = UIImage(named: "celtic_border_gold") {
+            let borderTexture = SKTexture(image: borderImage)
+            let stripWidth: CGFloat = 14
+            let stripHeight = layout.boardSize.height + frameInset - 10
+
+            // Left strip
+            let leftStrip = SKSpriteNode(texture: borderTexture, size: CGSize(width: stripWidth, height: stripHeight))
+            leftStrip.position = CGPoint(x: boardCenter.x - frameRect.width / 2 - 2, y: boardCenter.y)
+            leftStrip.alpha = 0.6
+            leftStrip.zPosition = -3.5
+            boardLayer.addChild(leftStrip)
+
+            // Right strip
+            let rightStrip = SKSpriteNode(texture: borderTexture, size: CGSize(width: stripWidth, height: stripHeight))
+            rightStrip.position = CGPoint(x: boardCenter.x + frameRect.width / 2 + 2, y: boardCenter.y)
+            rightStrip.alpha = 0.6
+            rightStrip.zPosition = -3.5
+            boardLayer.addChild(rightStrip)
+        }
 
         // Corner ornaments (larger diamonds at each corner)
         let halfW = frameRect.width / 2
@@ -725,9 +759,9 @@ class GameScene: SKScene {
         container.zPosition = 200
         container.name = "gemTooltip"
 
-        var text = gem.color.displayName
+        var text = localizationManager.map { gem.color.localizedDisplayName($0) } ?? gem.color.displayName
         if gem.special != .none {
-            text += " (\(gem.special.displayName))"
+            text += " (\(localizationManager.map { gem.special.localizedDisplayName($0) } ?? gem.special.displayName))"
         }
 
         let bg = SKShapeNode(rectOf: CGSize(width: 120, height: 30), cornerRadius: 8)

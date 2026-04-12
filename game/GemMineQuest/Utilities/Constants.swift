@@ -1,7 +1,12 @@
 import Foundation
 import CoreGraphics
+import UIKit
 
 enum Constants {
+    // MARK: - iPad Adaptive Scaling
+    /// Scale factor: 1.0 on iPhone, 1.5 on iPad
+    static let isIPad = UIDevice.current.userInterfaceIdiom == .pad
+    static let uiScale: CGFloat = isIPad ? 1.5 : 1.0
     // MARK: - Grid
     static let defaultGridRows = 11
     static let defaultGridColumns = 9
@@ -36,11 +41,11 @@ enum Constants {
     static let mineBlastDronePoints = 250
 
     // MARK: - Board Layout
-    static let maxGemSize: CGFloat = 64.0
-    static let minGemSize: CGFloat = 36.0
-    static let boardPadding: CGFloat = 6.0
-    static let gemSpacing: CGFloat = 1.0
-    static let hudHeight: CGFloat = 120.0
+    static let maxGemSize: CGFloat = isIPad ? 96.0 : 64.0
+    static let minGemSize: CGFloat = isIPad ? 48.0 : 36.0
+    static let boardPadding: CGFloat = isIPad ? 10.0 : 6.0
+    static let gemSpacing: CGFloat = isIPad ? 1.5 : 1.0
+    static let hudHeight: CGFloat = isIPad ? 160.0 : 120.0
 
     // MARK: - Level Generation
     static let tutorialLevelCount = 10

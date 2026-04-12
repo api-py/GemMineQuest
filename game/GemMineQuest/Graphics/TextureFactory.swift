@@ -12,9 +12,16 @@ class TextureFactory {
 
     // MARK: - Gem Textures
 
-    /// Asset name mapping for each gem color
+    /// Asset name mapping for each gem color (Welsh mineral names)
     private func gemAssetName(for color: GemColor) -> String {
-        "gem_\(color.displayName.lowercased())"
+        switch color {
+        case .ruby:     return "gem_dragon_stone"
+        case .gold:     return "gem_welsh_gold"
+        case .silver:   return "gem_arian"
+        case .emerald:  return "gem_preseli_stone"
+        case .sapphire: return "gem_slate_gem"
+        case .amethyst: return "gem_ceridwen_crystal"
+        }
     }
 
     func gemTexture(for color: GemColor, size: CGFloat) -> SKTexture {

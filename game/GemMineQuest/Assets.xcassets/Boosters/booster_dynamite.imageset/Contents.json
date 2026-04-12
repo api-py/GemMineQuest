@@ -7,11 +7,13 @@
     },
     {
       "idiom": "universal",
-      "scale": "2x"
+      "scale": "2x",
+      "filename": "booster_dynamite@2x.png"
     },
     {
       "idiom": "universal",
-      "scale": "3x"
+      "scale": "3x",
+      "filename": "booster_dynamite@3x.png"
     }
   ],
   "info": {

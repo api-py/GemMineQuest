@@ -52,7 +52,7 @@ struct EventBannerView: View {
                         )
                         .frame(width: 48, height: 48)
 
-                    Image("booster_pickaxe")
+                    Image(BoosterType.pickaxe.iconAssetName)
                         .resizable()
                         .scaledToFit()
                         .frame(width: 28, height: 28)

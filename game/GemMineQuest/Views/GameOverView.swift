@@ -27,6 +27,14 @@ struct GameOverView: View {
 
     private var coinReward: Int { stars * 25 }
 
+    private var victoryCharacterImage: String {
+        let zone = MiningZone.zone(for: levelNumber)
+        if zone == .dinasEmrys {
+            return levelNumber >= 200 ? "dragon_awakened" : "dragon_sleeping"
+        }
+        return "character_miner_king"
+    }
+
     var body: some View {
         ZStack {
             // Dark overlay / victory background
@@ -49,8 +57,8 @@ struct GameOverView: View {
                     // Phase 1: Title
                     if showTitle {
                         // Win icon
-                        if let _ = UIImage(named: "character_miner_king") {
-                            Image("character_miner_king")
+                        if let _ = UIImage(named: victoryCharacterImage) {
+                            Image(victoryCharacterImage)
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: 100, height: 100)
@@ -85,6 +93,14 @@ struct GameOverView: View {
                             .font(.system(size: 16, weight: .medium, design: .serif))
                             .foregroundColor(Color(hex: 0xCCBB99))
                             .italic()
+
+                        // Zone-specific victory flavor text
+                        let victoryZone = MiningZone.zone(for: levelNumber)
+                        Text(localizationManager.t("victory.zone\(victoryZone.rawValue)"))
+                            .font(.system(size: 12, weight: .regular, design: .serif))
+                            .foregroundColor(victoryZone.accentColor.opacity(0.8))
+                            .italic()
+                            .padding(.top, 2)
                     }
 
                     // Phase 2: Stars

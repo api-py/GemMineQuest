@@ -14,6 +14,11 @@ enum Achievement: String, CaseIterable {
     case gemHunter
     case dailyDevotion
     case fortuneSeeker
+    // Welsh Druid Progression
+    case ovateOfTheMine
+    case bardOfTheDeep
+    case druidOfAnnwn
+    case dragonsFriend
 
     var displayName: String {
         switch self {
@@ -30,6 +35,10 @@ enum Achievement: String, CaseIterable {
         case .gemHunter: return "Gem Hunter"
         case .dailyDevotion: return "Daily Devotion"
         case .fortuneSeeker: return "Fortune Seeker"
+        case .ovateOfTheMine: return "Ovate of the Mine"
+        case .bardOfTheDeep: return "Bard of the Deep"
+        case .druidOfAnnwn: return "Druid of Annwn"
+        case .dragonsFriend: return "Dragon's Friend"
         }
     }
 
@@ -48,6 +57,10 @@ enum Achievement: String, CaseIterable {
         case .gemHunter: return "Collect 500 gems total"
         case .dailyDevotion: return "Claim 7 daily rewards in a row"
         case .fortuneSeeker: return "Spin the wheel 10 times"
+        case .ovateOfTheMine: return "Reach the South Wales Coalfields (Level 31)"
+        case .bardOfTheDeep: return "Reach the Llechwedd Slate mines (Level 91)"
+        case .druidOfAnnwn: return "Reach the Roman gold mines of Dolaucothi (Level 151)"
+        case .dragonsFriend: return "Complete the Dragon's Lair at Dinas Emrys (Level 200)"
         }
     }
 
@@ -74,6 +87,10 @@ enum Achievement: String, CaseIterable {
         case .gemHunter: return "diamond.fill"
         case .dailyDevotion: return "calendar.badge.checkmark"
         case .fortuneSeeker: return "arrow.triangle.2.circlepath"
+        case .ovateOfTheMine: return "leaf.fill"
+        case .bardOfTheDeep: return "music.note"
+        case .druidOfAnnwn: return "wand.and.stars"
+        case .dragonsFriend: return "shield.fill"
         }
     }
 
@@ -92,6 +109,10 @@ enum Achievement: String, CaseIterable {
         case .gemHunter: return 300
         case .dailyDevotion: return 250
         case .fortuneSeeker: return 100
+        case .ovateOfTheMine: return 300
+        case .bardOfTheDeep: return 600
+        case .druidOfAnnwn: return 1000
+        case .dragonsFriend: return 2000
         }
     }
 
@@ -129,6 +150,14 @@ enum Achievement: String, CaseIterable {
             return progress.dailyStreak >= 7
         case .fortuneSeeker:
             return progress.totalGamesPlayed >= 10
+        case .ovateOfTheMine:
+            return progress.levelsCompleted >= 31
+        case .bardOfTheDeep:
+            return progress.levelsCompleted >= 91
+        case .druidOfAnnwn:
+            return progress.levelsCompleted >= 151
+        case .dragonsFriend:
+            return progress.levelsCompleted >= 200
         }
     }
 }

@@ -1,21 +1,23 @@
 {
-  "images" : [
+  "images": [
     {
-      "filename" : "blocker_tnt.png",
-      "idiom" : "universal",
-      "scale" : "1x"
+      "filename": "blocker_tnt.png",
+      "idiom": "universal",
+      "scale": "1x"
     },
     {
-      "idiom" : "universal",
-      "scale" : "2x"
+      "idiom": "universal",
+      "scale": "2x",
+      "filename": "blocker_tnt@2x.png"
     },
     {
-      "idiom" : "universal",
-      "scale" : "3x"
+      "idiom": "universal",
+      "scale": "3x",
+      "filename": "blocker_tnt@3x.png"
     }
   ],
-  "info" : {
-    "author" : "xcode",
-    "version" : 1
+  "info": {
+    "author": "xcode",
+    "version": 1
   }
 }

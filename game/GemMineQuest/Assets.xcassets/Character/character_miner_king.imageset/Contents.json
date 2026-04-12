@@ -1,21 +1,23 @@
 {
-  "images" : [
+  "images": [
     {
-      "filename" : "character_miner_king.png",
-      "idiom" : "universal",
-      "scale" : "1x"
+      "filename": "character_miner_king.png",
+      "idiom": "universal",
+      "scale": "1x"
     },
     {
-      "idiom" : "universal",
-      "scale" : "2x"
+      "idiom": "universal",
+      "scale": "2x",
+      "filename": "character_miner_king@2x.png"
     },
     {
-      "idiom" : "universal",
-      "scale" : "3x"
+      "idiom": "universal",
+      "scale": "3x",
+      "filename": "character_miner_king@3x.png"
     }
   ],
-  "info" : {
-    "author" : "xcode",
-    "version" : 1
+  "info": {
+    "author": "xcode",
+    "version": 1
   }
 }

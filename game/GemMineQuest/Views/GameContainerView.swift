@@ -14,6 +14,8 @@ struct GameContainerView: View {
     // Level transition state
     @State private var showTransition = false
     @State private var transitionLevel = 0
+    @State private var showZoneTransition = false
+    @State private var zoneTransitionZone: MiningZone = .greatOrme
     @State private var showExitConfirmation = false
     @State private var showShop = false
     @State private var showObjectiveBanner = false
@@ -165,7 +167,7 @@ struct GameContainerView: View {
 
                     // Shop button
                     Button { showShop = true } label: {
-                        Image("booster_mine_cart")
+                        Image(BoosterType.mineCartRush.iconAssetName)
                             .resizable()
                             .frame(width: 28, height: 28)
                     }
@@ -340,7 +342,7 @@ struct GameContainerView: View {
                     stars: viewModel.stars,
                     score: viewModel.finalScore,
                     levelNumber: levelNumber,
-                    playerCoins: progressManager.progress.coins,
+                    playerCoins: viewModel.godModeEnabled ? 999999 : progressManager.progress.coins,
                     onRetry: {
                         if !viewModel.didWin {
                             if let awarded = progressManager.recordLevelLoss(level: levelNumber, boosterInventory: boosterInventory) {
@@ -361,8 +363,14 @@ struct GameContainerView: View {
                         boosterInventory.checkMilestoneReward(levelCompleted: levelNumber)
                         let threeStarCount = progressManager.progress.levelStars.values.filter { $0 >= 3 }.count
                         boosterInventory.checkStarRewards(totalThreeStarLevels: threeStarCount)
-                        startTransition(text: localizationManager.t("game.levelName", next, WelshPlaceNames.name(for: next))) {
-                            onNextLevel(next)
+                        // Check if entering a new zone
+                        if MiningZone.isZoneStart(level: next) && next > 1 {
+                            zoneTransitionZone = MiningZone.zone(for: next)
+                            withAnimation { showZoneTransition = true }
+                        } else {
+                            startTransition(text: localizationManager.t("game.levelName", next, WelshPlaceNames.name(for: next))) {
+                                onNextLevel(next)
+                            }
                         }
                     },
                     onMenu: {
@@ -380,6 +388,19 @@ struct GameContainerView: View {
                 .transition(.opacity)
             }
 
+            // Zone transition overlay (entering new mining region)
+            if showZoneTransition {
+                ZoneTransitionView(zone: zoneTransitionZone) {
+                    withAnimation { showZoneTransition = false }
+                    let next = viewModel.nextLevelNumber
+                    startTransition(text: localizationManager.t("game.levelName", next, WelshPlaceNames.name(for: next))) {
+                        onNextLevel(next)
+                    }
+                }
+                .environmentObject(localizationManager)
+                .transition(.opacity)
+            }
+
             // Level transition banner
             if showTransition {
                 LevelTransitionView(
@@ -391,6 +412,7 @@ struct GameContainerView: View {
         }
         // Show intro banner on first appear
         .onAppear {
+            viewModel.localizationManager = localizationManager
             boosterInventory.claimDailyRewardIfNeeded()
             showIntroBanner()
         }

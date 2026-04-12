@@ -94,6 +94,50 @@ struct LevelDetailSheet: View {
                         .padding(.horizontal)
                         .allowsHitTesting(false)
 
+                        // Zone badge and Welsh lore tip
+                        let currentZone = MiningZone.zone(for: levelNumber)
+                        VStack(spacing: 8) {
+                            // Zone name badge
+                            HStack(spacing: 6) {
+                                if let img = UIImage(named: currentZone.iconName) {
+                                    Image(uiImage: img)
+                                        .resizable()
+                                        .scaledToFit()
+                                        .frame(width: 20, height: 20)
+                                } else {
+                                    Image(systemName: currentZone.fallbackSystemImage)
+                                        .font(.system(size: 12))
+                                        .foregroundColor(currentZone.accentColor)
+                                }
+                                Text(localizationManager.t(currentZone.displayNameKey))
+                                    .font(.system(size: 12, weight: .bold, design: .rounded))
+                                    .foregroundColor(currentZone.accentColor)
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(
+                                Capsule()
+                                    .fill(currentZone.accentColor.opacity(0.15))
+                                    .overlay(
+                                        Capsule()
+                                            .stroke(currentZone.accentColor.opacity(0.3), lineWidth: 0.5)
+                                    )
+                            )
+
+                            // Lore tip
+                            let loreTip = WelshLoreTips.tip(for: levelNumber)
+                            if !loreTip.isEmpty {
+                                Text(loreTip)
+                                    .font(.system(size: 12, weight: .regular, design: .serif))
+                                    .italic()
+                                    .foregroundColor(Color(hex: 0xCCBB99).opacity(0.8))
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal, 24)
+                                    .padding(.vertical, 8)
+                            }
+                        }
+                        .padding(.vertical, 4)
+
                         // Best score
                         if progressManager.progress.highScore(for: levelNumber) > 0 {
                             VStack(spacing: 4) {
@@ -164,7 +208,7 @@ struct LevelDetailSheet: View {
             // Play button - fixed at bottom, outside ScrollView
             Button(action: onPlay) {
                 HStack {
-                    Image("booster_pickaxe")
+                    Image(BoosterType.pickaxe.iconAssetName)
                         .resizable()
                         .scaledToFit()
                         .frame(width: 24, height: 24)
