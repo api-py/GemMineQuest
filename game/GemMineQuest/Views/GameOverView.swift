@@ -80,7 +80,7 @@ struct GameOverView: View {
                         }
 
                         Text(localizationManager.t("gameOver.levelComplete", levelNumber))
-                            .font(.system(size: 30, weight: .bold, design: .rounded))
+                            .font(.system(size: 30 * Constants.uiScale, weight: .bold, design: .rounded))
                             .foregroundStyle(
                                 LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xE8A035)],
                                                startPoint: .top, endPoint: .bottom)
@@ -90,7 +90,7 @@ struct GameOverView: View {
                             .transition(.scale.combined(with: .opacity))
 
                         Text(WelshPlaceNames.name(for: levelNumber))
-                            .font(.system(size: 16, weight: .medium, design: .serif))
+                            .font(.system(size: 16 * Constants.uiScale, weight: .medium, design: .serif))
                             .foregroundColor(Color(hex: 0xCCBB99))
                             .italic()
 

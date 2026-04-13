@@ -9,6 +9,8 @@ struct LevelDetailSheet: View {
     var onPlay: () -> Void
     var onDismiss: () -> Void
 
+    private let s = Constants.uiScale
+
     private var level: Level {
         LevelGenerator.getLevel(number: levelNumber)
     }
@@ -56,18 +58,18 @@ struct LevelDetailSheet: View {
 
                         // Level number and Welsh name
                         Text(localizationManager.t("levelDetail.level", levelNumber))
-                            .font(.system(size: 32, weight: .bold, design: .rounded))
+                            .font(.system(size: 32 * s, weight: .bold, design: .rounded))
                             .foregroundColor(Color(hex: 0xFFD700))
 
                         HStack(spacing: 8) {
                             Text(WelshPlaceNames.name(for: levelNumber))
-                                .font(.system(size: 18, weight: .medium, design: .serif))
+                                .font(.system(size: 18 * s, weight: .medium, design: .serif))
                                 .foregroundColor(Color(hex: 0xCCBB99))
                                 .italic()
 
                             if let badge = difficultyBadge {
                                 Text(badge.text)
-                                    .font(.system(size: 11, weight: .bold))
+                                    .font(.system(size: max(11 * s, 10), weight: .bold))
                                     .foregroundColor(.white)
                                     .padding(.horizontal, 8)
                                     .padding(.vertical, 3)
@@ -125,7 +127,7 @@ struct LevelDetailSheet: View {
                             )
 
                             // Lore tip
-                            let loreTip = WelshLoreTips.tip(for: levelNumber)
+                            let loreTip = WelshLoreTips.tip(for: levelNumber, localizationManager: localizationManager)
                             if !loreTip.isEmpty {
                                 Text(loreTip)
                                     .font(.system(size: max(14, 12 * Constants.uiScale), weight: .regular, design: .serif))
@@ -141,7 +143,7 @@ struct LevelDetailSheet: View {
                         // Best score
                         if progressManager.progress.highScore(for: levelNumber) > 0 {
                             VStack(spacing: 4) {
-                                StarRatingView(stars: progressManager.progress.stars(for: levelNumber), size: 24)
+                                StarRatingView(stars: progressManager.progress.stars(for: levelNumber), size: 24 * Constants.uiScale)
                                 Text(localizationManager.t("levelDetail.best", progressManager.progress.highScore(for: levelNumber)))
                                     .font(.caption)
                                     .foregroundColor(Color(hex: 0xCCBB99))
@@ -211,7 +213,7 @@ struct LevelDetailSheet: View {
                     Image(BoosterType.pickaxe.iconAssetName)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 24, height: 24)
+                        .frame(width: 24 * s, height: 24 * s)
                     Text(progressManager.progress.stars(for: levelNumber) > 0
                          ? localizationManager.t("levelDetail.digAgain")
                          : localizationManager.t("levelDetail.startDig"))

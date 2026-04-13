@@ -213,7 +213,7 @@ struct GameContainerView: View {
                 // HUD tooltip (shown below all banners, above board)
                 if let tooltip = hudTooltipText {
                     Text(tooltip)
-                        .font(.system(size: 13, weight: .medium))
+                        .font(.system(size: 13 * s, weight: .medium))
                         .foregroundColor(Color(hex: 0xFFF8E8))
                         .multilineTextAlignment(.center)
                         .padding(.horizontal, 16)

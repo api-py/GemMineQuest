@@ -7,6 +7,7 @@ class LevelGenerator {
     }
 
     static func generateLevel(number: Int) -> Level {
+        // FNV-1a 32-bit offset basis — ensures good hash distribution for level seeds
         var rng = SeededRandomNumberGenerator(seed: UInt64(number) &* 2654435761)
 
         // Floor bumps aligned to Welsh mining zone boundaries

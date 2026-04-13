@@ -30,7 +30,7 @@ struct LevelMapView: View {
                     ZStack {
                         Circle()
                             .fill(Color(hex: 0xC71414))
-                            .frame(width: 44, height: 44)
+                            .frame(width: 44 * Constants.uiScale, height: 44 * Constants.uiScale)
                         Image(systemName: "xmark")
                             .font(.system(size: 20, weight: .bold))
                             .foregroundColor(.white)
@@ -40,7 +40,7 @@ struct LevelMapView: View {
                 Spacer()
 
                 Text(localizationManager.t("levelMap.title"))
-                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .font(.system(size: 22 * Constants.uiScale, weight: .bold, design: .rounded))
                     .foregroundColor(Color(hex: 0xFFD700))
 
                 Spacer()
@@ -48,10 +48,10 @@ struct LevelMapView: View {
                 // Coin counter
                 HStack(spacing: 4) {
                     Image(systemName: "star.circle.fill")
-                        .font(.system(size: 16))
+                        .font(.system(size: 16 * Constants.uiScale))
                         .foregroundColor(Color(hex: 0xFFD700))
                     Text(isGodMode ? "\u{221E}" : "\(progressManager.progress.coins)")
-                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                        .font(.system(size: 14 * Constants.uiScale, weight: .bold, design: .rounded))
                         .foregroundColor(Color(hex: 0xFFD700))
                 }
                 .padding(.horizontal, 10)

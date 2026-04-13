@@ -126,11 +126,13 @@ class BlockerManager {
     }
 
     /// Process end-of-turn effects (lava spreading, TNT countdown)
-    func processEndOfTurn(on board: Board) -> [GameEvent] {
+    func processEndOfTurn(on board: Board, godMode: Bool = false) -> [GameEvent] {
         var events: [GameEvent] = []
 
-        // TNT countdown
-        events.append(contentsOf: processTNTCountdown(on: board))
+        // TNT countdown (frozen in god mode)
+        if !godMode {
+            events.append(contentsOf: processTNTCountdown(on: board))
+        }
 
         // Lava spreading
         events.append(contentsOf: processLavaSpread(on: board))

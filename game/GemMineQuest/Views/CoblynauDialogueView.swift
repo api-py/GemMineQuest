@@ -87,10 +87,11 @@ struct CoblynauDialogueView: View {
 /// A compact Coblynau that sits on the level map near the current level.
 struct CoblynauMapSprite: View {
     let levelNumber: Int
+    @EnvironmentObject var localizationManager: LocalizationManager
 
     var body: some View {
         CoblynauDialogueView(
-            message: WelshLoreTips.tip(for: levelNumber)
+            message: WelshLoreTips.tip(for: levelNumber, localizationManager: localizationManager)
         )
     }
 }

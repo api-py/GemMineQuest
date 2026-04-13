@@ -475,7 +475,7 @@ class GameEngine {
 
     private func processEndOfTurn() -> [GameEvent] {
         var events: [GameEvent] = []
-        let blockerEvents = blockerManager.processEndOfTurn(on: board)
+        let blockerEvents = blockerManager.processEndOfTurn(on: board, godMode: state.godModeEnabled)
         events.append(contentsOf: blockerEvents)
 
         if blockerManager.hasTNTExploded(events: blockerEvents) && !state.godModeEnabled {

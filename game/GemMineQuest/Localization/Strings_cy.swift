@@ -308,6 +308,55 @@ let welshStrings: [String: String] = [
     "settings.langEN": "EN",
     "settings.langCY": "CY",
 
+    // Lore Tips — Zone 1: Y Gogarth
+    "lore.zone1.tip0": "Mae mwyngloddiau copr y Gogarth ger Llandudno dros 4,000 o flynyddoedd oed — y mwyngloddiau cynhanesyddol mwyaf yn y byd.",
+    "lore.zone1.tip1": "Defnyddiodd mwynwyr yr Oes Efydd ar y Gogarth offer asgwrn a chyrn carw i dynnu copr o dwneli calchfaen.",
+    "lore.zone1.tip2": "Mae'r Coblynau yn ysbrydion mwyngloddiau Cymreig — mwynwyr bach mewn dillad bychan sy'n curo ger gwythiennau mwyn cyfoethog.",
+    "lore.zone1.tip3": "Mae Cymru wedi'i chloddio'n barhaus ers dros 4,000 o flynyddoedd, o gopr yr Oes Efydd i lo modern.",
+    "lore.zone1.tip4": "Mae'r gair Cymraeg 'mwynglawdd' yn golygu mwynglawdd. 'Cloddio' yw calon ein hantur.",
+
+    // Lore Tips — Zone 2: Maes Glo De Cymru
+    "lore.zone2.tip0": "Maes Glo De Cymru oedd y mwyaf ym Mhrydain. Erbyn 1913, y Barri oedd porthladd allforio glo mwyaf y byd.",
+    "lore.zone2.tip1": "Ganwyd corau meibion Cymreig mewn cymunedau glofaol — ffurfiodd glowyr di-waith gorau a ddaeth yn enwog drwy'r byd.",
+    "lore.zone2.tip2": "Gelwir Cymru yn 'Gwlad y Gân'. Mae'r traddodiad canu mor ddwfn â'r gwythiennau glo.",
+    "lore.zone2.tip3": "Achubwyd bywydau di-rif gan lamp diogelwch Davy trwy ganfod nwy ffrwydrol mewn mwyngloddiau Cymreig.",
+    "lore.zone2.tip4": "Mae cysyniad Cymreig 'hiraeth' — hiraeth dwfn am gartref — yn atseinio gyda chymunedau glofaol ledled y byd.",
+
+    // Lore Tips — Zone 3: Mynydd Parys
+    "lore.zone3.tip0": "Mynydd Parys ar Ynys Môn oedd unwaith y mwynglawdd copr mwyaf yn y byd. Mae ei dirwedd fel Mawrth yn syfrdanu ymwelwyr.",
+    "lore.zone3.tip1": "Darganfuwyd y mwyn Anglesit am y tro cyntaf ym Mynydd Parys yn 1783 ac fe'i henwyd ar ôl Ynys Môn.",
+    "lore.zone3.tip2": "Rheolai Thomas Williams, 'Brenin y Copr,' brisiau copr byd-eang o Fynydd Parys yn y 1780au.",
+    "lore.zone3.tip3": "Ynys Môn oedd cadarnle olaf y Derwyddon cyn ymosodiad y Rhufeiniaid yn OC 61.",
+    "lore.zone3.tip4": "Mae'r pyllau oren, porffor a gwyrdd llachar ym Mynydd Parys yn cael eu hachosi gan fwynau copr, haearn a sylffwr.",
+
+    // Lore Tips — Zone 4: Llechi Llechwedd
+    "lore.zone4.tip0": "Mae Tirwedd Llechi Gogledd Cymru yn Safle Treftadaeth y Byd UNESCO — y diwydiant a doeodd y byd.",
+    "lore.zone4.tip1": "Mae Ogofâu Llechi Llechwedd ym Mlaenau Ffestiniog yn cynnwys siambrau tanddaearol fel eglwysi cadeiriol.",
+    "lore.zone4.tip2": "Mae llechi Cymreig wedi'u chwarela ers cyfnod y Rhufeiniaid. Penrhyn a Dinorwig oedd y ddwy chwarel lechi fwyaf ar y Ddaear.",
+    "lore.zone4.tip3": "Roedd gan y Derwyddon dri urdd: Ofydd (gwyrdd), Bardd (glas), a Derwydd (gwyn) — dilyniant o ddoethineb.",
+    "lore.zone4.tip4": "Mae'r triskele Celtaidd — tair troell gydgloi — yn cynrychioli daear, dŵr, ac awyr, tair teyrnas bodolaeth.",
+
+    // Lore Tips — Zone 5: Gwregys Aur Dolgellau
+    "lore.zone5.tip0": "Mae aur Cymreig o Ddolgellau wedi'i ddefnyddio ar gyfer modrwyau priodas Brenhinol ers 1923.",
+    "lore.zone5.tip1": "Mwynglawdd Aur Clogau ger Dolgellau oedd y cyfoethocaf yng Nghymru, gan gynhyrchu dros 78,000 owns troy o aur.",
+    "lore.zone5.tip2": "Mae llwyau caru Cymreig yn docynnau anwyldeb pren cerfiedig — mae gan bob symbol ystyr: calonnau am gariad, allweddi am ymroddiad.",
+    "lore.zone5.tip3": "Mae 'Awen' yn golygu ysbrydoliaeth ddwyfol yn Gymraeg — mae tri pelydryn yr Awen yn cynrychioli gwirionedd, gwybodaeth, a barddoniaeth.",
+    "lore.zone5.tip4": "Breuodd Pair Ceridwen drwyth yr Awen am flwyddyn a diwrnod — dim ond y tri diferyn cyntaf oedd yn dal ei rym.",
+
+    // Lore Tips — Zone 6: Dolaucothi
+    "lore.zone6.tip0": "Dolaucothi yw'r unig fwynglawdd aur Rhufeinig hysbys ym Mhrydain, a weithredwyd o tua OC 74 am dros ddwy ganrif.",
+    "lore.zone6.tip1": "Mae'r Mabinogion yn cynnwys y chwedlau rhyddiaith Cymreig cynharaf — straeon Pwyll, Branwen, a'r pair hudol o aileni.",
+    "lore.zone6.tip2": "Yn y Mabinogion, mae Arawn yn rheoli Annwn — Isfyd Cymreig, teynas o ddigonedd o dan y ddaear.",
+    "lore.zone6.tip3": "Cludwyd Cerrig Gleision Preseli o Sir Benfro 150 milltir i adeiladu Côr y Cewri — yn cysylltu carreg Gymreig â grym sanctaidd.",
+    "lore.zone6.tip4": "Dywedir bod Myrddin wedi'i eni yng Nghaerfyrddin — sef 'Caer Myrddin' yn Gymraeg.",
+
+    // Lore Tips — Zone 7: Dinas Emrys / Annwn
+    "lore.zone7.tip0": "O dan Dinas Emrys yn Eryri, mae dwy ddraig yn cysgu mewn llyn tanddaearol — un goch, un wen.",
+    "lore.zone7.tip1": "Datgelodd y Myrddin ifanc y dreigiau i'r Brenin Gwrtheyrn, gan broffwydo y byddai Y Ddraig Goch yn gorchfygu.",
+    "lore.zone7.tip2": "Mae Annwn, Isfyd Cymreig, yn golygu 'dwfn iawn.' Nid lle tywyll ydyw — paradwys o ieuenctid tragwyddol a digonedd.",
+    "lore.zone7.tip3": "Mae Cŵn Annwn yn gŵn hela ysbrydol gwyn â chlustiau coch sy'n hela rhwng bydoedd, dan arweiniad Gwyn ap Nudd.",
+    "lore.zone7.tip4": "Mae Y Ddraig Goch wedi bod yn symbol Cymru ers dros 1,500 o flynyddoedd — dewrder, her, a dyfalbarhad ar ffurf.",
+
     // Zone-Specific Victory Text
     "victory.zone1": "Mae'r copr hynafol yn ildio'i drysor",
     "victory.zone2": "Mae aur du'r cymoedd yn disgleirio",

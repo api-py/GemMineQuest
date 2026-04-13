@@ -20,6 +20,7 @@ struct ContentView: View {
     @State private var showSpinWheel = false
     @State private var showMilestone: String? = nil
     @State private var showAchievementToast: Achievement? = nil
+    @State private var achievementQueue: [Achievement] = []
     @State private var showEventBanner = false
     @State private var showLanguageSelection = false
 
@@ -145,9 +146,23 @@ struct ContentView: View {
 
     private func checkPostGameAchievements() {
         let newAchievements = progressManager.checkAchievements()
-        if let first = newAchievements.first {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                withAnimation { showAchievementToast = first }
+        guard !newAchievements.isEmpty else { return }
+        achievementQueue.append(contentsOf: newAchievements)
+        if showAchievementToast == nil {
+            showNextAchievement()
+        }
+    }
+
+    private func showNextAchievement() {
+        guard !achievementQueue.isEmpty else { return }
+        let next = achievementQueue.removeFirst()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            withAnimation { showAchievementToast = next }
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) {
+            withAnimation { showAchievementToast = nil }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                showNextAchievement()
             }
         }
     }

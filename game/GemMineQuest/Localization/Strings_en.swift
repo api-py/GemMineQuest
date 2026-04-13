@@ -308,6 +308,55 @@ let englishStrings: [String: String] = [
     "settings.langEN": "EN",
     "settings.langCY": "CY",
 
+    // Lore Tips — Zone 1: Great Orme
+    "lore.zone1.tip0": "The Great Orme copper mines near Llandudno are over 4,000 years old — the largest prehistoric mines in the world.",
+    "lore.zone1.tip1": "Bronze Age miners at the Great Orme used bone and antler tools to extract copper from limestone tunnels.",
+    "lore.zone1.tip2": "The Coblynau are Welsh mine spirits — tiny miners dressed in miniature clothing who knock near rich ore veins.",
+    "lore.zone1.tip3": "Wales has been mined continuously for over 4,000 years, from Bronze Age copper to modern-day coal.",
+    "lore.zone1.tip4": "The Welsh word 'mwynglawdd' means mine. 'Cloddio' means to dig — the heart of our quest.",
+
+    // Lore Tips — Zone 2: South Wales Coalfields
+    "lore.zone2.tip0": "The South Wales Coalfield was the largest in Britain. By 1913, Barry was the world's largest coal-exporting port.",
+    "lore.zone2.tip1": "Welsh male voice choirs were born in mining communities — unemployed miners formed choirs that became world-famous.",
+    "lore.zone2.tip2": "Wales is called 'Gwlad y Gân' — Land of Song. The singing tradition runs as deep as the coal seams.",
+    "lore.zone2.tip3": "A Davy safety lamp saved countless lives in Welsh mines by detecting explosive firedamp gas underground.",
+    "lore.zone2.tip4": "The Welsh concept of 'hiraeth' — a deep longing for home — resonates with mining communities scattered across the world.",
+
+    // Lore Tips — Zone 3: Parys Mountain
+    "lore.zone3.tip0": "Parys Mountain on Anglesey was once the largest copper mine in the world. Its Mars-like landscape still astonishes visitors.",
+    "lore.zone3.tip1": "The mineral Anglesite was first discovered at Parys Mountain in 1783 and named after the island of Anglesey.",
+    "lore.zone3.tip2": "Thomas Williams, the 'Copper King,' controlled global copper prices from Parys Mountain in the 1780s.",
+    "lore.zone3.tip3": "Anglesey — Ynys Môn in Welsh — was the last stronghold of the Druids before the Roman invasion in AD 61.",
+    "lore.zone3.tip4": "The vivid orange, purple, and green pools at Parys Mountain are caused by copper, iron, and sulfur minerals.",
+
+    // Lore Tips — Zone 4: Llechwedd Slate
+    "lore.zone4.tip0": "The North Wales Slate Landscape is a UNESCO World Heritage Site — the industry that roofed the world.",
+    "lore.zone4.tip1": "Llechwedd Slate Caverns at Blaenau Ffestiniog contain cathedral-like underground chambers carved by quarrymen.",
+    "lore.zone4.tip2": "Welsh slate has been quarried since Roman times. Penrhyn and Dinorwic were the two largest slate quarries on Earth.",
+    "lore.zone4.tip3": "The Druids had three orders: Ovate (green robes), Bard (blue robes), and Druid (white robes) — a progression of wisdom.",
+    "lore.zone4.tip4": "The Celtic triskele — three interlocking spirals — represents earth, water, and sky, the three realms of existence.",
+
+    // Lore Tips — Zone 5: Dolgellau Gold Belt
+    "lore.zone5.tip0": "Welsh gold from Dolgellau has been used for Royal wedding rings since the Queen Mother's in 1923.",
+    "lore.zone5.tip1": "The Clogau Gold Mine near Dolgellau was the richest in Wales, producing over 78,000 troy ounces of gold.",
+    "lore.zone5.tip2": "Welsh love spoons are carved wooden tokens of affection — each symbol has meaning: hearts for love, keys for devotion.",
+    "lore.zone5.tip3": "'Awen' means divine inspiration in Welsh — the three rays of the Awen symbol represent truth, knowledge, and poetry.",
+    "lore.zone5.tip4": "Ceridwen's Cauldron brewed the potion of Awen for a year and a day — only the first three drops held its power.",
+
+    // Lore Tips — Zone 6: Dolaucothi Roman Mines
+    "lore.zone6.tip0": "Dolaucothi is the only known Roman gold mine in Britain, operated from around AD 74 for over two centuries.",
+    "lore.zone6.tip1": "The Mabinogion contains the earliest Welsh prose tales — stories of Pwyll, Branwen, and the magical cauldron of rebirth.",
+    "lore.zone6.tip2": "In the Mabinogion, Arawn rules Annwn — the Welsh Otherworld, a realm of abundance beneath the earth.",
+    "lore.zone6.tip3": "The Preseli Bluestones of Pembrokeshire were transported 150 miles to build Stonehenge — connecting Welsh stone to sacred power.",
+    "lore.zone6.tip4": "Myrddin (Merlin) was said to be born in Carmarthen — Caerfyrddin in Welsh, meaning 'Merlin's Fort.'",
+
+    // Lore Tips — Zone 7: Dinas Emrys / Annwn
+    "lore.zone7.tip0": "Beneath Dinas Emrys in Snowdonia, two dragons sleep in an underground lake — one red, one white.",
+    "lore.zone7.tip1": "Young Merlin revealed the dragons to King Vortigern, prophesying that Y Ddraig Goch — the Red Dragon — would triumph.",
+    "lore.zone7.tip2": "Annwn, the Welsh Otherworld, means 'very deep.' It is not a dark place — it is a paradise of eternal youth and abundance.",
+    "lore.zone7.tip3": "The Cwn Annwn are spectral white hounds with red ears who hunt between worlds, guided by Gwyn ap Nudd.",
+    "lore.zone7.tip4": "Y Ddraig Goch has been the symbol of Wales for over 1,500 years — courage, defiance, and endurance given form.",
+
     // Zone-Specific Victory Text
     "victory.zone1": "The ancient copper yields its treasure",
     "victory.zone2": "The black gold of the valleys shines",
