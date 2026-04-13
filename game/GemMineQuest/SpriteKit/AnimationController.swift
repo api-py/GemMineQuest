@@ -150,13 +150,15 @@ class AnimationController {
         case .levelComplete(_, _):
             // Show "Level Complete!" popup on board before game-over screen
             let center = CGPoint(x: layout.sceneSize.width / 2, y: layout.sceneSize.height / 2)
-            let banner = createEncouragementBanner("Level Complete!", at: center, color: ColorPalette.sparkleGold, large: true)
+            let completeText = scene.localizationManager?.t("game.levelComplete") ?? "Level Complete!"
+            let banner = createEncouragementBanner(completeText, at: center, color: ColorPalette.sparkleGold, large: true)
             scene.addChild(banner)
             return 1.5
 
         case .levelFailed:
             let center = CGPoint(x: layout.sceneSize.width / 2, y: layout.sceneSize.height / 2)
-            let banner = createEncouragementBanner("Out of Moves!", at: center, color: SKColor(hex: 0xFF6347), large: true)
+            let failedText = scene.localizationManager?.t("game.outOfMoves") ?? "Out of Moves!"
+            let banner = createEncouragementBanner(failedText, at: center, color: SKColor(hex: 0xFF6347), large: true)
             scene.addChild(banner)
             return 1.2
 
@@ -486,7 +488,8 @@ class AnimationController {
         guard let scene = scene else { return 0 }
 
         // Show reshuffling banner
-        let banner = MineBlastAnimation.createBannerNode(text: "Reshuffling...", size: layout.sceneSize)
+        let shuffleText = scene.localizationManager?.t("game.reshuffling") ?? "Reshuffling..."
+        let banner = MineBlastAnimation.createBannerNode(text: shuffleText, size: layout.sceneSize)
         scene.addChild(banner)
 
         // Rebuild gems after a delay

@@ -84,7 +84,11 @@ class GameScene: SKScene {
         animationController.scene = self
 
         // Create HUD (minimal — just for score popups, not permanent display)
-        hud = HUDNode(width: size.width)
+        hud = HUDNode(
+            width: size.width,
+            scoreTitle: localizationManager?.t("hud.score") ?? "SCORE",
+            movesTitle: localizationManager?.t("hud.moves") ?? "MOVES"
+        )
         hud.position = CGPoint(x: size.width / 2, y: size.height - 10)
         hud.zPosition = 20
         hud.alpha = 0  // Hidden — SwiftUI overlay handles all info display
@@ -598,9 +602,10 @@ class GameScene: SKScene {
             // Show ore vein hint if tapping an ore tile (don't cancel touch — allow swiping)
             if let tileType = gameState?.board.tileAt(pos),
                tileType == .oreVein || tileType == .doubleOre {
-                let text = tileType == .doubleOre
-                    ? "Thick Ore \u{2014} Match here twice to mine it"
-                    : "Ore Vein \u{2014} Match gems here to mine it"
+                let lm = localizationManager
+            let text = tileType == .doubleOre
+                    ? (lm?.t("tooltip.doubleOre") ?? "Thick Ore \u{2014} Match here twice to mine it")
+                    : (lm?.t("tooltip.oreVein") ?? "Ore Vein \u{2014} Match gems here to mine it")
                 showHintTooltip(text, at: pos)
             }
             // Show special gem hint if tapping a special gem
@@ -708,37 +713,40 @@ class GameScene: SKScene {
     }
 
     private func showBlockerHint(_ blocker: BlockerType, at pos: GridPosition) {
+        let lm = localizationManager
         let text: String
         switch blocker {
         case .granite(let layers):
-            text = "Granite (\(layers) layer\(layers > 1 ? "s" : "")) - Match next to it to crack"
+            let plural = lm?.t("tooltip.granite.s") ?? (layers > 1 ? "s" : "")
+            text = lm?.t("tooltip.granite", layers, layers > 1 ? plural : "") ?? "Granite (\(layers) layer\(layers > 1 ? "s" : "")) - Match next to it to crack"
         case .boulder:
-            text = "Boulder - Match next to it to remove"
+            text = lm?.t("tooltip.boulder") ?? "Boulder - Match next to it to remove"
         case .cage:
-            text = "Caged Gem - Match the gem inside to free it"
+            text = lm?.t("tooltip.cage") ?? "Caged Gem - Match the gem inside to free it"
         case .lava:
-            text = "Lava - Spreads each turn! Match next to it"
+            text = lm?.t("tooltip.lava") ?? "Lava - Spreads each turn! Match next to it"
         case .tnt(let countdown):
-            text = "TNT (\(countdown) moves) - Clear before it explodes!"
+            text = lm?.t("tooltip.tnt", countdown) ?? "TNT (\(countdown) moves) - Clear before it explodes!"
         case .amber:
-            text = "Amber - Match next to it to break free"
+            text = lm?.t("tooltip.amber") ?? "Amber - Match next to it to break free"
         }
         showHintTooltip(text, at: pos)
     }
 
     private func showSpecialGemHint(_ special: SpecialType, at pos: GridPosition) {
+        let lm = localizationManager
         let text: String
         switch special {
         case .laserHorizontal:
-            text = "Laser Gem - Clears the entire row"
+            text = lm?.t("tooltip.laserH") ?? "Laser Gem - Clears the entire row"
         case .laserVertical:
-            text = "Laser Gem - Clears the entire column"
+            text = lm?.t("tooltip.laserV") ?? "Laser Gem - Clears the entire column"
         case .volatile:
-            text = "Volatile Gem - Explodes a 3x3 area"
+            text = lm?.t("tooltip.volatile") ?? "Volatile Gem - Explodes a 3x3 area"
         case .crystalBall:
-            text = "Crystal Ball - Swap to remove all of one color"
+            text = lm?.t("tooltip.crystalBall") ?? "Crystal Ball - Swap to remove all of one color"
         case .miningDrone:
-            text = "Mining Drone - Deploys 3 seekers to clear targets"
+            text = lm?.t("tooltip.miningDrone") ?? "Mining Drone - Deploys 3 seekers to clear targets"
         case .none:
             return
         }
@@ -1038,18 +1046,21 @@ class GameScene: SKScene {
 
     private func updateObjectiveDisplay() {
         guard let state = gameState else { return }
+        let lm = localizationManager
         let texts = state.level.objectives.map { obj -> String in
             switch obj {
             case .reachScore(let target):
-                return "Score: \(state.score)/\(target)"
+                return lm?.t("objective.scoreDisplay", state.score, target) ?? "Score: \(state.score)/\(target)"
             case .clearAllOre:
-                return "Ore: \(state.oreCleared)/\(state.totalOre)"
+                return lm?.t("objective.oreDisplay", state.oreCleared, state.totalOre) ?? "Ore: \(state.oreCleared)/\(state.totalOre)"
             case .dropTreasures(let count):
-                return "Treasure: \(state.treasuresDropped)/\(count)"
+                return lm?.t("objective.treasureDisplay", state.treasuresDropped, count) ?? "Treasure: \(state.treasuresDropped)/\(count)"
             case .collectGems(let color, let count):
-                return "\(color.displayName): \(state.gemsCollected[color] ?? 0)/\(count)"
+                let name = lm.map { color.localizedDisplayName($0) } ?? color.displayName
+                return "\(name): \(state.gemsCollected[color] ?? 0)/\(count)"
             case .collectSpecials(let type, let count):
-                return "\(type.displayName): \(state.specialsCollected[type] ?? 0)/\(count)"
+                let name = lm.map { type.localizedDisplayName($0) } ?? type.displayName
+                return "\(name): \(state.specialsCollected[type] ?? 0)/\(count)"
             }
         }
         hud.updateObjective(texts.joined(separator: "\n"))

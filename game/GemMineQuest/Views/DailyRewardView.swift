@@ -111,7 +111,7 @@ struct DailyRewardView: View {
                             }
                             if let booster = reward.boosterType {
                                 HStack(spacing: 4) {
-                                    Image(boosterIcon(booster))
+                                    Image(booster.iconAssetName)
                                         .resizable()
                                         .scaledToFit()
                                         .frame(width: 18 * s, height: 18 * s)
@@ -181,7 +181,4 @@ struct DailyRewardView: View {
         }
     }
 
-    private func boosterIcon(_ type: BoosterType) -> String {
-        type.iconAssetName
-    }
 }

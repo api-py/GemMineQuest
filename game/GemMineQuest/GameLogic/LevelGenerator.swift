@@ -33,10 +33,10 @@ class LevelGenerator {
 
         // Solvability taxes: tight safety net without making levels too easy
         let blockerCount = blockerLayout?.flatMap { $0 }.compactMap({ $0 }).count ?? 0
-        let blockerTax = min(3, blockerCount / 4)
+        let blockerTax = min(Constants.maxBlockerTax, blockerCount / Constants.blockersPerExtraMove)
 
         let oreCount = tileLayout.flatMap { $0 }.filter { $0 == 2 || $0 == 3 }.count
-        let oreTax = min(2, oreCount / 5)
+        let oreTax = min(Constants.maxOreTax, oreCount / Constants.orePerExtraMove)
 
         // TNT safety: ensure at least tntCountdown + 3 moves
         var minTNTMoves = 0
@@ -46,7 +46,7 @@ class LevelGenerator {
                 return v
             }
             if let minCountdown = tntCountdowns.min() {
-                minTNTMoves = minCountdown + 3
+                minTNTMoves = minCountdown + Constants.tntSafetyMargin
             }
         }
 

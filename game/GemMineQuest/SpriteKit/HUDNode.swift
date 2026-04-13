@@ -9,9 +9,13 @@ class HUDNode: SKNode {
     private var objectiveLabel: SKLabelNode!
     private var movesIcon: SKLabelNode!
     private let hudWidth: CGFloat
+    private let scoreTitle: String
+    private let movesTitle: String
 
-    init(width: CGFloat) {
+    init(width: CGFloat, scoreTitle: String = "SCORE", movesTitle: String = "MOVES") {
         self.hudWidth = width
+        self.scoreTitle = scoreTitle
+        self.movesTitle = movesTitle
         super.init()
         setupHUD()
     }
@@ -29,14 +33,14 @@ class HUDNode: SKNode {
         addChild(bg)
 
         // Score section (left)
-        let scoreTitleShadow = SKLabelNode(text: "SCORE")
+        let scoreTitleShadow = SKLabelNode(text: scoreTitle)
         scoreTitleShadow.fontName = "AvenirNext-Heavy"
         scoreTitleShadow.fontSize = 11
         scoreTitleShadow.fontColor = SKColor(white: 0, alpha: 0.6)
         scoreTitleShadow.position = CGPoint(x: -hudWidth * 0.3 + 1, y: 15 - 1)
         addChild(scoreTitleShadow)
 
-        let scoreTitleLabel = SKLabelNode(text: "SCORE")
+        let scoreTitleLabel = SKLabelNode(text: scoreTitle)
         scoreTitleLabel.fontName = "AvenirNext-Heavy"
         scoreTitleLabel.fontSize = 11
         scoreTitleLabel.fontColor = ColorPalette.textSecondary
@@ -59,14 +63,14 @@ class HUDNode: SKNode {
         addChild(scoreLabel)
 
         // Moves section (center)
-        let movesTitleShadow = SKLabelNode(text: "MOVES")
+        let movesTitleShadow = SKLabelNode(text: movesTitle)
         movesTitleShadow.fontName = "AvenirNext-Heavy"
         movesTitleShadow.fontSize = 11
         movesTitleShadow.fontColor = SKColor(white: 0, alpha: 0.6)
         movesTitleShadow.position = CGPoint(x: 1, y: 15 - 1)
         addChild(movesTitleShadow)
 
-        let movesTitleLabel = SKLabelNode(text: "MOVES")
+        let movesTitleLabel = SKLabelNode(text: movesTitle)
         movesTitleLabel.fontName = "AvenirNext-Heavy"
         movesTitleLabel.fontSize = 11
         movesTitleLabel.fontColor = ColorPalette.textSecondary

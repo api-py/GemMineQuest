@@ -124,8 +124,8 @@ class ProgressManager: ObservableObject {
         // Update streak
         if let lastDateStr = progress.lastDailyRewardDate,
            let lastDate = Self.dateFormatter.date(from: lastDateStr) {
-            let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date())!
-            if Calendar.current.isDate(lastDate, inSameDayAs: yesterday) {
+            if let yesterday = Calendar.current.date(byAdding: .day, value: -1, to: Date()),
+               Calendar.current.isDate(lastDate, inSameDayAs: yesterday) {
                 progress.dailyStreak = (progress.dailyStreak % 7) + 1
             } else {
                 progress.dailyStreak = 1

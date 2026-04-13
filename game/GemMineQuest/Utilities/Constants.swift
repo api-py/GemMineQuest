@@ -61,4 +61,11 @@ enum Constants {
     static let maxCascadeRounds = 50
     static let maxChainActivationRounds = 10
     static let defaultDroneCount = 3
+
+    // MARK: - Level Generation Safety Nets
+    static let maxBlockerTax = 3
+    static let blockersPerExtraMove = 4
+    static let maxOreTax = 2
+    static let orePerExtraMove = 5
+    static let tntSafetyMargin = 3
 }

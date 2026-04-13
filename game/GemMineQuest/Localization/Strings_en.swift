@@ -366,5 +366,38 @@ let englishStrings: [String: String] = [
     "victory.zone6": "The ancient Roman veins run true",
     "victory.zone7": "The dragon stirs in the deep",
 
+    // Tooltip Hints — Blockers
+    "tooltip.granite": "Granite (%d layer%@) — Match next to it to crack",
+    "tooltip.granite.s": "s",
+    "tooltip.boulder": "Boulder — Match next to it to remove",
+    "tooltip.cage": "Caged Gem — Match the gem inside to free it",
+    "tooltip.lava": "Lava — Spreads each turn! Match next to it",
+    "tooltip.tnt": "TNT (%d moves) — Clear before it explodes!",
+    "tooltip.amber": "Amber — Match next to it to break free",
+
+    // Tooltip Hints — Ore
+    "tooltip.oreVein": "Ore Vein — Match gems here to mine it",
+    "tooltip.doubleOre": "Thick Ore — Match here twice to mine it",
+
+    // Tooltip Hints — Special Gems
+    "tooltip.laserH": "Laser Gem — Clears the entire row",
+    "tooltip.laserV": "Laser Gem — Clears the entire column",
+    "tooltip.volatile": "Volatile Gem — Explodes a 3×3 area",
+    "tooltip.crystalBall": "Crystal Ball — Swap to remove all of one color",
+    "tooltip.miningDrone": "Mining Drone — Deploys 3 seekers to clear targets",
+
+    // HUD Labels
+    "hud.score": "SCORE",
+    "hud.moves": "MOVES",
+
+    // Game Banners
+    "game.levelComplete": "Level Complete!",
+    "game.outOfMoves": "Out of Moves!",
+    "game.reshuffling": "Reshuffling...",
+
+    // Objective Display
+    "objective.scoreDisplay": "Score: %d/%d",
+    "objective.oreDisplay": "Ore: %d/%d",
+    "objective.treasureDisplay": "Treasure: %d/%d",
 
 ]

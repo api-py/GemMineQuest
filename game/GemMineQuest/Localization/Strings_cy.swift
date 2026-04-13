@@ -366,5 +366,38 @@ let welshStrings: [String: String] = [
     "victory.zone6": "Mae gwythiennau Rhufeinig hynafol yn rhedeg yn wir",
     "victory.zone7": "Mae'r ddraig yn deffro yn y dyfnder",
 
+    // Tooltip Hints — Blockers
+    "tooltip.granite": "Llechi (%d haen%@) — Matshiwch wrth ei ymyl i'w gracio",
+    "tooltip.granite.s": "au",
+    "tooltip.boulder": "Maen Glas — Matshiwch wrth ei ymyl i'w symud",
+    "tooltip.cage": "Gem mewn Cawell — Matshiwch y gem i'w rhyddhau",
+    "tooltip.lava": "Tân Draig — Yn lledu bob tro! Matshiwch wrth ei ymyl",
+    "tooltip.tnt": "Ffrwydrad (%d symudiad) — Cliriwch cyn iddo ffrwydro!",
+    "tooltip.amber": "Crisial Awen — Matshiwch wrth ei ymyl i'w dorri'n rhydd",
+
+    // Tooltip Hints — Ore
+    "tooltip.oreVein": "Gwythïen Mwyn — Matshiwch emau yma i'w gloddio",
+    "tooltip.doubleOre": "Mwyn Trwchus — Matshiwch yma ddwywaith i'w gloddio",
+
+    // Tooltip Hints — Special Gems
+    "tooltip.laserH": "Gem Laser — Yn clirio'r rhes gyfan",
+    "tooltip.laserV": "Gem Laser — Yn clirio'r golofn gyfan",
+    "tooltip.volatile": "Gem Ffrwydrol — Yn ffrwydro ardal 3×3",
+    "tooltip.crystalBall": "Pelen Grisial — Cyfnewidiwch i ddileu un lliw i gyd",
+    "tooltip.miningDrone": "Drôn Mwyngloddio — Yn anfon 3 chwiliwr i glirio targedau",
+
+    // HUD Labels
+    "hud.score": "SGÔR",
+    "hud.moves": "SYMUDIADAU",
+
+    // Game Banners
+    "game.levelComplete": "Lefel Wedi'i Chwblhau!",
+    "game.outOfMoves": "Dim Symudiadau ar ôl!",
+    "game.reshuffling": "Yn Ailgymysgu...",
+
+    // Objective Display
+    "objective.scoreDisplay": "Sgôr: %d/%d",
+    "objective.oreDisplay": "Mwyn: %d/%d",
+    "objective.treasureDisplay": "Trysor: %d/%d",
 
 ]
