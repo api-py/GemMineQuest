@@ -56,7 +56,7 @@ struct BoosterBarView: View {
                 RoundedRectangle(cornerRadius: 18)
                     .fill(
                         LinearGradient(
-                            colors: [Color(hex: 0x1A2E18).opacity(0.95), Color(hex: 0x0D1A0C).opacity(0.95)],
+                            colors: [Color(hex: 0x1A2E18).opacity(0.95), ColorPalette.uiListRow.opacity(0.95)],
                             startPoint: .top, endPoint: .bottom
                         )
                     )
@@ -165,7 +165,7 @@ struct BoosterButton: View {
                             Circle()
                                 .fill(
                                     godMode ? Color(hex: 0xC71414)
-                                    : (count > 0 ? Color(hex: 0xE8A035) : Color.gray.opacity(0.4))
+                                    : (count > 0 ? ColorPalette.uiAmber : Color.gray.opacity(0.4))
                                 )
                                 .overlay(
                                     Circle()
@@ -177,11 +177,11 @@ struct BoosterButton: View {
 
                 Text(label)
                     .font(.system(size: 8 * s, weight: .semibold))
-                    .foregroundColor(isAvailable ? Color(hex: 0xCCDDCC) : Color(hex: 0x5A4530))
+                    .foregroundColor(isAvailable ? Color(hex: 0xCCDDCC) : ColorPalette.uiDarkBrown)
 
                 Text(hint)
                     .font(.system(size: 6 * s))
-                    .foregroundColor(Color(hex: 0x8B7355))
+                    .foregroundColor(ColorPalette.uiBrown)
             }
         }
         .disabled(!isAvailable)

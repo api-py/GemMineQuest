@@ -50,7 +50,7 @@ struct MainMenuView: View {
                 ZStack {
                     Circle()
                         .fill(RadialGradient(
-                            colors: [Color(hex: 0xFFD700).opacity(0.2), Color.clear],
+                            colors: [ColorPalette.uiGold.opacity(0.2), Color.clear],
                             center: .center, startRadius: 5, endRadius: 80
                         ))
                         .frame(width: 160 * s, height: 160 * s)
@@ -60,7 +60,7 @@ struct MainMenuView: View {
                             .resizable()
                             .aspectRatio(contentMode: .fit)
                             .frame(height: 120 * s)
-                            .shadow(color: Color(hex: 0xFFD700).opacity(0.4), radius: 12)
+                            .shadow(color: ColorPalette.uiGold.opacity(0.4), radius: 12)
                             .shadow(color: .black, radius: 3)
                             .compositingGroup()
                     } else {
@@ -68,12 +68,12 @@ struct MainMenuView: View {
                             .font(.system(size: 44))
                             .foregroundStyle(
                                 LinearGradient(
-                                    colors: [Color(hex: 0xFFD700), Color(hex: 0xE8A035)],
+                                    colors: [ColorPalette.uiGold, ColorPalette.uiAmber],
                                     startPoint: .top, endPoint: .bottom
                                 )
                             )
                             .rotationEffect(.degrees(gemRotation))
-                            .shadow(color: Color(hex: 0xFFD700).opacity(0.4), radius: 8)
+                            .shadow(color: ColorPalette.uiGold.opacity(0.4), radius: 8)
                     }
                 }
                 .padding(.bottom, 8)
@@ -85,7 +85,7 @@ struct MainMenuView: View {
                             .font(.system(size: 48, weight: .black, design: .rounded))
                             .foregroundStyle(
                                 LinearGradient(
-                                    colors: [Color(hex: 0xFFD700), Color(hex: 0xFF8C00)],
+                                    colors: [ColorPalette.uiGold, Color(hex: 0xFF8C00)],
                                     startPoint: .leading, endPoint: .trailing
                                 )
                             )
@@ -93,7 +93,7 @@ struct MainMenuView: View {
 
                         Text(localizationManager.t("menu.title2"))
                             .font(.system(size: 32, weight: .bold, design: .rounded))
-                            .foregroundColor(Color(hex: 0xE8A035))
+                            .foregroundColor(ColorPalette.uiAmber)
                             .tracking(8)
                     }
                     .shadow(color: .black.opacity(0.6), radius: 10)
@@ -156,7 +156,7 @@ struct MainMenuView: View {
                         Text(localizationManager.t("menu.shop"))
                             .font(.body.weight(.semibold))
                     }
-                    .foregroundColor(Color(hex: 0xFFD700))
+                    .foregroundColor(ColorPalette.uiGold)
                     .frame(maxWidth: 200 * s)
                     .padding(.vertical, 14)
                     .background(
@@ -180,7 +180,7 @@ struct MainMenuView: View {
                         Text(localizationManager.t("menu.settings"))
                             .font(.body.weight(.semibold))
                     }
-                    .foregroundColor(Color(hex: 0xCCBB99))
+                    .foregroundColor(ColorPalette.uiCream)
                     .frame(maxWidth: 200 * s)
                     .padding(.vertical, 14)
                     .background(
@@ -206,12 +206,12 @@ struct MainMenuView: View {
                                 Text("\(progressManager.progress.highestUnlocked)")
                                     .font(.system(size: 28, weight: .bold, design: .rounded))
                                     .foregroundStyle(
-                                        LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xE8A035)],
+                                        LinearGradient(colors: [ColorPalette.uiGold, ColorPalette.uiAmber],
                                                        startPoint: .top, endPoint: .bottom)
                                     )
                                 Text(localizationManager.t("menu.level"))
                                     .font(.system(size: 9, weight: .bold))
-                                    .foregroundColor(Color(hex: 0x8B7355))
+                                    .foregroundColor(ColorPalette.uiBrown)
                                     .tracking(1)
                             }
 
@@ -220,7 +220,7 @@ struct MainMenuView: View {
                                 HStack(spacing: 3) {
                                     Text("\(totalStars)")
                                         .font(.system(size: 28, weight: .bold, design: .rounded))
-                                        .foregroundColor(Color(hex: 0xFFD700))
+                                        .foregroundColor(ColorPalette.uiGold)
                                     if let _ = UIImage(named: "star_filled") {
                                         Image("star_filled")
                                             .resizable()
@@ -228,12 +228,12 @@ struct MainMenuView: View {
                                     } else {
                                         Image(systemName: "star.fill")
                                             .font(.system(size: 14))
-                                            .foregroundColor(Color(hex: 0xFFD700))
+                                            .foregroundColor(ColorPalette.uiGold)
                                     }
                                 }
                                 Text(localizationManager.t("menu.stars"))
                                     .font(.system(size: 9, weight: .bold))
-                                    .foregroundColor(Color(hex: 0x8B7355))
+                                    .foregroundColor(ColorPalette.uiBrown)
                                     .tracking(1)
                             }
 
@@ -241,12 +241,12 @@ struct MainMenuView: View {
                             VStack(spacing: 2) {
                                 Text("\(totalScore)")
                                     .font(.system(size: 20, weight: .bold, design: .rounded))
-                                    .foregroundColor(Color(hex: 0xE8A035))
+                                    .foregroundColor(ColorPalette.uiAmber)
                                     .minimumScaleFactor(0.6)
                                     .lineLimit(1)
                                 Text(localizationManager.t("menu.totalScore"))
                                     .font(.system(size: 9, weight: .bold))
-                                    .foregroundColor(Color(hex: 0x8B7355))
+                                    .foregroundColor(ColorPalette.uiBrown)
                                     .tracking(1)
                             }
                         }

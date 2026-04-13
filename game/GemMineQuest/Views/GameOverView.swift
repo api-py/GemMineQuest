@@ -63,35 +63,35 @@ struct GameOverView: View {
                                 .aspectRatio(contentMode: .fit)
                                 .frame(width: 100 * Constants.uiScale, height: 100 * Constants.uiScale)
                                 .clipShape(Circle())
-                                .overlay(Circle().stroke(Color(hex: 0xFFD700), lineWidth: 3))
-                                .shadow(color: Color(hex: 0xFFD700).opacity(0.4), radius: 12)
+                                .overlay(Circle().stroke(ColorPalette.uiGold, lineWidth: 3))
+                                .shadow(color: ColorPalette.uiGold.opacity(0.4), radius: 12)
                         } else {
                             Circle()
                                 .fill(RadialGradient(
-                                    colors: [Color(hex: 0xFFD700).opacity(0.12), Color.clear],
+                                    colors: [ColorPalette.uiGold.opacity(0.12), Color.clear],
                                     center: .center, startRadius: 10, endRadius: 100
                                 ))
                                 .frame(width: 200, height: 200)
                                 .overlay(
                                     Image(systemName: "diamond.fill")
                                         .font(.system(size: 32))
-                                        .foregroundColor(Color(hex: 0xFFD700).opacity(0.5))
+                                        .foregroundColor(ColorPalette.uiGold.opacity(0.5))
                                 )
                         }
 
                         Text(localizationManager.t("gameOver.levelComplete", levelNumber))
                             .font(.system(size: 30 * Constants.uiScale, weight: .bold, design: .rounded))
                             .foregroundStyle(
-                                LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xE8A035)],
+                                LinearGradient(colors: [ColorPalette.uiGold, ColorPalette.uiAmber],
                                                startPoint: .top, endPoint: .bottom)
                             )
-                            .shadow(color: Color(hex: 0xFFD700).opacity(0.3), radius: 8)
+                            .shadow(color: ColorPalette.uiGold.opacity(0.3), radius: 8)
                             .scaleEffect(bannerScale)
                             .transition(.scale.combined(with: .opacity))
 
                         Text(WelshPlaceNames.name(for: levelNumber))
                             .font(.system(size: 16 * Constants.uiScale, weight: .medium, design: .serif))
-                            .foregroundColor(Color(hex: 0xCCBB99))
+                            .foregroundColor(ColorPalette.uiCream)
                             .italic()
 
                         // Zone-specific victory flavor text
@@ -107,7 +107,7 @@ struct GameOverView: View {
                     if showStars {
                         StarRatingView(stars: stars, size: 40 * Constants.uiScale)
                             .transition(.scale)
-                            .shadow(color: Color(hex: 0xFFD700).opacity(0.4), radius: 6)
+                            .shadow(color: ColorPalette.uiGold.opacity(0.4), radius: 6)
                     }
 
                     // Phase 3: Treasure Chest
@@ -115,7 +115,7 @@ struct GameOverView: View {
                         ZStack {
                             Circle()
                                 .fill(RadialGradient(
-                                    colors: [Color(hex: 0xFFD700).opacity(0.15), .clear],
+                                    colors: [ColorPalette.uiGold.opacity(0.15), .clear],
                                     center: .center, startRadius: 5, endRadius: 60
                                 ))
                                 .frame(width: 120, height: 120)
@@ -123,10 +123,10 @@ struct GameOverView: View {
                             Image(systemName: "shippingbox.fill")
                                 .font(.system(size: 48))
                                 .foregroundStyle(
-                                    LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xC9A84C)],
+                                    LinearGradient(colors: [ColorPalette.uiGold, Color(hex: 0xC9A84C)],
                                                    startPoint: .top, endPoint: .bottom)
                                 )
-                                .shadow(color: Color(hex: 0xFFD700).opacity(0.4), radius: 8)
+                                .shadow(color: ColorPalette.uiGold.opacity(0.4), radius: 8)
                         }
                         .scaleEffect(chestScale)
                         .offset(y: chestBounce ? -5 : 5)
@@ -153,7 +153,7 @@ struct GameOverView: View {
                             HStack(spacing: 16) {
                                 Label(localizationManager.t("gameOver.goldReward", coinReward), systemImage: "dollarsign.circle.fill")
                                     .font(.system(size: 16, weight: .bold))
-                                    .foregroundColor(Color(hex: 0xFFD700))
+                                    .foregroundColor(ColorPalette.uiGold)
                             }
                         }
                         .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -173,7 +173,7 @@ struct GameOverView: View {
 
                     Text(localizationManager.t("gameOver.outOfMoves"))
                         .font(.body)
-                        .foregroundColor(Color(hex: 0xCCBB99))
+                        .foregroundColor(ColorPalette.uiCream)
 
                     // "Need more moves?" purchase options
                     if showMoreMovesOffer {
@@ -184,7 +184,7 @@ struct GameOverView: View {
 
                             Text(localizationManager.t("gameOver.goldAvailable", playerCoins))
                                 .font(.system(size: 12, weight: .medium))
-                                .foregroundColor(Color(hex: 0x8B7355))
+                                .foregroundColor(ColorPalette.uiBrown)
 
                             ForEach([(1, 25), (5, 100), (15, 200)], id: \.0) { moves, cost in
                                 Button {
@@ -192,7 +192,7 @@ struct GameOverView: View {
                                 } label: {
                                     HStack(spacing: 8) {
                                         Image(systemName: "plus.circle.fill")
-                                            .foregroundColor(Color(hex: 0xFFD700))
+                                            .foregroundColor(ColorPalette.uiGold)
                                         Text(moves > 1
                                              ? localizationManager.t("gameOver.plusMoves", moves)
                                              : localizationManager.t("gameOver.plusMove", moves))
@@ -206,8 +206,8 @@ struct GameOverView: View {
                                                 .font(.system(size: 14, weight: .bold))
                                         }
                                         .foregroundColor(playerCoins >= cost
-                                            ? Color(hex: 0xFFD700)
-                                            : Color(hex: 0x5A4530))
+                                            ? ColorPalette.uiGold
+                                            : ColorPalette.uiDarkBrown)
                                     }
                                     .padding(.horizontal, 16)
                                     .padding(.vertical, 10)
@@ -289,7 +289,7 @@ struct GameOverView: View {
                         Button(action: onMenu) {
                             Text(localizationManager.t("gameOver.backToMap"))
                                 .font(.subheadline)
-                                .foregroundColor(Color(hex: 0x8B7355))
+                                .foregroundColor(ColorPalette.uiBrown)
                         }
                         .padding(.top, 8)
                     }

@@ -67,13 +67,13 @@ class GameEngine {
         events.append(contentsOf: processEndOfTurn())
 
         // Shuffle levels: shuffle all gems after every 3rd move
-        if state.isShuffleLevel && state.movesMade % 3 == 0 && !state.isComplete && !state.isFailed {
+        if state.isShuffleLevel && state.movesMade % Constants.shuffleInterval == 0 && !state.isComplete && !state.isFailed {
             shuffleBoard()
             events.append(.boardShuffled)
         }
 
         // Worm mechanic: every 5 moves on worm levels, worm eats a random gem/blocker
-        if state.isWormLevel && state.movesMade % 5 == 0 && !state.isComplete && !state.isFailed {
+        if state.isWormLevel && state.movesMade % Constants.wormInterval == 0 && !state.isComplete && !state.isFailed {
             events.append(contentsOf: processWorm())
         }
 
@@ -171,9 +171,8 @@ class GameEngine {
             // 6. Score the matches
             for match in matches {
                 let delta = scoreCalculator.scoreForMatch(match, chainIndex: chainIndex)
-                state.score += delta
                 if let centerPos = match.positions.first {
-                    events.append(.scoreUpdated(newScore: state.score, delta: delta, at: centerPos))
+                    addScore(delta, at: centerPos, to: &events)
                 }
             }
 
@@ -226,8 +225,7 @@ class GameEngine {
             if !affected.isEmpty {
                 events.append(.specialActivated(type: specialGem.special, at: specialPos, affected: affected))
                 let delta = scoreCalculator.scoreForSpecialActivation(specialGem.special)
-                state.score += delta
-                events.append(.scoreUpdated(newScore: state.score, delta: delta, at: specialPos))
+                addScore(delta, at: specialPos, to: &events)
                 board.removeGem(at: specialPos)
                 for pos in affected { board.removeGem(at: pos) }
                 let adjacentEvents = blockerManager.processMatchAdjacent(
@@ -268,8 +266,7 @@ class GameEngine {
         events.append(.specialActivated(type: .crystalBall, at: crystalPos, affected: affected))
 
         let delta = scoreCalculator.scoreForSpecialActivation(.crystalBall)
-        state.score += delta
-        events.append(.scoreUpdated(newScore: state.score, delta: delta, at: crystalPos))
+        addScore(delta, at: crystalPos, to: &events)
 
         board.removeGem(at: crystalPos)
         for pos in affected { board.removeGem(at: pos) }
@@ -336,8 +333,7 @@ class GameEngine {
         ))
 
         let delta = scoreCalculator.scoreForSpecialActivation(.crystalBall) * 3
-        state.score += delta
-        events.append(.scoreUpdated(newScore: state.score, delta: delta, at: crystalPos))
+        addScore(delta, at: crystalPos, to: &events)
 
         let (falls, newGems) = boardFiller.dropAndFill(board: board, numColors: state.level.effectiveNumColors)
         if !falls.isEmpty { events.append(.gemsFell(moves: falls)) }
@@ -370,8 +366,7 @@ class GameEngine {
             }
 
             let delta = scoreCalculator.scoreForSpecialActivation(.crystalBall) * 5
-            state.score += delta
-            events.append(.scoreUpdated(newScore: state.score, delta: delta, at: posA))
+            addScore(delta, at: posA, to: &events)
 
             // Refill with guaranteed specials
             let (falls, newGems) = boardFiller.dropAndFill(board: board, numColors: state.level.effectiveNumColors)
@@ -412,8 +407,7 @@ class GameEngine {
 
         let delta = scoreCalculator.scoreForSpecialActivation(gemA.special) +
                     scoreCalculator.scoreForSpecialActivation(gemB.special)
-        state.score += delta
-        events.append(.scoreUpdated(newScore: state.score, delta: delta, at: posA))
+        addScore(delta, at: posA, to: &events)
 
         // Chain-activate any special gems hit by the combo
         var activated = Set<GridPosition>([posA, posB])
@@ -450,8 +444,7 @@ class GameEngine {
                 }
 
                 let chainDelta = scoreCalculator.scoreForSpecialActivation(gem.special)
-                state.score += chainDelta
-                events.append(.scoreUpdated(newScore: state.score, delta: chainDelta, at: pos))
+                addScore(chainDelta, at: pos, to: &events)
             }
             toActivate = nextRound
             chainRound += 1
@@ -566,8 +559,7 @@ class GameEngine {
                 if !affected.isEmpty {
                     events.append(.specialActivated(type: gem.special, at: pos, affected: affected))
                     let delta = scoreCalculator.scoreForSpecialActivation(gem.special)
-                    state.score += delta
-                    events.append(.scoreUpdated(newScore: state.score, delta: delta, at: pos))
+                    addScore(delta, at: pos, to: &events)
 
                     events.append(contentsOf: blockerManager.damageBlockersInPath(affected, on: board))
 
@@ -589,6 +581,12 @@ class GameEngine {
 
     // MARK: - Helpers
 
+    /// Centralized score update: mutates state and appends the UI event.
+    private func addScore(_ delta: Int, at position: GridPosition, to events: inout [GameEvent]) {
+        state.score += delta
+        events.append(.scoreUpdated(newScore: state.score, delta: delta, at: position))
+    }
+
     /// Deploy drones from a position (used for chain reactions when a drone is destroyed).
     private func deployDrones(from pos: GridPosition, count: Int) -> [GameEvent] {
         var events: [GameEvent] = []
@@ -608,8 +606,7 @@ class GameEngine {
                 if !chainAffected.isEmpty {
                     events.append(.specialActivated(type: tGem.special, at: target, affected: chainAffected))
                     let delta = scoreCalculator.scoreForSpecialActivation(tGem.special)
-                    state.score += delta
-                    events.append(.scoreUpdated(newScore: state.score, delta: delta, at: target))
+                    addScore(delta, at: target, to: &events)
                     for p in chainAffected { board.removeGem(at: p) }
                     let droneChainAdj = blockerManager.processMatchAdjacent(
                         matchedPositions: chainAffected, on: board

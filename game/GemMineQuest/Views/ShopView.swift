@@ -45,10 +45,10 @@ struct ShopView: View {
                 Text(localizationManager.t("shop.title"))
                     .font(.system(size: 32 * s, weight: .black, design: .rounded))
                     .foregroundStyle(
-                        LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xE8A035)],
+                        LinearGradient(colors: [ColorPalette.uiGold, ColorPalette.uiAmber],
                                        startPoint: .top, endPoint: .bottom)
                     )
-                    .shadow(color: Color(hex: 0xFFD700).opacity(0.4), radius: 8)
+                    .shadow(color: ColorPalette.uiGold.opacity(0.4), radius: 8)
                     .padding(.horizontal, 24)
                     .padding(.vertical, 12)
                     .celticBorder(cornerSize: 36)
@@ -57,10 +57,10 @@ struct ShopView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "star.circle.fill")
                         .font(.system(size: 22 * s))
-                        .foregroundColor(Color(hex: 0xFFD700))
+                        .foregroundColor(ColorPalette.uiGold)
                     Text(isGodMode ? "\u{221E}" : "\(progressManager.progress.coins)")
                         .font(.system(size: 24 * s, weight: .bold, design: .rounded))
-                        .foregroundColor(Color(hex: 0xFFD700))
+                        .foregroundColor(ColorPalette.uiGold)
                 }
                 .padding(.horizontal, 16)
                 .padding(.vertical, 8)
@@ -97,7 +97,7 @@ struct ShopView: View {
             ZStack {
                 Circle()
                     .fill(RadialGradient(
-                        colors: [Color(hex: 0xFFD700).opacity(0.15), Color.clear],
+                        colors: [ColorPalette.uiGold.opacity(0.15), Color.clear],
                         center: .center, startRadius: 2, endRadius: 30
                     ))
                     .frame(width: 50 * s, height: 50 * s)
@@ -119,14 +119,14 @@ struct ShopView: View {
             let owned = boosterInventory.count(for: item.boosterType)
             Text(localizationManager.t("shop.owned", owned))
                 .font(.system(size: max(10 * s, 10), weight: .medium))
-                .foregroundColor(Color(hex: 0x8B7355))
+                .foregroundColor(ColorPalette.uiBrown)
 
             // Price + BUY button
             Button(action: { purchaseItem(item) }) {
                 HStack(spacing: 4) {
                     Image(systemName: "star.circle.fill")
                         .font(.system(size: 12 * s))
-                        .foregroundColor(Color(hex: 0xFFD700))
+                        .foregroundColor(ColorPalette.uiGold)
                     Text("\(item.price)")
                         .font(.system(size: 14 * s, weight: .bold, design: .rounded))
                 }

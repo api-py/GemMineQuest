@@ -43,18 +43,18 @@ struct MilestonePopupView: View {
                 ZStack {
                     Circle()
                         .fill(RadialGradient(
-                            colors: [Color(hex: 0xFFD700).opacity(0.25), .clear],
+                            colors: [ColorPalette.uiGold.opacity(0.25), .clear],
                             center: .center, startRadius: 10, endRadius: 80
                         ))
                         .frame(width: 160 * s, height: 160 * s)
 
                     Circle()
                         .fill(
-                            LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xC9A84C)],
+                            LinearGradient(colors: [ColorPalette.uiGold, Color(hex: 0xC9A84C)],
                                            startPoint: .top, endPoint: .bottom)
                         )
                         .frame(width: 80 * s, height: 80 * s)
-                        .shadow(color: Color(hex: 0xFFD700).opacity(0.5), radius: 12)
+                        .shadow(color: ColorPalette.uiGold.opacity(0.5), radius: 12)
 
                     Image(systemName: icon)
                         .font(.system(size: 36 * s, weight: .bold))
@@ -64,16 +64,16 @@ struct MilestonePopupView: View {
                 // Title
                 Text(localizationManager.t("milestone.reached"))
                     .font(.system(size: 14 * s, weight: .bold))
-                    .foregroundColor(Color(hex: 0xCCBB99))
+                    .foregroundColor(ColorPalette.uiCream)
                     .tracking(2)
 
                 Text(title)
                     .font(.system(size: 26 * s, weight: .black, design: .rounded))
                     .foregroundStyle(
-                        LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xE8A035)],
+                        LinearGradient(colors: [ColorPalette.uiGold, ColorPalette.uiAmber],
                                        startPoint: .top, endPoint: .bottom)
                     )
-                    .shadow(color: Color(hex: 0xFFD700).opacity(0.3), radius: 6)
+                    .shadow(color: ColorPalette.uiGold.opacity(0.3), radius: 6)
                     .multilineTextAlignment(.center)
 
                 // Reward

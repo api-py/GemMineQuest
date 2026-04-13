@@ -16,7 +16,7 @@ struct AchievementToastView: View {
                 ZStack {
                     Circle()
                         .fill(
-                            LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xC9A84C)],
+                            LinearGradient(colors: [ColorPalette.uiGold, Color(hex: 0xC9A84C)],
                                            startPoint: .top, endPoint: .bottom)
                         )
                         .frame(width: 44 * s, height: 44 * s)
@@ -30,7 +30,7 @@ struct AchievementToastView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text(localizationManager.t("achievement.unlocked"))
                         .font(.system(size: 11 * s, weight: .bold))
-                        .foregroundColor(Color(hex: 0xFFD700))
+                        .foregroundColor(ColorPalette.uiGold)
 
                     Text(achievement.localizedDisplayName(localizationManager))
                         .font(.system(size: 16 * s, weight: .heavy, design: .rounded))
@@ -38,7 +38,7 @@ struct AchievementToastView: View {
 
                     Text(localizationManager.t("achievement.gold", achievement.coinReward))
                         .font(.system(size: 12 * s, weight: .semibold))
-                        .foregroundColor(Color(hex: 0xCCBB99))
+                        .foregroundColor(ColorPalette.uiCream)
                 }
 
                 Spacer()
@@ -55,7 +55,7 @@ struct AchievementToastView: View {
                         RoundedRectangle(cornerRadius: 16)
                             .stroke(Color(hex: 0xC9A84C).opacity(0.4), lineWidth: 1.5)
                     )
-                    .shadow(color: Color(hex: 0xFFD700).opacity(0.2), radius: 12, y: 4)
+                    .shadow(color: ColorPalette.uiGold.opacity(0.2), radius: 12, y: 4)
             )
             .padding(.horizontal, 20)
             .offset(y: offsetY)

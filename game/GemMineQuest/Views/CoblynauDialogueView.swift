@@ -17,7 +17,7 @@ struct CoblynauDialogueView: View {
             if showBubble && !message.isEmpty {
                 Text(message)
                     .font(.system(size: max(11 * s, 10), weight: .regular, design: .serif))
-                    .foregroundColor(Color(hex: 0xCCBB99))
+                    .foregroundColor(ColorPalette.uiCream)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 12)
                     .padding(.vertical, 8)

@@ -224,7 +224,7 @@ class ProgressManager: ObservableObject {
 
     private func save() {
         guard let data = try? JSONEncoder().encode(progress) else {
-            assertionFailure("[ProgressManager] Failed to encode progress")
+            print("[ProgressManager] Failed to encode progress")
             return
         }
         UserDefaults.standard.set(data, forKey: Self.storageKey)

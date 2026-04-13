@@ -63,13 +63,13 @@ struct EventBannerView: View {
                     Text(eventTitle)
                         .font(.system(size: 16 * s, weight: .heavy, design: .rounded))
                         .foregroundStyle(
-                            LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xE8A035)],
+                            LinearGradient(colors: [ColorPalette.uiGold, ColorPalette.uiAmber],
                                            startPoint: .leading, endPoint: .trailing)
                         )
 
                     Text(eventDescription)
                         .font(.system(size: 12 * s, weight: .medium))
-                        .foregroundColor(Color(hex: 0xCCBB99))
+                        .foregroundColor(ColorPalette.uiCream)
 
                     // Countdown
                     HStack(spacing: 4) {

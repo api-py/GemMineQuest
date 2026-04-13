@@ -50,17 +50,17 @@ struct SpinWheelView: View {
                 Text(localizationManager.t("spin.title"))
                     .font(.system(size: 28 * s, weight: .black, design: .rounded))
                     .foregroundStyle(
-                        LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xE8A035)],
+                        LinearGradient(colors: [ColorPalette.uiGold, ColorPalette.uiAmber],
                                        startPoint: .top, endPoint: .bottom)
                     )
-                    .shadow(color: Color(hex: 0xFFD700).opacity(0.4), radius: 8)
+                    .shadow(color: ColorPalette.uiGold.opacity(0.4), radius: 8)
 
                 // Wheel
                 ZStack {
                     // Outer ring
                     Circle()
                         .stroke(
-                            LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xC9A84C)],
+                            LinearGradient(colors: [ColorPalette.uiGold, Color(hex: 0xC9A84C)],
                                            startPoint: .top, endPoint: .bottom),
                             lineWidth: 6
                         )
@@ -82,18 +82,18 @@ struct SpinWheelView: View {
                     // Center circle
                     Circle()
                         .fill(
-                            LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xC9A84C)],
+                            LinearGradient(colors: [ColorPalette.uiGold, Color(hex: 0xC9A84C)],
                                            startPoint: .top, endPoint: .bottom)
                         )
                         .frame(width: 40 * s, height: 40 * s)
-                        .shadow(color: Color(hex: 0xFFD700).opacity(0.5), radius: 6)
+                        .shadow(color: ColorPalette.uiGold.opacity(0.5), radius: 6)
 
                     // Pointer (top)
                     VStack {
                         Triangle()
-                            .fill(Color(hex: 0xFFD700))
+                            .fill(ColorPalette.uiGold)
                             .frame(width: 24 * s, height: 20 * s)
-                            .shadow(color: Color(hex: 0xFFD700).opacity(0.5), radius: 4)
+                            .shadow(color: ColorPalette.uiGold.opacity(0.5), radius: 4)
                         Spacer()
                     }
                     .frame(height: 280 * s)
@@ -104,7 +104,7 @@ struct SpinWheelView: View {
                     VStack(spacing: 8) {
                         Text(localizationManager.t("spin.youWon"))
                             .font(.system(size: 24 * s, weight: .black, design: .rounded))
-                            .foregroundColor(Color(hex: 0xFFD700))
+                            .foregroundColor(ColorPalette.uiGold)
 
                         Text(prize.label)
                             .font(.system(size: 20 * s, weight: .bold))
@@ -153,7 +153,7 @@ struct SpinWheelView: View {
                 Button(action: onDismiss) {
                     Text(localizationManager.t("spin.close"))
                         .font(.subheadline)
-                        .foregroundColor(Color(hex: 0x8B7355))
+                        .foregroundColor(ColorPalette.uiBrown)
                 }
                 .padding(.top, 8)
 

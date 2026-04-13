@@ -59,14 +59,14 @@ struct GameContainerView: View {
                         } else {
                             Image(systemName: "person.fill")
                                 .font(.system(size: 22))
-                                .foregroundColor(Color(hex: 0xFFD700))
+                                .foregroundColor(ColorPalette.uiGold)
                                 .frame(width: 42 * s, height: 42 * s)
                                 .background(Circle().fill(Color(hex: 0x3D2B1F)))
                                 .overlay(Circle().stroke(Color(hex: 0xC9A84C), lineWidth: 2))
                         }
                         Text(localizationManager.t("game.lv", levelNumber))
                             .font(.system(size: 10 * s, weight: .heavy, design: .rounded))
-                            .foregroundColor(Color(hex: 0xFFD700))
+                            .foregroundColor(ColorPalette.uiGold)
                     }
 
                     Spacer(minLength: 6)
@@ -106,7 +106,7 @@ struct GameContainerView: View {
                     VStack(spacing: 0) {
                         Text(localizationManager.t("game.moves"))
                             .font(.system(size: 10 * s, weight: .bold))
-                            .foregroundColor(Color(hex: 0x8B7355))
+                            .foregroundColor(ColorPalette.uiBrown)
                         Text(viewModel.godModeEnabled ? "\u{221E}" : "\(viewModel.displayMoves)")
                             .font(.system(size: 28 * s, weight: .black, design: .rounded))
                             .foregroundColor(viewModel.displayMoves <= 3 && !viewModel.godModeEnabled
@@ -146,11 +146,11 @@ struct GameContainerView: View {
                     HStack(spacing: 4) {
                         Image(systemName: "star.fill")
                             .font(.system(size: 14 * s))
-                            .foregroundColor(Color(hex: 0xFFD700))
+                            .foregroundColor(ColorPalette.uiGold)
                         Text("\(viewModel.displayScore)")
                             .font(.system(size: 18 * s, weight: .black, design: .rounded))
                             .foregroundStyle(
-                                LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xE8A035)],
+                                LinearGradient(colors: [ColorPalette.uiGold, ColorPalette.uiAmber],
                                                startPoint: .top, endPoint: .bottom)
                             )
                     }
@@ -189,7 +189,7 @@ struct GameContainerView: View {
                     HStack(spacing: 3) {
                         Text(localizationManager.t("game.god"))
                             .font(.system(size: 8 * s, weight: .bold))
-                            .foregroundColor(viewModel.godModeEnabled ? Color(hex: 0xFFD700) : Color(hex: 0x6B5A40))
+                            .foregroundColor(viewModel.godModeEnabled ? ColorPalette.uiGold : Color(hex: 0x6B5A40))
                         Toggle("", isOn: $viewModel.godModeEnabled)
                             .toggleStyle(CompactToggleStyle())
                             .onChange(of: viewModel.godModeEnabled) { _, newValue in
@@ -301,7 +301,7 @@ struct GameContainerView: View {
                         .padding(.vertical, 8)
                         .background(Capsule().fill(
                             viewModel.godModeEnabled
-                                ? Color(hex: 0xE8A035).opacity(0.9)
+                                ? ColorPalette.uiAmber.opacity(0.9)
                                 : Color(hex: 0x3D2B1F).opacity(0.9)
                         ))
                         .transition(.move(edge: .top).combined(with: .opacity))
@@ -523,28 +523,28 @@ struct LevelTransitionView: View {
                         .font(.system(size: 44))
                         .foregroundStyle(
                             LinearGradient(
-                                colors: [Color(hex: 0xFFD700), Color(hex: 0xE8A035)],
+                                colors: [ColorPalette.uiGold, ColorPalette.uiAmber],
                                 startPoint: .top, endPoint: .bottom
                             )
                         )
-                        .shadow(color: Color(hex: 0xFFD700).opacity(0.4), radius: 10)
+                        .shadow(color: ColorPalette.uiGold.opacity(0.4), radius: 10)
                 }
 
                 // Level number
                 Text(localizationManager.t("levelDetail.level", levelNumber))
                     .font(.system(size: 42 * s, weight: .black, design: .rounded))
                     .foregroundStyle(
-                        LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xE8A035)],
+                        LinearGradient(colors: [ColorPalette.uiGold, ColorPalette.uiAmber],
                                        startPoint: .top, endPoint: .bottom)
                     )
-                    .shadow(color: Color(hex: 0xFFD700).opacity(0.3), radius: 10)
+                    .shadow(color: ColorPalette.uiGold.opacity(0.3), radius: 10)
                     .scaleEffect(bannerScale)
                     .opacity(bannerOpacity)
 
                 // Welsh place name
                 Text(levelName)
                     .font(.system(size: 18 * s, weight: .medium, design: .serif))
-                    .foregroundColor(Color(hex: 0xCCBB99))
+                    .foregroundColor(ColorPalette.uiCream)
                     .italic()
                     .opacity(subtitleOpacity)
 
@@ -565,16 +565,16 @@ struct LevelTransitionView: View {
                     ForEach(level.objectives.indices, id: \.self) { i in
                         HStack(spacing: 6) {
                             Circle()
-                                .fill(Color(hex: 0xE8A035))
+                                .fill(ColorPalette.uiAmber)
                                 .frame(width: 5, height: 5)
                             Text(level.objectives[i].localizedDisplayText(localizationManager))
                                 .font(.system(size: 14 * s))
-                                .foregroundColor(Color(hex: 0x8B7355))
+                                .foregroundColor(ColorPalette.uiBrown)
                         }
                     }
                     Text(localizationManager.t("levelDetail.moves", level.maxMoves))
                         .font(.system(size: 14 * s, weight: .bold))
-                        .foregroundColor(Color(hex: 0xE8A035))
+                        .foregroundColor(ColorPalette.uiAmber)
                 }
                 .opacity(subtitleOpacity)
                 .padding(.top, 4)
@@ -583,7 +583,7 @@ struct LevelTransitionView: View {
 
                 Text(localizationManager.t("game.getReady"))
                     .font(.system(size: 13 * s, weight: .medium))
-                    .foregroundColor(Color(hex: 0x5A4530))
+                    .foregroundColor(ColorPalette.uiDarkBrown)
                     .opacity(subtitleOpacity)
                     .padding(.bottom, 40)
             }
@@ -615,7 +615,7 @@ private struct SceneHostView: View {
             SpriteView(scene: scene)
                 .ignoresSafeArea()
         } else {
-            Color(hex: 0x061206)
+            ColorPalette.uiBackground
                 .onAppear {
                     let _ = viewModel.createScene(size: size, godMode: godMode)
                 }
@@ -647,9 +647,9 @@ struct ObjectiveIconView: View {
 
     private var bgColor: Color {
         switch objective {
-        case .reachScore: return Color(hex: 0xFFD700)
+        case .reachScore: return ColorPalette.uiGold
         case .clearAllOre: return Color(hex: 0x8B6914)
-        case .dropTreasures: return Color(hex: 0xE8A035)
+        case .dropTreasures: return ColorPalette.uiAmber
         case .collectGems: return Color(hex: 0xC71414)
         case .collectSpecials: return Color(hex: 0x8B00FF)
         }
@@ -710,7 +710,7 @@ struct ObjectiveIconView: View {
             // Progress text below icon
             Text(progressText)
                 .font(.system(size: max(9 * s, 10), weight: .heavy, design: .rounded))
-                .foregroundColor(isComplete ? Color(hex: 0x4CAF50) : Color(hex: 0x5A4530))
+                .foregroundColor(isComplete ? Color(hex: 0x4CAF50) : ColorPalette.uiDarkBrown)
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
         }
@@ -728,7 +728,7 @@ struct CompactToggleStyle: ToggleStyle {
     func makeBody(configuration: Configuration) -> some View {
         Button { configuration.isOn.toggle() } label: {
             RoundedRectangle(cornerRadius: 8)
-                .fill(configuration.isOn ? Color(hex: 0xE8A035) : Color(hex: 0x3D2B1F))
+                .fill(configuration.isOn ? ColorPalette.uiAmber : Color(hex: 0x3D2B1F))
                 .frame(width: 36 * s, height: 20 * s)
                 .overlay(
                     Circle().fill(.white).frame(width: 16 * s, height: 16 * s)

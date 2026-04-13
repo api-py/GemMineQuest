@@ -48,7 +48,7 @@ struct LevelDetailSheet: View {
                             Button(action: onDismiss) {
                                 Image(systemName: "chevron.left")
                                     .font(.system(size: 18, weight: .bold))
-                                    .foregroundColor(Color(hex: 0xCCBB99))
+                                    .foregroundColor(ColorPalette.uiCream)
                                     .padding(10)
                                     .background(Circle().fill(Color.black.opacity(0.4)))
                             }
@@ -59,12 +59,12 @@ struct LevelDetailSheet: View {
                         // Level number and Welsh name
                         Text(localizationManager.t("levelDetail.level", levelNumber))
                             .font(.system(size: 32 * s, weight: .bold, design: .rounded))
-                            .foregroundColor(Color(hex: 0xFFD700))
+                            .foregroundColor(ColorPalette.uiGold)
 
                         HStack(spacing: 8) {
                             Text(WelshPlaceNames.name(for: levelNumber))
                                 .font(.system(size: 18 * s, weight: .medium, design: .serif))
-                                .foregroundColor(Color(hex: 0xCCBB99))
+                                .foregroundColor(ColorPalette.uiCream)
                                 .italic()
 
                             if let badge = difficultyBadge {
@@ -132,7 +132,7 @@ struct LevelDetailSheet: View {
                                 Text(loreTip)
                                     .font(.system(size: max(14, 12 * Constants.uiScale), weight: .regular, design: .serif))
                                     .italic()
-                                    .foregroundColor(Color(hex: 0xCCBB99).opacity(0.8))
+                                    .foregroundColor(ColorPalette.uiCream.opacity(0.8))
                                     .multilineTextAlignment(.center)
                                     .padding(.horizontal, 24)
                                     .padding(.vertical, 8)
@@ -146,7 +146,7 @@ struct LevelDetailSheet: View {
                                 StarRatingView(stars: progressManager.progress.stars(for: levelNumber), size: 24 * Constants.uiScale)
                                 Text(localizationManager.t("levelDetail.best", progressManager.progress.highScore(for: levelNumber)))
                                     .font(.caption)
-                                    .foregroundColor(Color(hex: 0xCCBB99))
+                                    .foregroundColor(ColorPalette.uiCream)
                             }
                         }
 
@@ -156,20 +156,20 @@ struct LevelDetailSheet: View {
                         VStack(spacing: 12) {
                             Text(localizationManager.t("levelDetail.objectives"))
                                 .font(.headline)
-                                .foregroundColor(Color(hex: 0xE8A035))
+                                .foregroundColor(ColorPalette.uiAmber)
 
                             ForEach(level.objectives.indices, id: \.self) { i in
                                 VStack(alignment: .leading, spacing: 2) {
                                     HStack {
                                         Image(systemName: objectiveIcon(level.objectives[i]))
-                                            .foregroundColor(Color(hex: 0xFFD700))
+                                            .foregroundColor(ColorPalette.uiGold)
                                         Text(level.objectives[i].localizedDisplayText(localizationManager))
                                             .foregroundColor(.white)
                                         Spacer()
                                     }
                                     Text(level.objectives[i].localizedDescriptionText(localizationManager))
                                         .font(.caption)
-                                        .foregroundColor(Color(hex: 0x8B7355))
+                                        .foregroundColor(ColorPalette.uiBrown)
                                         .padding(.leading, 28)
                                 }
                                 .padding(.horizontal)
@@ -179,9 +179,9 @@ struct LevelDetailSheet: View {
                         // Move limit
                         HStack {
                             Image(systemName: "figure.walk")
-                                .foregroundColor(Color(hex: 0xCCBB99))
+                                .foregroundColor(ColorPalette.uiCream)
                             Text(localizationManager.t("levelDetail.moves", level.maxMoves))
-                                .foregroundColor(Color(hex: 0xCCBB99))
+                                .foregroundColor(ColorPalette.uiCream)
                         }
 
                         // Shuffle warning

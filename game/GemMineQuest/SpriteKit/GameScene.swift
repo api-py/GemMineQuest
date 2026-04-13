@@ -548,7 +548,7 @@ class GameScene: SKScene {
 
     func setGemSprite(_ sprite: GemSprite, at pos: GridPosition) {
         guard isValidGemPosition(pos) else {
-            assertionFailure("setGemSprite called with invalid position: \(pos)")
+            print("[GameScene] setGemSprite called with invalid position: \(pos)")
             return
         }
         gemSprites[pos.row][pos.column] = sprite
@@ -718,17 +718,17 @@ class GameScene: SKScene {
         switch blocker {
         case .granite(let layers):
             let plural = lm?.t("tooltip.granite.s") ?? (layers > 1 ? "s" : "")
-            text = lm?.t("tooltip.granite", layers, layers > 1 ? plural : "") ?? "Granite (\(layers) layer\(layers > 1 ? "s" : "")) - Match next to it to crack"
+            text = lm?.t("tooltip.granite", layers, layers > 1 ? plural : "") ?? "Granite (\(layers) layer\(layers > 1 ? "s" : "")) \u{2014} Match next to it to crack"
         case .boulder:
-            text = lm?.t("tooltip.boulder") ?? "Boulder - Match next to it to remove"
+            text = lm?.t("tooltip.boulder") ?? "Boulder \u{2014} Match next to it to remove"
         case .cage:
-            text = lm?.t("tooltip.cage") ?? "Caged Gem - Match the gem inside to free it"
+            text = lm?.t("tooltip.cage") ?? "Caged Gem \u{2014} Match the gem inside to free it"
         case .lava:
-            text = lm?.t("tooltip.lava") ?? "Lava - Spreads each turn! Match next to it"
+            text = lm?.t("tooltip.lava") ?? "Lava \u{2014} Spreads each turn! Match next to it"
         case .tnt(let countdown):
-            text = lm?.t("tooltip.tnt", countdown) ?? "TNT (\(countdown) moves) - Clear before it explodes!"
+            text = lm?.t("tooltip.tnt", countdown) ?? "TNT (\(countdown) moves) \u{2014} Clear before it explodes!"
         case .amber:
-            text = lm?.t("tooltip.amber") ?? "Amber - Match next to it to break free"
+            text = lm?.t("tooltip.amber") ?? "Amber \u{2014} Match next to it to break free"
         }
         showHintTooltip(text, at: pos)
     }
@@ -738,15 +738,15 @@ class GameScene: SKScene {
         let text: String
         switch special {
         case .laserHorizontal:
-            text = lm?.t("tooltip.laserH") ?? "Laser Gem - Clears the entire row"
+            text = lm?.t("tooltip.laserH") ?? "Laser Gem \u{2014} Clears the entire row"
         case .laserVertical:
-            text = lm?.t("tooltip.laserV") ?? "Laser Gem - Clears the entire column"
+            text = lm?.t("tooltip.laserV") ?? "Laser Gem \u{2014} Clears the entire column"
         case .volatile:
-            text = lm?.t("tooltip.volatile") ?? "Volatile Gem - Explodes a 3x3 area"
+            text = lm?.t("tooltip.volatile") ?? "Volatile Gem \u{2014} Explodes a 3\u{00d7}3 area"
         case .crystalBall:
-            text = lm?.t("tooltip.crystalBall") ?? "Crystal Ball - Swap to remove all of one color"
+            text = lm?.t("tooltip.crystalBall") ?? "Crystal Ball \u{2014} Swap to remove all of one color"
         case .miningDrone:
-            text = lm?.t("tooltip.miningDrone") ?? "Mining Drone - Deploys 3 seekers to clear targets"
+            text = lm?.t("tooltip.miningDrone") ?? "Mining Drone \u{2014} Deploys 3 seekers to clear targets"
         case .none:
             return
         }

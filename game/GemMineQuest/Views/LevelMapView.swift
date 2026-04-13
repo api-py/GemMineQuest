@@ -41,7 +41,7 @@ struct LevelMapView: View {
 
                 Text(localizationManager.t("levelMap.title"))
                     .font(.system(size: 22 * Constants.uiScale, weight: .bold, design: .rounded))
-                    .foregroundColor(Color(hex: 0xFFD700))
+                    .foregroundColor(ColorPalette.uiGold)
 
                 Spacer()
 
@@ -49,10 +49,10 @@ struct LevelMapView: View {
                 HStack(spacing: 4) {
                     Image(systemName: "star.circle.fill")
                         .font(.system(size: 16 * Constants.uiScale))
-                        .foregroundColor(Color(hex: 0xFFD700))
+                        .foregroundColor(ColorPalette.uiGold)
                     Text(isGodMode ? "\u{221E}" : "\(progressManager.progress.coins)")
                         .font(.system(size: 14 * Constants.uiScale, weight: .bold, design: .rounded))
-                        .foregroundColor(Color(hex: 0xFFD700))
+                        .foregroundColor(ColorPalette.uiGold)
                 }
                 .padding(.horizontal, 10)
                 .padding(.vertical, 5)
@@ -134,10 +134,10 @@ struct LevelMapView: View {
                 Button(action: spinAction) {
                     ZStack {
                         Circle()
-                            .fill(LinearGradient(colors: [Color(hex: 0xE8A035), Color(hex: 0xC68020)], startPoint: .top, endPoint: .bottom))
+                            .fill(LinearGradient(colors: [ColorPalette.uiAmber, Color(hex: 0xC68020)], startPoint: .top, endPoint: .bottom))
                             .frame(width: 60 * Constants.uiScale, height: 60 * Constants.uiScale)
-                            .overlay(Circle().stroke(Color(hex: 0xFFD700), lineWidth: 2))
-                            .shadow(color: Color(hex: 0xE8A035).opacity(0.4), radius: 8)
+                            .overlay(Circle().stroke(ColorPalette.uiGold, lineWidth: 2))
+                            .shadow(color: ColorPalette.uiAmber.opacity(0.4), radius: 8)
                         Image(systemName: "arrow.trianglehead.2.clockwise.rotate.90")
                             .font(.system(size: 22 * Constants.uiScale, weight: .bold)).foregroundColor(.white)
                         if progressManager.hasFreeSpin() {
@@ -305,7 +305,7 @@ struct ZoneHeaderView: View {
                         .foregroundColor(zone.accentColor)
                     Text(localizationManager.t(zone.taglineKey))
                         .font(.system(size: 10, weight: .regular, design: .serif))
-                        .foregroundColor(Color(hex: 0xCCBB99).opacity(0.7))
+                        .foregroundColor(ColorPalette.uiCream.opacity(0.7))
                         .italic()
                 }
 
@@ -364,7 +364,7 @@ struct LevelNodeView: View {
                             Circle()
                                 .fill(RadialGradient(
                                     colors: [
-                                        (isCurrent ? Color(hex: 0xFFD700) : Color(hex: 0xFFAA00)).opacity(0.3),
+                                        (isCurrent ? ColorPalette.uiGold : Color(hex: 0xFFAA00)).opacity(0.3),
                                         .clear
                                     ],
                                     center: .center, startRadius: nodeSize * 0.2, endRadius: nodeSize * 0.9
@@ -376,7 +376,7 @@ struct LevelNodeView: View {
                         Circle()
                             .stroke(
                                 item.isUnlocked
-                                    ? LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xC9A84C)],
+                                    ? LinearGradient(colors: [ColorPalette.uiGold, Color(hex: 0xC9A84C)],
                                                      startPoint: .top, endPoint: .bottom)
                                     : LinearGradient(colors: [Color(hex: 0x4A3520), Color(hex: 0x2A1E10)],
                                                      startPoint: .top, endPoint: .bottom),
@@ -410,7 +410,7 @@ struct LevelNodeView: View {
                             if !item.isUnlocked {
                                 Image(systemName: "lock.fill")
                                     .font(.system(size: fontSize * 0.3))
-                                    .foregroundColor(Color(hex: 0x5A4530))
+                                    .foregroundColor(ColorPalette.uiDarkBrown)
                             }
                         }
                     }
@@ -424,7 +424,7 @@ struct LevelNodeView: View {
                         }
                         Text(WelshPlaceNames.name(for: item.number))
                             .font(.system(size: nameFontSize, weight: .semibold))
-                            .foregroundColor(item.isUnlocked ? Color(hex: 0xFFD700) : Color(hex: 0x7A6A50))
+                            .foregroundColor(item.isUnlocked ? ColorPalette.uiGold : Color(hex: 0x7A6A50))
                             .lineLimit(1)
                     }
                     .padding(.horizontal, 8)

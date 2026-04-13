@@ -47,8 +47,8 @@ class HUDNode: SKNode {
         scoreTitleLabel.position = CGPoint(x: -hudWidth * 0.3, y: 15)
         addChild(scoreTitleLabel)
 
-        scoreShadowLabel = SKLabelNode(text: "0")
-        let scoreShadow = scoreShadowLabel!
+        let scoreShadow = SKLabelNode(text: "0")
+        scoreShadowLabel = scoreShadow
         scoreShadow.fontName = "AvenirNext-Heavy"
         scoreShadow.fontSize = 26
         scoreShadow.fontColor = SKColor(white: 0, alpha: 0.6)
@@ -77,8 +77,8 @@ class HUDNode: SKNode {
         movesTitleLabel.position = CGPoint(x: 0, y: 15)
         addChild(movesTitleLabel)
 
-        movesShadowLabel = SKLabelNode(text: "20")
-        let movesShadow = movesShadowLabel!
+        let movesShadow = SKLabelNode(text: "20")
+        movesShadowLabel = movesShadow
         movesShadow.fontName = "AvenirNext-Heavy"
         movesShadow.fontSize = 28
         movesShadow.fontColor = SKColor(white: 0, alpha: 0.6)

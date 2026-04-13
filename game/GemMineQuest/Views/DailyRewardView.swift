@@ -34,15 +34,15 @@ struct DailyRewardView: View {
                 Text(localizationManager.t("daily.title"))
                     .font(.system(size: 28 * s, weight: .black, design: .rounded))
                     .foregroundStyle(
-                        LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xE8A035)],
+                        LinearGradient(colors: [ColorPalette.uiGold, ColorPalette.uiAmber],
                                        startPoint: .top, endPoint: .bottom)
                     )
-                    .shadow(color: Color(hex: 0xFFD700).opacity(0.4), radius: 8)
+                    .shadow(color: ColorPalette.uiGold.opacity(0.4), radius: 8)
 
                 // Streak counter
                 Text(localizationManager.t("daily.dayStreak", progressManager.progress.dailyStreak))
                     .font(.system(size: 16 * s, weight: .semibold))
-                    .foregroundColor(Color(hex: 0xCCBB99))
+                    .foregroundColor(ColorPalette.uiCream)
 
                 // 7-day reward row
                 ScrollView(.horizontal, showsIndicators: false) {
@@ -55,7 +55,7 @@ struct DailyRewardView: View {
                             VStack(spacing: 4) {
                                 Text(localizationManager.t("daily.day", day))
                                     .font(.system(size: max(10 * s, 10), weight: .bold))
-                                    .foregroundColor(isCurrent ? Color(hex: 0xFFD700) : .white)
+                                    .foregroundColor(isCurrent ? ColorPalette.uiGold : .white)
 
                                 ZStack {
                                     RoundedRectangle(cornerRadius: 10)
@@ -67,13 +67,13 @@ struct DailyRewardView: View {
                                         .frame(width: 52 * s, height: 64 * s)
 
                                     RoundedRectangle(cornerRadius: 10)
-                                        .stroke(isCurrent ? Color(hex: 0xFFD700) : Color(hex: 0x4A3520), lineWidth: 2)
+                                        .stroke(isCurrent ? ColorPalette.uiGold : Color(hex: 0x4A3520), lineWidth: 2)
                                         .frame(width: 52 * s, height: 64 * s)
 
                                     VStack(spacing: 2) {
                                         Image(systemName: dayRewardIcon(day))
                                             .font(.system(size: 18 * s))
-                                            .foregroundColor(isPast ? Color(hex: 0x6B5A40) : Color(hex: 0xFFD700))
+                                            .foregroundColor(isPast ? Color(hex: 0x6B5A40) : ColorPalette.uiGold)
 
                                         Text("\(dayRewards[index].coins)")
                                             .font(.system(size: max(10 * s, 10), weight: .bold))
@@ -103,7 +103,7 @@ struct DailyRewardView: View {
                         HStack(spacing: 16) {
                             if reward.coinAmount > 0 {
                                 Label("+\(reward.coinAmount)", systemImage: "star.circle.fill")
-                                    .foregroundColor(Color(hex: 0xFFD700))
+                                    .foregroundColor(ColorPalette.uiGold)
                             }
                             if reward.gemAmount > 0 {
                                 Label("+\(reward.gemAmount)", systemImage: "diamond.fill")
@@ -145,7 +145,7 @@ struct DailyRewardView: View {
                 Button(action: onDismiss) {
                     Text(showClaimed ? localizationManager.t("daily.continue") : localizationManager.t("daily.skip"))
                         .font(.subheadline)
-                        .foregroundColor(Color(hex: 0x8B7355))
+                        .foregroundColor(ColorPalette.uiBrown)
                 }
                 .padding(.top, 8)
 

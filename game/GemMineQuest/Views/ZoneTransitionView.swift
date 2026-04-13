@@ -67,7 +67,7 @@ struct ZoneTransitionView: View {
                 // Tagline
                 Text(localizationManager.t(zone.taglineKey))
                     .font(.system(size: 14 * s, weight: .regular))
-                    .foregroundColor(Color(hex: 0xCCBB99))
+                    .foregroundColor(ColorPalette.uiCream)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 40)
 

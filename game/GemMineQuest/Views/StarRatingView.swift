@@ -26,12 +26,12 @@ struct StarRatingView: View {
                         .resizable()
                         .scaledToFit()
                         .frame(width: size, height: size)
-                        .shadow(color: Color(hex: 0xFFD700).opacity(0.4), radius: 3)
+                        .shadow(color: ColorPalette.uiGold.opacity(0.4), radius: 3)
                 } else {
                     // Fallback to system stars
                     Image(systemName: earned ? "star.fill" : "star")
                         .font(.system(size: size))
-                        .foregroundColor(earned ? Color(hex: 0xFFD700) : Color.gray.opacity(0.4))
+                        .foregroundColor(earned ? ColorPalette.uiGold : Color.gray.opacity(0.4))
                 }
             }
         }

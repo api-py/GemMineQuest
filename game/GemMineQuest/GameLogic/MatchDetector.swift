@@ -8,69 +8,11 @@ class MatchDetector {
     /// Sliding window scan for horizontal then vertical, collect ALL matched positions,
     /// then classify patterns to determine special gem creation.
     func detectMatches(on board: Board) -> [MatchResult] {
-        var horizontalSegments: [Segment] = []
-        var verticalSegments: [Segment] = []
-
-        // Phase 1: Find all horizontal segments of 3+
-        for row in 0..<board.numRows {
-            var col = 0
-            while col <= board.numColumns - 3 {
-                guard let gem = board[row, col],
-                      board.isPlayable(row: row, col: col),
-                      gem.special != .crystalBall else {
-                    col += 1; continue
-                }
-                let color = gem.color
-                guard let gem2 = board[row, col + 1], gem2.color == color, gem2.special != .crystalBall,
-                      board.isPlayable(row: row, col: col + 1),
-                      let gem3 = board[row, col + 2], gem3.color == color, gem3.special != .crystalBall,
-                      board.isPlayable(row: row, col: col + 2) else {
-                    col += 1; continue
-                }
-                // Found at least 3 — extend as far as possible
-                var end = col + 2
-                while end + 1 < board.numColumns,
-                      let nextGem = board[row, end + 1],
-                      nextGem.color == color,
-                      nextGem.special != .crystalBall,
-                      board.isPlayable(row: row, col: end + 1) {
-                    end += 1
-                }
-                let positions = (col...end).map { GridPosition(row: row, column: $0) }
-                horizontalSegments.append(Segment(positions: positions, color: color, isHorizontal: true))
-                col = end + 1 // Skip past this segment
-            }
-        }
-
-        // Phase 2: Find all vertical segments of 3+
-        for col in 0..<board.numColumns {
-            var row = 0
-            while row <= board.numRows - 3 {
-                guard let gem = board[row, col],
-                      board.isPlayable(row: row, col: col),
-                      gem.special != .crystalBall else {
-                    row += 1; continue
-                }
-                let color = gem.color
-                guard let gem2 = board[row + 1, col], gem2.color == color, gem2.special != .crystalBall,
-                      board.isPlayable(row: row + 1, col: col),
-                      let gem3 = board[row + 2, col], gem3.color == color, gem3.special != .crystalBall,
-                      board.isPlayable(row: row + 2, col: col) else {
-                    row += 1; continue
-                }
-                var end = row + 2
-                while end + 1 < board.numRows,
-                      let nextGem = board[end + 1, col],
-                      nextGem.color == color,
-                      nextGem.special != .crystalBall,
-                      board.isPlayable(row: end + 1, col: col) {
-                    end += 1
-                }
-                let positions = (row...end).map { GridPosition(row: $0, column: col) }
-                verticalSegments.append(Segment(positions: positions, color: color, isHorizontal: false))
-                row = end + 1
-            }
-        }
+        // Phase 1 & 2: Find all horizontal and vertical segments of 3+
+        let horizontalSegments = findSegments(on: board, primaryCount: board.numColumns,
+                                               secondaryCount: board.numRows, isHorizontal: true)
+        let verticalSegments = findSegments(on: board, primaryCount: board.numRows,
+                                             secondaryCount: board.numColumns, isHorizontal: false)
 
         // Phase 3: Find 2×2 square matches
         var squareResults: [MatchResult] = []
@@ -181,6 +123,54 @@ class MatchDetector {
             }
         }
         return false
+    }
+
+    // MARK: - Segment Scanning
+
+    /// Unified segment finder for both horizontal and vertical directions.
+    /// `primaryCount` is the axis being scanned (columns for horizontal, rows for vertical).
+    /// `secondaryCount` is the perpendicular axis (rows for horizontal, columns for vertical).
+    private func findSegments(on board: Board, primaryCount: Int, secondaryCount: Int, isHorizontal: Bool) -> [Segment] {
+        var segments: [Segment] = []
+        for secondary in 0..<secondaryCount {
+            var primary = 0
+            while primary <= primaryCount - 3 {
+                let row = isHorizontal ? secondary : primary
+                let col = isHorizontal ? primary : secondary
+                guard let gem = board[row, col],
+                      board.isPlayable(row: row, col: col),
+                      gem.special != .crystalBall else {
+                    primary += 1; continue
+                }
+                let color = gem.color
+                let r1 = isHorizontal ? secondary : primary + 1
+                let c1 = isHorizontal ? primary + 1 : secondary
+                let r2 = isHorizontal ? secondary : primary + 2
+                let c2 = isHorizontal ? primary + 2 : secondary
+                guard let gem2 = board[r1, c1], gem2.color == color, gem2.special != .crystalBall,
+                      board.isPlayable(row: r1, col: c1),
+                      let gem3 = board[r2, c2], gem3.color == color, gem3.special != .crystalBall,
+                      board.isPlayable(row: r2, col: c2) else {
+                    primary += 1; continue
+                }
+                var end = primary + 2
+                while end + 1 < primaryCount {
+                    let nr = isHorizontal ? secondary : end + 1
+                    let nc = isHorizontal ? end + 1 : secondary
+                    guard let nextGem = board[nr, nc],
+                          nextGem.color == color,
+                          nextGem.special != .crystalBall,
+                          board.isPlayable(row: nr, col: nc) else { break }
+                    end += 1
+                }
+                let positions = (primary...end).map { p in
+                    isHorizontal ? GridPosition(row: secondary, column: p) : GridPosition(row: p, column: secondary)
+                }
+                segments.append(Segment(positions: positions, color: color, isHorizontal: isHorizontal))
+                primary = end + 1
+            }
+        }
+        return segments
     }
 
     // MARK: - Classification (reference algorithm Section 2)

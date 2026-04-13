@@ -11,7 +11,7 @@ struct SettingsView: View {
 
     var body: some View {
         ZStack {
-            Color(hex: 0x061206).ignoresSafeArea()
+            ColorPalette.uiBackground.ignoresSafeArea()
 
             VStack(spacing: 0) {
                 // Header
@@ -19,13 +19,13 @@ struct SettingsView: View {
                     Button(action: onDismiss) {
                         Image(systemName: "chevron.left")
                             .font(.title3.weight(.bold))
-                            .foregroundColor(Color(hex: 0xCCBB99))
+                            .foregroundColor(ColorPalette.uiCream)
                             .padding(12)
                     }
                     Spacer()
                     Text(localizationManager.t("settings.title"))
                         .font(.title2.weight(.bold))
-                        .foregroundColor(Color(hex: 0xFFD700))
+                        .foregroundColor(ColorPalette.uiGold)
                     Spacer()
                     Color.clear.frame(width: 44, height: 44)
                 }
@@ -36,121 +36,68 @@ struct SettingsView: View {
                     Section {
                         HStack {
                             Image(systemName: "globe")
-                                .foregroundColor(Color(hex: 0xFFD700))
+                                .foregroundColor(ColorPalette.uiGold)
                                 .frame(width: 30)
                             Text(localizationManager.t("settings.language"))
                                 .foregroundColor(.white)
                             Spacer()
                             HStack(spacing: 8) {
-                                Button {
-                                    localizationManager.setLanguage(.english)
-                                } label: {
-                                    HStack(spacing: 4) {
-                                        CartoonEnglishFlag()
-                                            .frame(width: 24, height: 16)
-                                            .clipShape(RoundedRectangle(cornerRadius: 3))
-                                        Text(localizationManager.t("settings.langEN"))
-                                            .font(.system(size: 12, weight: .bold))
-                                    }
-                                    .foregroundColor(localizationManager.currentLanguage == .english ? Color(hex: 0xFFD700) : Color(hex: 0x8B7355))
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical, 6)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 8)
-                                            .fill(localizationManager.currentLanguage == .english
-                                                  ? Color(hex: 0xE8A035).opacity(0.2)
-                                                  : Color.clear)
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 8)
-                                                    .stroke(localizationManager.currentLanguage == .english
-                                                            ? Color(hex: 0xE8A035).opacity(0.5)
-                                                            : Color(hex: 0x5A4530).opacity(0.3), lineWidth: 1)
-                                            )
-                                    )
-                                }
-                                .buttonStyle(.plain)
-
-                                Button {
-                                    localizationManager.setLanguage(.welsh)
-                                } label: {
-                                    HStack(spacing: 4) {
-                                        CartoonWelshFlag()
-                                            .frame(width: 24, height: 16)
-                                            .clipShape(RoundedRectangle(cornerRadius: 3))
-                                        Text(localizationManager.t("settings.langCY"))
-                                            .font(.system(size: 12, weight: .bold))
-                                    }
-                                    .foregroundColor(localizationManager.currentLanguage == .welsh ? Color(hex: 0xFFD700) : Color(hex: 0x8B7355))
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical, 6)
-                                    .background(
-                                        RoundedRectangle(cornerRadius: 8)
-                                            .fill(localizationManager.currentLanguage == .welsh
-                                                  ? Color(hex: 0xE8A035).opacity(0.2)
-                                                  : Color.clear)
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 8)
-                                                    .stroke(localizationManager.currentLanguage == .welsh
-                                                            ? Color(hex: 0xE8A035).opacity(0.5)
-                                                            : Color(hex: 0x5A4530).opacity(0.3), lineWidth: 1)
-                                            )
-                                    )
-                                }
-                                .buttonStyle(.plain)
+                                LanguageToggleButton(language: .english, flag: AnyView(CartoonEnglishFlag()), labelKey: "settings.langEN")
+                                LanguageToggleButton(language: .welsh, flag: AnyView(CartoonWelshFlag()), labelKey: "settings.langCY")
                             }
                         }
                     } header: {
                         Text(localizationManager.t("settings.language"))
-                            .foregroundColor(Color(hex: 0xE8A035))
+                            .foregroundColor(ColorPalette.uiAmber)
                     }
-                    .listRowBackground(Color(hex: 0x0D1A0C))
+                    .listRowBackground(ColorPalette.uiListRow)
 
                     #if DEBUG
                     Section {
                         // God Mode toggle
                         HStack {
                             Image(systemName: "infinity")
-                                .foregroundColor(Color(hex: 0xFFD700))
+                                .foregroundColor(ColorPalette.uiGold)
                                 .frame(width: 30)
                             Toggle(localizationManager.t("settings.godMode"), isOn: $settingsManager.godModeEnabled)
-                                .tint(Color(hex: 0xE8A035))
+                                .tint(ColorPalette.uiAmber)
                         }
 
                         if settingsManager.godModeEnabled {
                             Text(localizationManager.t("settings.godModeDesc"))
                                 .font(.caption)
-                                .foregroundColor(Color(hex: 0x8B7355))
+                                .foregroundColor(ColorPalette.uiBrown)
                         }
                     } header: {
                         Text(localizationManager.t("settings.gameplay"))
-                            .foregroundColor(Color(hex: 0xE8A035))
+                            .foregroundColor(ColorPalette.uiAmber)
                     }
-                    .listRowBackground(Color(hex: 0x0D1A0C))
+                    .listRowBackground(ColorPalette.uiListRow)
                     #endif
 
                     Section {
                         HStack {
                             Image(systemName: "iphone.radiowaves.left.and.right")
-                                .foregroundColor(Color(hex: 0xCCBB99))
+                                .foregroundColor(ColorPalette.uiCream)
                                 .frame(width: 30)
                             Toggle(localizationManager.t("settings.hapticFeedback"), isOn: $settingsManager.hapticsEnabled)
-                                .tint(Color(hex: 0xE8A035))
+                                .tint(ColorPalette.uiAmber)
                         }
                     } header: {
                         Text(localizationManager.t("settings.feedback"))
-                            .foregroundColor(Color(hex: 0xE8A035))
+                            .foregroundColor(ColorPalette.uiAmber)
                     }
-                    .listRowBackground(Color(hex: 0x0D1A0C))
+                    .listRowBackground(ColorPalette.uiListRow)
 
                     Section {
                         ForEach(BoosterInventory.allInGameBoosters, id: \.self) { booster in
                             BoosterSettingsRow(booster: booster, inventory: boosterInventory)
                         }
-                        Text(localizationManager.t("settings.boosterNote")).font(.caption).foregroundColor(Color(hex: 0x8B7355))
+                        Text(localizationManager.t("settings.boosterNote")).font(.caption).foregroundColor(ColorPalette.uiBrown)
                     } header: {
-                        Text(localizationManager.t("settings.boosters")).foregroundColor(Color(hex: 0xE8A035))
+                        Text(localizationManager.t("settings.boosters")).foregroundColor(ColorPalette.uiAmber)
                     }
-                    .listRowBackground(Color(hex: 0x0D1A0C))
+                    .listRowBackground(ColorPalette.uiListRow)
 
                     Section {
                         // Progress info
@@ -159,7 +106,7 @@ struct SettingsView: View {
                                 .foregroundColor(.white)
                             Spacer()
                             Text("\(progressManager.progress.highestUnlocked)")
-                                .foregroundColor(Color(hex: 0xCCBB99))
+                                .foregroundColor(ColorPalette.uiCream)
                         }
 
                         HStack {
@@ -167,7 +114,7 @@ struct SettingsView: View {
                                 .foregroundColor(.white)
                             Spacer()
                             Text("\(progressManager.progress.levelStars.count)")
-                                .foregroundColor(Color(hex: 0xCCBB99))
+                                .foregroundColor(ColorPalette.uiCream)
                         }
 
                         HStack {
@@ -176,13 +123,13 @@ struct SettingsView: View {
                             Spacer()
                             let totalStars = progressManager.progress.levelStars.values.reduce(0, +)
                             Text("\(totalStars)")
-                                .foregroundColor(Color(hex: 0xFFD700))
+                                .foregroundColor(ColorPalette.uiGold)
                         }
                     } header: {
                         Text(localizationManager.t("settings.progress"))
-                            .foregroundColor(Color(hex: 0xE8A035))
+                            .foregroundColor(ColorPalette.uiAmber)
                     }
-                    .listRowBackground(Color(hex: 0x0D1A0C))
+                    .listRowBackground(ColorPalette.uiListRow)
 
                     Section {
                         Button(action: { showResetConfirmation = true }) {
@@ -193,7 +140,7 @@ struct SettingsView: View {
                             .foregroundColor(.red)
                         }
                     }
-                    .listRowBackground(Color(hex: 0x0D1A0C))
+                    .listRowBackground(ColorPalette.uiListRow)
                 }
                 .scrollContentBackground(.hidden)
                 .listStyle(.insetGrouped)
@@ -208,6 +155,42 @@ struct SettingsView: View {
         } message: {
             Text(localizationManager.t("settings.resetMessage"))
         }
+    }
+}
+
+// MARK: - Language Toggle Button
+
+private struct LanguageToggleButton: View {
+    let language: AppLanguage
+    let flag: AnyView
+    let labelKey: String
+    @EnvironmentObject var localizationManager: LocalizationManager
+
+    var body: some View {
+        let isSelected = localizationManager.currentLanguage == language
+        Button {
+            localizationManager.setLanguage(language)
+        } label: {
+            HStack(spacing: 4) {
+                flag
+                    .frame(width: 24, height: 16)
+                    .clipShape(RoundedRectangle(cornerRadius: 3))
+                Text(localizationManager.t(labelKey))
+                    .font(.system(size: 12, weight: .bold))
+            }
+            .foregroundColor(isSelected ? ColorPalette.uiGold : ColorPalette.uiBrown)
+            .padding(.horizontal, 8)
+            .padding(.vertical, 6)
+            .background(
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(isSelected ? ColorPalette.uiAmber.opacity(0.2) : Color.clear)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(isSelected ? ColorPalette.uiAmber.opacity(0.5) : ColorPalette.uiDarkBrown.opacity(0.3), lineWidth: 1)
+                    )
+            )
+        }
+        .buttonStyle(.plain)
     }
 }
 
@@ -247,13 +230,13 @@ struct BoosterSettingsRow: View {
                     inventory.decrement(booster)
                 } label: {
                     Image(systemName: "minus.circle.fill")
-                        .foregroundColor(inventory.count(for: booster) > 0 ? Color(hex: 0xE8A035) : Color(hex: 0x5A4530))
+                        .foregroundColor(inventory.count(for: booster) > 0 ? ColorPalette.uiAmber : ColorPalette.uiDarkBrown)
                 }
                 .disabled(inventory.count(for: booster) <= 0)
                 .buttonStyle(.plain)
 
                 Text("\(inventory.count(for: booster))")
-                    .foregroundColor(Color(hex: 0xCCBB99))
+                    .foregroundColor(ColorPalette.uiCream)
                     .frame(minWidth: 20)
                     .monospacedDigit()
 
@@ -263,14 +246,14 @@ struct BoosterSettingsRow: View {
                     }
                 } label: {
                     Image(systemName: "plus.circle.fill")
-                        .foregroundColor(inventory.count(for: booster) >= 5 ? Color(hex: 0x5A4530) : Color(hex: 0xE8A035))
+                        .foregroundColor(inventory.count(for: booster) >= 5 ? ColorPalette.uiDarkBrown : ColorPalette.uiAmber)
                 }
                 .disabled(inventory.count(for: booster) >= 5)
                 .buttonStyle(.plain)
 
                 Text(localizationManager.t("settings.max5"))
                     .font(.system(size: max(9 * s, 10), weight: .medium))
-                    .foregroundColor(Color(hex: 0x8B7355))
+                    .foregroundColor(ColorPalette.uiBrown)
             }
         }
     }

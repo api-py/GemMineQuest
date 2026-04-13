@@ -31,7 +31,7 @@ struct LanguageSelectionView: View {
                 ZStack {
                     Circle()
                         .fill(RadialGradient(
-                            colors: [Color(hex: 0xFFD700).opacity(0.2), Color.clear],
+                            colors: [ColorPalette.uiGold.opacity(0.2), Color.clear],
                             center: .center, startRadius: 5, endRadius: 60
                         ))
                         .frame(width: 120 * s, height: 120 * s)
@@ -40,11 +40,11 @@ struct LanguageSelectionView: View {
                         .font(.system(size: 40 * s))
                         .foregroundStyle(
                             LinearGradient(
-                                colors: [Color(hex: 0xFFD700), Color(hex: 0xE8A035)],
+                                colors: [ColorPalette.uiGold, ColorPalette.uiAmber],
                                 startPoint: .top, endPoint: .bottom
                             )
                         )
-                        .shadow(color: Color(hex: 0xFFD700).opacity(0.4), radius: 8)
+                        .shadow(color: ColorPalette.uiGold.opacity(0.4), radius: 8)
                 }
                 .padding(.bottom, 8)
 
@@ -54,14 +54,14 @@ struct LanguageSelectionView: View {
                         .font(.system(size: 28 * s, weight: .black, design: .rounded))
                         .foregroundStyle(
                             LinearGradient(
-                                colors: [Color(hex: 0xFFD700), Color(hex: 0xFF8C00)],
+                                colors: [ColorPalette.uiGold, Color(hex: 0xFF8C00)],
                                 startPoint: .leading, endPoint: .trailing
                             )
                         )
 
                     Text("Dewiswch Eich Iaith")
                         .font(.system(size: 20 * s, weight: .bold, design: .rounded))
-                        .foregroundColor(Color(hex: 0xE8A035))
+                        .foregroundColor(ColorPalette.uiAmber)
                 }
                 .shadow(color: .black.opacity(0.6), radius: 10)
                 .scaleEffect(titleScale)
@@ -70,7 +70,7 @@ struct LanguageSelectionView: View {
 
                 Text("Tap a flag to select / Tapiwch faner i ddewis")
                     .font(.system(size: 14 * s, weight: .medium))
-                    .foregroundColor(Color(hex: 0x8B7355))
+                    .foregroundColor(ColorPalette.uiBrown)
                     .opacity(titleOpacity)
                     .padding(.bottom, 40)
 
@@ -89,9 +89,9 @@ struct LanguageSelectionView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 16))
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 16)
-                                        .stroke(Color(hex: 0xFFD700).opacity(0.5), lineWidth: 3)
+                                        .stroke(ColorPalette.uiGold.opacity(0.5), lineWidth: 3)
                                 )
-                                .shadow(color: Color(hex: 0xFFD700).opacity(0.3), radius: 10)
+                                .shadow(color: ColorPalette.uiGold.opacity(0.3), radius: 10)
                                 .scaleEffect(englishHover ? 1.08 : 1.0)
 
                             Text("English")
@@ -117,9 +117,9 @@ struct LanguageSelectionView: View {
                                 .clipShape(RoundedRectangle(cornerRadius: 16))
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 16)
-                                        .stroke(Color(hex: 0xFFD700).opacity(0.5), lineWidth: 3)
+                                        .stroke(ColorPalette.uiGold.opacity(0.5), lineWidth: 3)
                                 )
-                                .shadow(color: Color(hex: 0xFFD700).opacity(0.3), radius: 10)
+                                .shadow(color: ColorPalette.uiGold.opacity(0.3), radius: 10)
                                 .scaleEffect(welshHover ? 1.08 : 1.0)
 
                             Text("Cymraeg")
@@ -241,7 +241,7 @@ struct CartoonWelshFlag: View {
 
                     // Dragon eye
                     Circle()
-                        .fill(Color(hex: 0xFFD700))
+                        .fill(ColorPalette.uiGold)
                         .frame(width: w * 0.05, height: w * 0.05)
                         .offset(x: w * 0.08, y: -h * 0.1)
                 }
