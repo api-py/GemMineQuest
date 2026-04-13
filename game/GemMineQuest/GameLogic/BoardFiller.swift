@@ -269,23 +269,43 @@ class BoardFiller {
         return false
     }
 
-    /// Shuffle all non-special gems (for deadlock situations)
-    func shuffle(board: Board) {
-        var gems = board.allGems().filter { $0.special == .none }
-        gems.shuffle()
+    /// Shuffle all non-special gems (for deadlock situations).
+    /// Retries up to 5 times, validates a move exists after each attempt.
+    func shuffle(board: Board, matchDetector: MatchDetector? = nil) {
+        for _ in 0..<5 {
+            var gems = board.allGems().filter { $0.special == .none }
+            gems.shuffle()
 
-        var gemIndex = 0
-        for row in 0..<board.numRows {
-            for col in 0..<board.numColumns {
-                let pos = GridPosition(row: row, column: col)
-                guard board.isPlayable(pos), let existing = board[pos], existing.special == .none else { continue }
-                if gemIndex < gems.count {
-                    var shuffled = gems[gemIndex]
-                    shuffled.row = row
-                    shuffled.column = col
-                    board.setGem(shuffled, at: pos)
-                    gemIndex += 1
+            var gemIndex = 0
+            for row in 0..<board.numRows {
+                for col in 0..<board.numColumns {
+                    let pos = GridPosition(row: row, column: col)
+                    guard board.isPlayable(pos), let existing = board[pos], existing.special == .none else { continue }
+                    if gemIndex < gems.count {
+                        var shuffled = gems[gemIndex]
+                        shuffled.row = row
+                        shuffled.column = col
+                        board.setGem(shuffled, at: pos)
+                        gemIndex += 1
+                    }
                 }
+            }
+
+            if matchDetector?.hasAnyValidMove(on: board) ?? true { return }
+        }
+
+        // Fallback: force a valid move by making two gems with a gap the same color
+        for row in 0..<board.numRows {
+            for col in 0..<(board.numColumns - 2) {
+                let pos1 = GridPosition(row: row, column: col)
+                let pos3 = GridPosition(row: row, column: col + 2)
+                guard board.isPlayable(pos1), board.isPlayable(pos3),
+                      let gem1 = board[pos1], let gem3 = board[pos3],
+                      gem1.special == .none, gem3.special == .none else { continue }
+                var modified = gem3
+                modified.color = gem1.color
+                board.setGem(modified, at: pos3)
+                return
             }
         }
     }

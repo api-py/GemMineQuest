@@ -148,6 +148,8 @@ class BlockerManager {
                 if case .tnt(let countdown) = board.blockerAt(pos) {
                     let newCountdown = countdown - 1
                     if newCountdown <= 0 {
+                        board.setBlocker(nil, at: pos)
+                        board.removeGem(at: pos)
                         events.append(.tntExploded(at: pos))
                     } else {
                         board.setBlocker(.tnt(countdown: newCountdown), at: pos)
@@ -183,6 +185,10 @@ class BlockerManager {
 
         guard !lavaPositions.isEmpty else { return events }
 
+        // Cap lava at ~33% of board to prevent unwinnable states
+        let maxLavaCount = board.numRows * board.numColumns / 3
+        guard lavaPositions.count < maxLavaCount else { return events }
+
         // Only ONE lava tile spreads per turn (randomly selected)
         lavaPositions.shuffle()
 
@@ -197,7 +203,7 @@ class BlockerManager {
             // 1. Down (gravity)
             prioritized.append(down)
             // 2. Sideways (shuffled)
-            if Bool.random() {
+            if Bool.random() { // Non-deterministic: lava direction is cosmetic variation
                 prioritized.append(contentsOf: [left, right])
             } else {
                 prioritized.append(contentsOf: [right, left])

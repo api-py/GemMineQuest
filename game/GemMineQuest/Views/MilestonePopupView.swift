@@ -4,6 +4,7 @@ struct MilestonePopupView: View {
     let milestoneId: String
     @EnvironmentObject var localizationManager: LocalizationManager
     var onDismiss: () -> Void
+    private let s = Constants.uiScale
 
     @State private var scale: CGFloat = 0.8
     @State private var opacity: Double = 0
@@ -45,29 +46,29 @@ struct MilestonePopupView: View {
                             colors: [Color(hex: 0xFFD700).opacity(0.25), .clear],
                             center: .center, startRadius: 10, endRadius: 80
                         ))
-                        .frame(width: 160, height: 160)
+                        .frame(width: 160 * s, height: 160 * s)
 
                     Circle()
                         .fill(
                             LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xC9A84C)],
                                            startPoint: .top, endPoint: .bottom)
                         )
-                        .frame(width: 80, height: 80)
+                        .frame(width: 80 * s, height: 80 * s)
                         .shadow(color: Color(hex: 0xFFD700).opacity(0.5), radius: 12)
 
                     Image(systemName: icon)
-                        .font(.system(size: 36, weight: .bold))
+                        .font(.system(size: 36 * s, weight: .bold))
                         .foregroundColor(Color(hex: 0x3D2B1F))
                 }
 
                 // Title
                 Text(localizationManager.t("milestone.reached"))
-                    .font(.system(size: 14, weight: .bold))
+                    .font(.system(size: 14 * s, weight: .bold))
                     .foregroundColor(Color(hex: 0xCCBB99))
                     .tracking(2)
 
                 Text(title)
-                    .font(.system(size: 26, weight: .black, design: .rounded))
+                    .font(.system(size: 26 * s, weight: .black, design: .rounded))
                     .foregroundStyle(
                         LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xE8A035)],
                                        startPoint: .top, endPoint: .bottom)
@@ -77,7 +78,7 @@ struct MilestonePopupView: View {
 
                 // Reward
                 Text(rewardText)
-                    .font(.system(size: 18, weight: .semibold))
+                    .font(.system(size: 18 * s, weight: .semibold))
                     .foregroundColor(.white)
                     .padding(.horizontal, 20)
                     .padding(.vertical, 8)
@@ -90,7 +91,7 @@ struct MilestonePopupView: View {
                 // Claim button
                 Button(action: onDismiss) {
                     Text(localizationManager.t("milestone.awesome"))
-                        .font(.system(size: 20, weight: .black, design: .rounded))
+                        .font(.system(size: 20 * s, weight: .black, design: .rounded))
                         .foregroundColor(.white)
                         .frame(maxWidth: 220)
                         .padding(.vertical, 16)

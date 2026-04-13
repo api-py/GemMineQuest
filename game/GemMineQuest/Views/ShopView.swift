@@ -5,6 +5,7 @@ struct ShopView: View {
     @EnvironmentObject var boosterInventory: BoosterInventory
     @EnvironmentObject var localizationManager: LocalizationManager
     var onDismiss: () -> Void
+    private let s = Constants.uiScale
 
     #if DEBUG
     @AppStorage("godModeEnabled") private var isGodMode = false
@@ -35,14 +36,14 @@ struct ShopView: View {
                     Button(action: onDismiss) {
                         Image("btn_close")
                             .resizable()
-                            .frame(width: 34, height: 34)
+                            .frame(width: 34 * s, height: 34 * s)
                     }
                 }
                 .padding(.horizontal, 20)
 
                 // Title with Celtic knotwork frame
                 Text(localizationManager.t("shop.title"))
-                    .font(.system(size: 32, weight: .black, design: .rounded))
+                    .font(.system(size: 32 * s, weight: .black, design: .rounded))
                     .foregroundStyle(
                         LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xE8A035)],
                                        startPoint: .top, endPoint: .bottom)
@@ -55,10 +56,10 @@ struct ShopView: View {
                 // Coin balance
                 HStack(spacing: 6) {
                     Image(systemName: "star.circle.fill")
-                        .font(.system(size: 22))
+                        .font(.system(size: 22 * s))
                         .foregroundColor(Color(hex: 0xFFD700))
                     Text(isGodMode ? "\u{221E}" : "\(progressManager.progress.coins)")
-                        .font(.system(size: 24, weight: .bold, design: .rounded))
+                        .font(.system(size: 24 * s, weight: .bold, design: .rounded))
                         .foregroundColor(Color(hex: 0xFFD700))
                 }
                 .padding(.horizontal, 16)
@@ -99,17 +100,17 @@ struct ShopView: View {
                         colors: [Color(hex: 0xFFD700).opacity(0.15), Color.clear],
                         center: .center, startRadius: 2, endRadius: 30
                     ))
-                    .frame(width: 50, height: 50)
+                    .frame(width: 50 * s, height: 50 * s)
 
                 Image(item.iconName)
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 36, height: 36)
+                    .frame(width: 36 * s, height: 36 * s)
             }
 
             // Name
             Text(item.localizedDisplayName(localizationManager))
-                .font(.system(size: 14, weight: .bold, design: .rounded))
+                .font(.system(size: 14 * s, weight: .bold, design: .rounded))
                 .foregroundColor(.white)
                 .lineLimit(1)
                 .minimumScaleFactor(0.8)
@@ -117,17 +118,17 @@ struct ShopView: View {
             // Current stock
             let owned = boosterInventory.count(for: item.boosterType)
             Text(localizationManager.t("shop.owned", owned))
-                .font(.system(size: 10, weight: .medium))
+                .font(.system(size: max(10 * s, 10), weight: .medium))
                 .foregroundColor(Color(hex: 0x8B7355))
 
             // Price + BUY button
             Button(action: { purchaseItem(item) }) {
                 HStack(spacing: 4) {
                     Image(systemName: "star.circle.fill")
-                        .font(.system(size: 12))
+                        .font(.system(size: 12 * s))
                         .foregroundColor(Color(hex: 0xFFD700))
                     Text("\(item.price)")
-                        .font(.system(size: 14, weight: .bold, design: .rounded))
+                        .font(.system(size: 14 * s, weight: .bold, design: .rounded))
                 }
                 .foregroundColor(.white)
                 .frame(maxWidth: .infinity)

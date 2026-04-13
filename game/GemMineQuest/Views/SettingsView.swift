@@ -7,6 +7,7 @@ struct SettingsView: View {
     @EnvironmentObject var localizationManager: LocalizationManager
     @State private var showResetConfirmation = false
     var onDismiss: () -> Void
+    private let s = Constants.uiScale
 
     var body: some View {
         ZStack {
@@ -48,7 +49,7 @@ struct SettingsView: View {
                                         CartoonEnglishFlag()
                                             .frame(width: 24, height: 16)
                                             .clipShape(RoundedRectangle(cornerRadius: 3))
-                                        Text("EN")
+                                        Text(localizationManager.t("settings.langEN"))
                                             .font(.system(size: 12, weight: .bold))
                                     }
                                     .foregroundColor(localizationManager.currentLanguage == .english ? Color(hex: 0xFFD700) : Color(hex: 0x8B7355))
@@ -76,7 +77,7 @@ struct SettingsView: View {
                                         CartoonWelshFlag()
                                             .frame(width: 24, height: 16)
                                             .clipShape(RoundedRectangle(cornerRadius: 3))
-                                        Text("CY")
+                                        Text(localizationManager.t("settings.langCY"))
                                             .font(.system(size: 12, weight: .bold))
                                     }
                                     .foregroundColor(localizationManager.currentLanguage == .welsh ? Color(hex: 0xFFD700) : Color(hex: 0x8B7355))
@@ -216,6 +217,7 @@ struct BoosterSettingsRow: View {
     let booster: BoosterType
     @ObservedObject var inventory: BoosterInventory
     @EnvironmentObject var localizationManager: LocalizationManager
+    private let s = Constants.uiScale
 
     private var icon: String {
         booster.iconAssetName
@@ -267,7 +269,7 @@ struct BoosterSettingsRow: View {
                 .buttonStyle(.plain)
 
                 Text(localizationManager.t("settings.max5"))
-                    .font(.system(size: 9, weight: .medium))
+                    .font(.system(size: max(9 * s, 10), weight: .medium))
                     .foregroundColor(Color(hex: 0x8B7355))
             }
         }

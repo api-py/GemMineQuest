@@ -4,6 +4,7 @@ struct EventBannerView: View {
     @EnvironmentObject var localizationManager: LocalizationManager
     var onStart: () -> Void
     var onDismiss: () -> Void
+    private let s = Constants.uiScale
 
     @State private var timeRemaining: TimeInterval = 0
     @State private var slideOffset: CGFloat = -300
@@ -50,33 +51,33 @@ struct EventBannerView: View {
                             LinearGradient(colors: [Color(hex: 0xD41818), Color(hex: 0x8B0000)],
                                            startPoint: .top, endPoint: .bottom)
                         )
-                        .frame(width: 48, height: 48)
+                        .frame(width: 48 * s, height: 48 * s)
 
                     Image(BoosterType.pickaxe.iconAssetName)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 28, height: 28)
+                        .frame(width: 28 * s, height: 28 * s)
                 }
 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(eventTitle)
-                        .font(.system(size: 16, weight: .heavy, design: .rounded))
+                        .font(.system(size: 16 * s, weight: .heavy, design: .rounded))
                         .foregroundStyle(
                             LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xE8A035)],
                                            startPoint: .leading, endPoint: .trailing)
                         )
 
                     Text(eventDescription)
-                        .font(.system(size: 12, weight: .medium))
+                        .font(.system(size: 12 * s, weight: .medium))
                         .foregroundColor(Color(hex: 0xCCBB99))
 
                     // Countdown
                     HStack(spacing: 4) {
                         Image(systemName: "clock.fill")
-                            .font(.system(size: 10))
+                            .font(.system(size: max(10 * s, 10)))
                             .foregroundColor(Color(hex: 0xFF6347))
                         Text(countdownText)
-                            .font(.system(size: 12, weight: .bold, design: .monospaced))
+                            .font(.system(size: 12 * s, weight: .bold, design: .monospaced))
                             .foregroundColor(Color(hex: 0xFF6347))
                     }
                 }
@@ -87,7 +88,7 @@ struct EventBannerView: View {
                     // Start button
                     Button(action: onStart) {
                         Text(localizationManager.t("event.start"))
-                            .font(.system(size: 13, weight: .bold))
+                            .font(.system(size: 13 * s, weight: .bold))
                             .foregroundColor(.white)
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
@@ -103,7 +104,7 @@ struct EventBannerView: View {
                     // Dismiss
                     Button(action: onDismiss) {
                         Image(systemName: "xmark")
-                            .font(.system(size: 10, weight: .bold))
+                            .font(.system(size: max(10 * s, 10), weight: .bold))
                             .foregroundColor(Color(hex: 0x6B5A40))
                     }
                 }

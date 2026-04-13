@@ -3,6 +3,7 @@ import SwiftUI
 struct LanguageSelectionView: View {
     @EnvironmentObject var localizationManager: LocalizationManager
     var onDismiss: () -> Void
+    private let s = Constants.uiScale
 
     @State private var titleScale: CGFloat = 0.8
     @State private var titleOpacity: Double = 0
@@ -33,10 +34,10 @@ struct LanguageSelectionView: View {
                             colors: [Color(hex: 0xFFD700).opacity(0.2), Color.clear],
                             center: .center, startRadius: 5, endRadius: 60
                         ))
-                        .frame(width: 120, height: 120)
+                        .frame(width: 120 * s, height: 120 * s)
 
                     Image(systemName: "globe")
-                        .font(.system(size: 40))
+                        .font(.system(size: 40 * s))
                         .foregroundStyle(
                             LinearGradient(
                                 colors: [Color(hex: 0xFFD700), Color(hex: 0xE8A035)],
@@ -50,7 +51,7 @@ struct LanguageSelectionView: View {
                 // Title (bilingual)
                 VStack(spacing: 6) {
                     Text("Choose Your Language")
-                        .font(.system(size: 28, weight: .black, design: .rounded))
+                        .font(.system(size: 28 * s, weight: .black, design: .rounded))
                         .foregroundStyle(
                             LinearGradient(
                                 colors: [Color(hex: 0xFFD700), Color(hex: 0xFF8C00)],
@@ -59,7 +60,7 @@ struct LanguageSelectionView: View {
                         )
 
                     Text("Dewiswch Eich Iaith")
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                        .font(.system(size: 20 * s, weight: .bold, design: .rounded))
                         .foregroundColor(Color(hex: 0xE8A035))
                 }
                 .shadow(color: .black.opacity(0.6), radius: 10)
@@ -68,7 +69,7 @@ struct LanguageSelectionView: View {
                 .padding(.bottom, 12)
 
                 Text("Tap a flag to select / Tapiwch faner i ddewis")
-                    .font(.system(size: 14, weight: .medium))
+                    .font(.system(size: 14 * s, weight: .medium))
                     .foregroundColor(Color(hex: 0x8B7355))
                     .opacity(titleOpacity)
                     .padding(.bottom, 40)
@@ -84,7 +85,7 @@ struct LanguageSelectionView: View {
                     } label: {
                         VStack(spacing: 12) {
                             CartoonEnglishFlag()
-                                .frame(width: 120, height: 80)
+                                .frame(width: 120 * s, height: 80 * s)
                                 .clipShape(RoundedRectangle(cornerRadius: 16))
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 16)
@@ -94,7 +95,7 @@ struct LanguageSelectionView: View {
                                 .scaleEffect(englishHover ? 1.08 : 1.0)
 
                             Text("English")
-                                .font(.system(size: 18, weight: .bold, design: .rounded))
+                                .font(.system(size: 18 * s, weight: .bold, design: .rounded))
                                 .foregroundColor(Color(hex: 0xFFE8C0))
                         }
                     }
@@ -112,7 +113,7 @@ struct LanguageSelectionView: View {
                     } label: {
                         VStack(spacing: 12) {
                             CartoonWelshFlag()
-                                .frame(width: 120, height: 80)
+                                .frame(width: 120 * s, height: 80 * s)
                                 .clipShape(RoundedRectangle(cornerRadius: 16))
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 16)
@@ -122,7 +123,7 @@ struct LanguageSelectionView: View {
                                 .scaleEffect(welshHover ? 1.08 : 1.0)
 
                             Text("Cymraeg")
-                                .font(.system(size: 18, weight: .bold, design: .rounded))
+                                .font(.system(size: 18 * s, weight: .bold, design: .rounded))
                                 .foregroundColor(Color(hex: 0xFFE8C0))
                         }
                     }

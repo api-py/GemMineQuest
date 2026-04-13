@@ -5,6 +5,7 @@ struct SpinWheelView: View {
     @EnvironmentObject var boosterInventory: BoosterInventory
     @EnvironmentObject var localizationManager: LocalizationManager
     var onDismiss: () -> Void
+    private let s = Constants.uiScale
 
     @State private var rotation: Double = 0
     @State private var isSpinning = false
@@ -47,7 +48,7 @@ struct SpinWheelView: View {
 
                 // Title
                 Text(localizationManager.t("spin.title"))
-                    .font(.system(size: 28, weight: .black, design: .rounded))
+                    .font(.system(size: 28 * s, weight: .black, design: .rounded))
                     .foregroundStyle(
                         LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xE8A035)],
                                        startPoint: .top, endPoint: .bottom)
@@ -63,7 +64,7 @@ struct SpinWheelView: View {
                                            startPoint: .top, endPoint: .bottom),
                             lineWidth: 6
                         )
-                        .frame(width: 280, height: 280)
+                        .frame(width: 280 * s, height: 280 * s)
 
                     // Segments
                     ForEach(0..<8, id: \.self) { index in
@@ -74,7 +75,7 @@ struct SpinWheelView: View {
                             color: Color(hex: segmentColors[index])
                         )
                     }
-                    .frame(width: 268, height: 268)
+                    .frame(width: 268 * s, height: 268 * s)
                     .clipShape(Circle())
                     .rotationEffect(.degrees(rotation))
 
@@ -84,34 +85,34 @@ struct SpinWheelView: View {
                             LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xC9A84C)],
                                            startPoint: .top, endPoint: .bottom)
                         )
-                        .frame(width: 40, height: 40)
+                        .frame(width: 40 * s, height: 40 * s)
                         .shadow(color: Color(hex: 0xFFD700).opacity(0.5), radius: 6)
 
                     // Pointer (top)
                     VStack {
                         Triangle()
                             .fill(Color(hex: 0xFFD700))
-                            .frame(width: 24, height: 20)
+                            .frame(width: 24 * s, height: 20 * s)
                             .shadow(color: Color(hex: 0xFFD700).opacity(0.5), radius: 4)
                         Spacer()
                     }
-                    .frame(height: 280)
+                    .frame(height: 280 * s)
                 }
 
                 if showResult, let prize = wonPrize {
                     // Result display
                     VStack(spacing: 8) {
                         Text(localizationManager.t("spin.youWon"))
-                            .font(.system(size: 24, weight: .black, design: .rounded))
+                            .font(.system(size: 24 * s, weight: .black, design: .rounded))
                             .foregroundColor(Color(hex: 0xFFD700))
 
                         Text(prize.label)
-                            .font(.system(size: 20, weight: .bold))
+                            .font(.system(size: 20 * s, weight: .bold))
                             .foregroundColor(.white)
 
                         Button(action: collectPrize) {
                             Text(localizationManager.t("spin.collect"))
-                                .font(.system(size: 18, weight: .black, design: .rounded))
+                                .font(.system(size: 18 * s, weight: .black, design: .rounded))
                                 .foregroundColor(.white)
                                 .frame(maxWidth: 200)
                                 .padding(.vertical, 14)
@@ -130,7 +131,7 @@ struct SpinWheelView: View {
                     // Spin button
                     Button(action: spinWheel) {
                         Text(localizationManager.t("spin.spin"))
-                            .font(.system(size: 22, weight: .black, design: .rounded))
+                            .font(.system(size: 22 * s, weight: .black, design: .rounded))
                             .foregroundColor(.white)
                             .frame(maxWidth: 200)
                             .padding(.vertical, 16)
@@ -215,6 +216,7 @@ struct WheelSegment: View {
     let total: Int
     let label: String
     let color: Color
+    private let s = Constants.uiScale
 
     var body: some View {
         GeometryReader { geo in
@@ -240,7 +242,7 @@ struct WheelSegment: View {
             let labelY = center.y + labelRadius * sin(CGFloat(midAngle.radians))
 
             Text(label)
-                .font(.system(size: 10, weight: .bold))
+                .font(.system(size: max(10 * s, 10), weight: .bold))
                 .foregroundColor(.white)
                 .shadow(color: .black, radius: 2)
                 .rotationEffect(midAngle + .degrees(90))

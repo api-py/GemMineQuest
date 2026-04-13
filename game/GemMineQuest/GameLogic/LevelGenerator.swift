@@ -286,10 +286,13 @@ class LevelGenerator {
         let zone = MiningZone.zone(for: levelNumber)
         let weights = blockerWeights(for: zone)
         // Build cumulative thresholds from weights
-        let total = weights.reduce(0, +)
+        let total = max(1, weights.reduce(0, +))
         var cumulative: [Int] = []
         var sum = 0
-        for w in weights { sum += w * 100 / total; cumulative.append(sum) }
+        for (i, w) in weights.enumerated() {
+            sum = (i == weights.count - 1) ? 100 : sum + w * 100 / total
+            cumulative.append(sum)
+        }
 
         // Gradual blocker increase: 1-2 at easy, up to 20+ at hardest
         let blockerCount = max(2, Int(difficulty * 30))
@@ -312,7 +315,7 @@ class LevelGenerator {
                 layout[r][c] = Level.BlockerData(type: "lava", value: nil)
             } else if roll < cumulative[4] && difficulty > 0.30 {
                 layout[r][c] = Level.BlockerData(type: "tnt", value: max(5, 15 - Int(difficulty * 10)))
-            } else if difficulty > 0.15 {
+            } else if roll < cumulative[5] && difficulty > 0.15 {
                 layout[r][c] = Level.BlockerData(type: "amber", value: nil)
             }
 

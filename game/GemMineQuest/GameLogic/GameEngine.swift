@@ -483,7 +483,7 @@ class GameEngine {
         }
 
         if !matchDetector.hasAnyValidMove(on: board) {
-            boardFiller.shuffle(board: board)
+            boardFiller.shuffle(board: board, matchDetector: matchDetector)
             events.append(.boardShuffled)
         }
 

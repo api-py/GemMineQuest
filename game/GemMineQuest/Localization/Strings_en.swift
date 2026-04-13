@@ -300,6 +300,14 @@ let englishStrings: [String: String] = [
     "blocker.cage": "Iron Cage",
     "blocker.tnt": "Blasting Charge",
 
+    // Zone UI
+    "zone.entering": "ENTERING",
+    "zone.continue": "Continue",
+
+    // Settings Language
+    "settings.langEN": "EN",
+    "settings.langCY": "CY",
+
     // Zone-Specific Victory Text
     "victory.zone1": "The ancient copper yields its treasure",
     "victory.zone2": "The black gold of the valleys shines",

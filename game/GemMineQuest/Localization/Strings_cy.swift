@@ -300,6 +300,14 @@ let welshStrings: [String: String] = [
     "blocker.cage": "Cawell Haearn",
     "blocker.tnt": "Ffrwydrad",
 
+    // Zone UI
+    "zone.entering": "YN MYND I MEWN",
+    "zone.continue": "Parhau",
+
+    // Settings Language
+    "settings.langEN": "EN",
+    "settings.langCY": "CY",
+
     // Zone-Specific Victory Text
     "victory.zone1": "Mae'r copr hynafol yn ildio'i drysor",
     "victory.zone2": "Mae aur du'r cymoedd yn disgleirio",

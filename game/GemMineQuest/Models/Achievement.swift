@@ -151,13 +151,13 @@ enum Achievement: String, CaseIterable {
         case .fortuneSeeker:
             return progress.totalGamesPlayed >= 10
         case .ovateOfTheMine:
-            return progress.levelsCompleted >= 31
+            return progress.highestUnlocked >= 32
         case .bardOfTheDeep:
-            return progress.levelsCompleted >= 91
+            return progress.highestUnlocked >= 92
         case .druidOfAnnwn:
-            return progress.levelsCompleted >= 151
+            return progress.highestUnlocked >= 152
         case .dragonsFriend:
-            return progress.levelsCompleted >= 200
+            return progress.highestUnlocked >= 201
         }
     }
 }

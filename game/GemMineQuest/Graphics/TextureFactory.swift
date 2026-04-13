@@ -8,6 +8,13 @@ class TextureFactory {
 
     private var gemTextureCache: [String: SKTexture] = [:]
     private var miscCache: [String: SKTexture] = [:]
+
+    private init() {
+        NotificationCenter.default.addObserver(
+            forName: UIApplication.didReceiveMemoryWarningNotification,
+            object: nil, queue: .main
+        ) { [weak self] _ in self?.clearCaches() }
+    }
     private static let colorSpace = CGColorSpaceCreateDeviceRGB()
 
     // MARK: - Gem Textures

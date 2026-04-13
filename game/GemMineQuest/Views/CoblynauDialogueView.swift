@@ -5,6 +5,7 @@ import SwiftUI
 struct CoblynauDialogueView: View {
     let message: String
     var onDismiss: (() -> Void)? = nil
+    private let s = Constants.uiScale
 
     @State private var bobOffset: CGFloat = 0
     @State private var showBubble = false
@@ -15,7 +16,7 @@ struct CoblynauDialogueView: View {
             // Speech bubble
             if showBubble && !message.isEmpty {
                 Text(message)
-                    .font(.system(size: 11, weight: .regular, design: .serif))
+                    .font(.system(size: max(11 * s, 10), weight: .regular, design: .serif))
                     .foregroundColor(Color(hex: 0xCCBB99))
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 12)
@@ -46,18 +47,18 @@ struct CoblynauDialogueView: View {
                         colors: [Color(hex: 0x88CCFF).opacity(0.2), .clear],
                         center: .center, startRadius: 5, endRadius: 30
                     ))
-                    .frame(width: 60, height: 60)
+                    .frame(width: 60 * s, height: 60 * s)
 
                 let spriteName = showExcited ? "coblynau_excited" : (showBubble ? "coblynau_talking" : "coblynau_idle")
                 if let _ = UIImage(named: spriteName) {
                     Image(spriteName)
                         .resizable()
                         .scaledToFit()
-                        .frame(width: 48, height: 48)
+                        .frame(width: 48 * s, height: 48 * s)
                 } else {
                     // Fallback: system image with miner hat feel
                     Image(systemName: "person.fill")
-                        .font(.system(size: 24))
+                        .font(.system(size: 24 * s))
                         .foregroundColor(Color(hex: 0x88CCFF))
                 }
             }

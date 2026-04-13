@@ -5,6 +5,7 @@ struct DailyRewardView: View {
     @EnvironmentObject var boosterInventory: BoosterInventory
     @EnvironmentObject var localizationManager: LocalizationManager
     var onDismiss: () -> Void
+    private let s = Constants.uiScale
 
     @State private var claimedReward: ProgressManager.DailyReward?
     @State private var showClaimed = false
@@ -31,7 +32,7 @@ struct DailyRewardView: View {
 
                 // Title
                 Text(localizationManager.t("daily.title"))
-                    .font(.system(size: 28, weight: .black, design: .rounded))
+                    .font(.system(size: 28 * s, weight: .black, design: .rounded))
                     .foregroundStyle(
                         LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xE8A035)],
                                        startPoint: .top, endPoint: .bottom)
@@ -40,7 +41,7 @@ struct DailyRewardView: View {
 
                 // Streak counter
                 Text(localizationManager.t("daily.dayStreak", progressManager.progress.dailyStreak))
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.system(size: 16 * s, weight: .semibold))
                     .foregroundColor(Color(hex: 0xCCBB99))
 
                 // 7-day reward row
@@ -53,7 +54,7 @@ struct DailyRewardView: View {
 
                             VStack(spacing: 4) {
                                 Text(localizationManager.t("daily.day", day))
-                                    .font(.system(size: 10, weight: .bold))
+                                    .font(.system(size: max(10 * s, 10), weight: .bold))
                                     .foregroundColor(isCurrent ? Color(hex: 0xFFD700) : .white)
 
                                 ZStack {
@@ -63,19 +64,19 @@ struct DailyRewardView: View {
                                                                startPoint: .top, endPoint: .bottom)
                                               : LinearGradient(colors: [Color(hex: 0x2A2218), Color(hex: 0x1A1208)],
                                                                startPoint: .top, endPoint: .bottom))
-                                        .frame(width: 52, height: 64)
+                                        .frame(width: 52 * s, height: 64 * s)
 
                                     RoundedRectangle(cornerRadius: 10)
                                         .stroke(isCurrent ? Color(hex: 0xFFD700) : Color(hex: 0x4A3520), lineWidth: 2)
-                                        .frame(width: 52, height: 64)
+                                        .frame(width: 52 * s, height: 64 * s)
 
                                     VStack(spacing: 2) {
                                         Image(systemName: dayRewardIcon(day))
-                                            .font(.system(size: 18))
+                                            .font(.system(size: 18 * s))
                                             .foregroundColor(isPast ? Color(hex: 0x6B5A40) : Color(hex: 0xFFD700))
 
                                         Text("\(dayRewards[index].coins)")
-                                            .font(.system(size: 10, weight: .bold))
+                                            .font(.system(size: max(10 * s, 10), weight: .bold))
                                             .foregroundColor(isPast ? Color(hex: 0x6B5A40) : .white)
                                     }
 
@@ -96,7 +97,7 @@ struct DailyRewardView: View {
                 if showClaimed, let reward = claimedReward {
                     VStack(spacing: 8) {
                         Text(localizationManager.t("daily.claimed"))
-                            .font(.system(size: 22, weight: .bold, design: .rounded))
+                            .font(.system(size: 22 * s, weight: .bold, design: .rounded))
                             .foregroundColor(Color(hex: 0x4CAF50))
 
                         HStack(spacing: 16) {
@@ -113,19 +114,19 @@ struct DailyRewardView: View {
                                     Image(boosterIcon(booster))
                                         .resizable()
                                         .scaledToFit()
-                                        .frame(width: 18, height: 18)
+                                        .frame(width: 18 * s, height: 18 * s)
                                     Text("+1")
                                 }
                                 .foregroundColor(Color(hex: 0xFF6347))
                             }
                         }
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(.system(size: 16 * s, weight: .semibold))
                     }
                     .transition(.scale.combined(with: .opacity))
                 } else {
                     Button(action: claimReward) {
                         Text(localizationManager.t("daily.claim"))
-                            .font(.system(size: 20, weight: .black, design: .rounded))
+                            .font(.system(size: 20 * s, weight: .black, design: .rounded))
                             .foregroundColor(.white)
                             .frame(maxWidth: 220)
                             .padding(.vertical, 16)
