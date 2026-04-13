@@ -488,6 +488,7 @@ struct LevelTransitionView: View {
     let levelNumber: Int
     let levelName: String
     @EnvironmentObject var localizationManager: LocalizationManager
+    private let s = Constants.uiScale
 
     @State private var bannerScale: CGFloat = 0.8
     @State private var bannerOpacity: Double = 0
@@ -531,7 +532,7 @@ struct LevelTransitionView: View {
 
                 // Level number
                 Text(localizationManager.t("levelDetail.level", levelNumber))
-                    .font(.system(size: 42, weight: .black, design: .rounded))
+                    .font(.system(size: 42 * s, weight: .black, design: .rounded))
                     .foregroundStyle(
                         LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xE8A035)],
                                        startPoint: .top, endPoint: .bottom)
@@ -542,7 +543,7 @@ struct LevelTransitionView: View {
 
                 // Welsh place name
                 Text(levelName)
-                    .font(.system(size: 18, weight: .medium, design: .serif))
+                    .font(.system(size: 18 * s, weight: .medium, design: .serif))
                     .foregroundColor(Color(hex: 0xCCBB99))
                     .italic()
                     .opacity(subtitleOpacity)
@@ -555,7 +556,7 @@ struct LevelTransitionView: View {
                             startPoint: .leading, endPoint: .trailing
                         )
                     )
-                    .frame(width: 180, height: 1)
+                    .frame(width: 180 * s, height: 1)
                     .opacity(subtitleOpacity)
 
                 // Objective hint
@@ -567,12 +568,12 @@ struct LevelTransitionView: View {
                                 .fill(Color(hex: 0xE8A035))
                                 .frame(width: 5, height: 5)
                             Text(level.objectives[i].localizedDisplayText(localizationManager))
-                                .font(.system(size: 14))
+                                .font(.system(size: 14 * s))
                                 .foregroundColor(Color(hex: 0x8B7355))
                         }
                     }
                     Text(localizationManager.t("levelDetail.moves", level.maxMoves))
-                        .font(.system(size: 14, weight: .bold))
+                        .font(.system(size: 14 * s, weight: .bold))
                         .foregroundColor(Color(hex: 0xE8A035))
                 }
                 .opacity(subtitleOpacity)
@@ -581,7 +582,7 @@ struct LevelTransitionView: View {
                 Spacer()
 
                 Text(localizationManager.t("game.getReady"))
-                    .font(.system(size: 13, weight: .medium))
+                    .font(.system(size: 13 * s, weight: .medium))
                     .foregroundColor(Color(hex: 0x5A4530))
                     .opacity(subtitleOpacity)
                     .padding(.bottom, 40)
@@ -630,6 +631,7 @@ struct ObjectiveIconView: View {
     let target: Int
     @EnvironmentObject var localizationManager: LocalizationManager
     var onLongPress: ((String) -> Void)? = nil
+    private let s = Constants.uiScale
 
     private var isComplete: Bool { current >= target }
 
@@ -677,7 +679,7 @@ struct ObjectiveIconView: View {
                 // Progress ring background
                 Circle()
                     .stroke(Color(hex: 0xDDCCAA), lineWidth: 3)
-                    .frame(width: 42, height: 42)
+                    .frame(width: 42 * s, height: 42 * s)
 
                 // Progress ring fill
                 Circle()
@@ -686,33 +688,33 @@ struct ObjectiveIconView: View {
                         isComplete ? Color(hex: 0x4CAF50) : bgColor,
                         style: StrokeStyle(lineWidth: 3, lineCap: .round)
                     )
-                    .frame(width: 42, height: 42)
+                    .frame(width: 42 * s, height: 42 * s)
                     .rotationEffect(.degrees(-90))
 
                 // Inner circle
                 Circle()
                     .fill(isComplete ? Color(hex: 0x4CAF50).opacity(0.15) : bgColor.opacity(0.12))
-                    .frame(width: 36, height: 36)
+                    .frame(width: 36 * s, height: 36 * s)
 
                 if isComplete {
                     Image(systemName: "checkmark")
-                        .font(.system(size: 18, weight: .bold))
+                        .font(.system(size: 18 * s, weight: .bold))
                         .foregroundColor(Color(hex: 0x4CAF50))
                 } else {
                     Image(systemName: iconName)
-                        .font(.system(size: 16, weight: .bold))
+                        .font(.system(size: 16 * s, weight: .bold))
                         .foregroundColor(bgColor)
                 }
             }
 
             // Progress text below icon
             Text(progressText)
-                .font(.system(size: 9, weight: .heavy, design: .rounded))
+                .font(.system(size: max(9 * s, 10), weight: .heavy, design: .rounded))
                 .foregroundColor(isComplete ? Color(hex: 0x4CAF50) : Color(hex: 0x5A4530))
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
         }
-        .frame(width: 48)
+        .frame(width: 48 * s)
         .onLongPressGesture(minimumDuration: 0.4) {
             onLongPress?(objective.localizedDescriptionText(localizationManager))
         }
@@ -722,14 +724,15 @@ struct ObjectiveIconView: View {
 // MARK: - Toggle Style
 
 struct CompactToggleStyle: ToggleStyle {
+    private let s = Constants.uiScale
     func makeBody(configuration: Configuration) -> some View {
         Button { configuration.isOn.toggle() } label: {
             RoundedRectangle(cornerRadius: 8)
                 .fill(configuration.isOn ? Color(hex: 0xE8A035) : Color(hex: 0x3D2B1F))
-                .frame(width: 36, height: 20)
+                .frame(width: 36 * s, height: 20 * s)
                 .overlay(
-                    Circle().fill(.white).frame(width: 16, height: 16)
-                        .offset(x: configuration.isOn ? 8 : -8)
+                    Circle().fill(.white).frame(width: 16 * s, height: 16 * s)
+                        .offset(x: configuration.isOn ? 8 * s : -8 * s)
                         .animation(.easeInOut(duration: 0.15), value: configuration.isOn)
                 )
         }

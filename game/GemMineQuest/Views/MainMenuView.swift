@@ -113,7 +113,7 @@ struct MainMenuView: View {
                         Image(BoosterType.pickaxe.iconAssetName)
                             .resizable()
                             .scaledToFit()
-                            .frame(width: 28, height: 28)
+                            .frame(width: 28 * s, height: 28 * s)
                         Text(progressManager.progress.highestUnlocked > 1
                              ? localizationManager.t("menu.continueMining")
                              : localizationManager.t("menu.startMining"))

@@ -135,13 +135,13 @@ struct LevelMapView: View {
                     ZStack {
                         Circle()
                             .fill(LinearGradient(colors: [Color(hex: 0xE8A035), Color(hex: 0xC68020)], startPoint: .top, endPoint: .bottom))
-                            .frame(width: 60, height: 60)
+                            .frame(width: 60 * Constants.uiScale, height: 60 * Constants.uiScale)
                             .overlay(Circle().stroke(Color(hex: 0xFFD700), lineWidth: 2))
                             .shadow(color: Color(hex: 0xE8A035).opacity(0.4), radius: 8)
                         Image(systemName: "arrow.trianglehead.2.clockwise.rotate.90")
-                            .font(.system(size: 22, weight: .bold)).foregroundColor(.white)
+                            .font(.system(size: 22 * Constants.uiScale, weight: .bold)).foregroundColor(.white)
                         if progressManager.hasFreeSpin() {
-                            Text(localizationManager.t("levelMap.free")).font(.system(size: 8, weight: .black)).foregroundColor(.white)
+                            Text(localizationManager.t("levelMap.free")).font(.system(size: max(8 * Constants.uiScale, 10), weight: .black)).foregroundColor(.white)
                                 .padding(.horizontal, 6).padding(.vertical, 2)
                                 .background(Capsule().fill(Color.green))
                                 .offset(x: 18, y: -22)

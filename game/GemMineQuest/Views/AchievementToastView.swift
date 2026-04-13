@@ -4,6 +4,7 @@ struct AchievementToastView: View {
     let achievement: Achievement
     @EnvironmentObject var localizationManager: LocalizationManager
     var onDismiss: () -> Void
+    private let s = Constants.uiScale
 
     @State private var offsetY: CGFloat = -120
     @State private var opacity: Double = 0
@@ -18,25 +19,25 @@ struct AchievementToastView: View {
                             LinearGradient(colors: [Color(hex: 0xFFD700), Color(hex: 0xC9A84C)],
                                            startPoint: .top, endPoint: .bottom)
                         )
-                        .frame(width: 44, height: 44)
+                        .frame(width: 44 * s, height: 44 * s)
 
                     Image(systemName: achievement.iconName)
-                        .font(.system(size: 20, weight: .bold))
+                        .font(.system(size: 20 * s, weight: .bold))
                         .foregroundColor(Color(hex: 0x3D2B1F))
                 }
 
                 // Text
                 VStack(alignment: .leading, spacing: 2) {
                     Text(localizationManager.t("achievement.unlocked"))
-                        .font(.system(size: 11, weight: .bold))
+                        .font(.system(size: 11 * s, weight: .bold))
                         .foregroundColor(Color(hex: 0xFFD700))
 
                     Text(achievement.localizedDisplayName(localizationManager))
-                        .font(.system(size: 16, weight: .heavy, design: .rounded))
+                        .font(.system(size: 16 * s, weight: .heavy, design: .rounded))
                         .foregroundColor(.white)
 
                     Text(localizationManager.t("achievement.gold", achievement.coinReward))
-                        .font(.system(size: 12, weight: .semibold))
+                        .font(.system(size: 12 * s, weight: .semibold))
                         .foregroundColor(Color(hex: 0xCCBB99))
                 }
 
