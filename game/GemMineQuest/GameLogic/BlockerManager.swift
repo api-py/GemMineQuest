@@ -8,19 +8,24 @@ class BlockerManager {
         lavaCooldownTurns = 1
     }
 
+    /// Decrement granite layers or remove it. Shared by all blocker-damage paths.
+    private func applyGraniteDamage(at pos: GridPosition, layers: Int, on board: Board) -> GameEvent {
+        if layers > 1 {
+            board.setBlocker(.granite(layers: layers - 1), at: pos)
+            return .blockerDamaged(at: pos, type: .granite(layers: layers))
+        } else {
+            board.setBlocker(nil, at: pos)
+            return .blockerDestroyed(at: pos)
+        }
+    }
+
     /// Apply one hit of damage to the blocker at the given position.
     /// Granite loses a layer; other destructible blockers are removed entirely.
     func damageBlocker(at pos: GridPosition, on board: Board) -> GameEvent? {
         guard let blocker = board.blockerAt(pos) else { return nil }
         switch blocker {
         case .granite(let layers):
-            if layers > 1 {
-                board.setBlocker(.granite(layers: layers - 1), at: pos)
-                return .blockerDamaged(at: pos, type: blocker)
-            } else {
-                board.setBlocker(nil, at: pos)
-                return .blockerDestroyed(at: pos)
-            }
+            return applyGraniteDamage(at: pos, layers: layers, on: board)
         default:
             board.setBlocker(nil, at: pos)
             return .blockerDestroyed(at: pos)
@@ -37,13 +42,7 @@ class BlockerManager {
             guard let blocker = board.blockerAt(pos) else { continue }
             switch blocker {
             case .granite(let layers):
-                if layers > 1 {
-                    board.setBlocker(.granite(layers: layers - 1), at: pos)
-                    events.append(.blockerDamaged(at: pos, type: blocker))
-                } else {
-                    board.setBlocker(nil, at: pos)
-                    events.append(.blockerDestroyed(at: pos))
-                }
+                events.append(applyGraniteDamage(at: pos, layers: layers, on: board))
             case .cage, .amber:
                 board.setBlocker(nil, at: pos)
                 events.append(.blockerDestroyed(at: pos))
@@ -71,13 +70,7 @@ class BlockerManager {
 
                 switch blocker {
                 case .granite(let layers):
-                    if layers > 1 {
-                        board.setBlocker(.granite(layers: layers - 1), at: neighbor)
-                        events.append(.blockerDamaged(at: neighbor, type: blocker))
-                    } else {
-                        board.setBlocker(nil, at: neighbor)
-                        events.append(.blockerDestroyed(at: neighbor))
-                    }
+                    events.append(applyGraniteDamage(at: neighbor, layers: layers, on: board))
 
                 case .boulder:
                     board.setBlocker(nil, at: neighbor)

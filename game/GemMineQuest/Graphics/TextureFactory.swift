@@ -31,8 +31,13 @@ class TextureFactory {
         }
     }
 
+    /// Quantize a size to 4-point steps to reduce near-duplicate cache entries.
+    private func quantize(_ size: CGFloat) -> Int {
+        Int((size / 4.0).rounded()) * 4
+    }
+
     func gemTexture(for color: GemColor, size: CGFloat) -> SKTexture {
-        let key = "\(color.rawValue)_\(Int(size))"
+        let key = "\(color.rawValue)_\(quantize(size))"
         if let cached = gemTextureCache[key] { return cached }
 
         let scale: CGFloat = 3.0
@@ -271,7 +276,7 @@ class TextureFactory {
     // MARK: - Tile Textures
 
     func tileTexture(size: CGFloat, isLight: Bool) -> SKTexture {
-        let key = "tile_\(Int(size))_\(isLight ? "L" : "D")"
+        let key = "tile_\(quantize(size))_\(isLight ? "L" : "D")"
         if let cached = miscCache[key] { return cached }
 
         let scale: CGFloat = 3.0
@@ -348,7 +353,7 @@ class TextureFactory {
     // MARK: - Soft Glow Texture (particles + halos)
 
     func softGlowTexture(size: CGFloat) -> SKTexture {
-        let key = "glow_\(Int(size))"
+        let key = "glow_\(quantize(size))"
         if let cached = miscCache[key] { return cached }
 
         let px = size * 2

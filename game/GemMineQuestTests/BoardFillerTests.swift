@@ -142,18 +142,3 @@ final class BoardFillerTests: XCTestCase {
         }
     }
 }
-
-// Helper for blocker comparison
-extension BlockerType: Equatable {
-    public static func == (lhs: BlockerType, rhs: BlockerType) -> Bool {
-        switch (lhs, rhs) {
-        case (.boulder, .boulder): return true
-        case (.granite(let a), .granite(let b)): return a == b
-        case (.cage, .cage): return true
-        case (.lava, .lava): return true
-        case (.tnt(let a), .tnt(let b)): return a == b
-        case (.amber, .amber): return true
-        default: return false
-        }
-    }
-}

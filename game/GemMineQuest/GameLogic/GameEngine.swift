@@ -651,17 +651,8 @@ class GameEngine {
         events.append(.wormAppeared(at: target))
 
         if isBlocker {
-            if case .granite(let layers) = board.blockerAt(target) {
-                if layers > 1 {
-                    board.setBlocker(.granite(layers: layers - 1), at: target)
-                    events.append(.blockerDamaged(at: target, type: .granite(layers: layers)))
-                } else {
-                    board.setBlocker(nil, at: target)
-                    events.append(.blockerDestroyed(at: target))
-                }
-            } else {
-                board.setBlocker(nil, at: target)
-                events.append(.blockerDestroyed(at: target))
+            if let event = blockerManager.damageBlocker(at: target, on: board) {
+                events.append(event)
             }
         }
 

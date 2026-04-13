@@ -18,13 +18,4 @@ struct MatchResult: Equatable {
         self.specialType = specialType
     }
 
-    static func specialFor(pattern: MatchPattern, isHorizontal: Bool) -> SpecialType? {
-        switch pattern {
-        case .three: return nil
-        case .four: return isHorizontal ? .laserVertical : .laserHorizontal
-        case .lShape, .tShape: return .volatile
-        case .five: return .crystalBall
-        case .square: return .miningDrone
-        }
-    }
 }

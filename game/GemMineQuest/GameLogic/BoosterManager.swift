@@ -6,6 +6,16 @@ class BoosterManager {
     private let specialResolver = SpecialGemResolver()
     private let blockerManager = BlockerManager()
 
+    // MARK: - Helpers
+
+    /// All playable positions containing a normal (non-special) gem with no blocker.
+    private func normalGemCandidates(on board: Board) -> [GridPosition] {
+        board.allPlayablePositions().filter {
+            guard let gem = board[$0] else { return false }
+            return gem.special == .none && board.blockerAt($0) == nil
+        }
+    }
+
     // MARK: - Pre-Game Boosters
 
     /// Apply extra moves booster
@@ -15,10 +25,7 @@ class BoosterManager {
 
     /// Place a crystal ball on the board
     func placeCrystalBall(on board: Board) -> GameEvent? {
-        let candidates = board.allPlayablePositions().filter {
-            guard let gem = board[$0] else { return false }
-            return gem.special == .none && board.blockerAt($0) == nil
-        }
+        let candidates = normalGemCandidates(on: board)
         guard let pos = candidates.randomElement() else { return nil }
 
         if var gem = board[pos] {
@@ -32,10 +39,7 @@ class BoosterManager {
     /// Place laser and volatile gems on the board
     func placePowerGems(on board: Board) -> [GameEvent] {
         var events: [GameEvent] = []
-        let candidates = board.allPlayablePositions().filter {
-            guard let gem = board[$0] else { return false }
-            return gem.special == .none && board.blockerAt($0) == nil
-        }.shuffled()
+        let candidates = normalGemCandidates(on: board).shuffled()
 
         // Place one laser gem
         if let pos = candidates.first, var gem = board[pos] {
@@ -61,10 +65,7 @@ class BoosterManager {
     func useGemForge(on board: Board) -> [GameEvent] {
         var events: [GameEvent] = [.boosterUsed(type: .gemForge)]
 
-        let candidates = board.allPlayablePositions().filter {
-            guard let gem = board[$0] else { return false }
-            return gem.special == .none && board.blockerAt($0) == nil
-        }.shuffled()
+        let candidates = normalGemCandidates(on: board).shuffled()
 
         // Filter out positions adjacent to existing specials (least priority for crystal ball)
         let filteredCandidates = candidates.filter { pos in
@@ -204,24 +205,11 @@ class BoosterManager {
         return events
     }
 
-    /// Mine Cart Rush: randomly place 5 laser gems on the board (never replacing specials)
-    func useMineCartRush(row: Int, on board: Board) -> [GameEvent] {
+    /// Mine Cart Rush: randomly place 3 laser gems on the board (never replacing specials)
+    func useMineCartRush(on board: Board) -> [GameEvent] {
         var events: [GameEvent] = [.boosterUsed(type: .mineCartRush)]
 
-        // Collect all normal gems on the board (no specials, no blockers)
-        var candidates: [GridPosition] = []
-        for r in 0..<board.numRows {
-            for c in 0..<board.numColumns {
-                let pos = GridPosition(row: r, column: c)
-                guard board.isPlayable(pos),
-                      let gem = board[pos],
-                      gem.special == .none,
-                      board.blockerAt(pos) == nil else { continue }
-                candidates.append(pos)
-            }
-        }
-
-        // Place exactly 3 random laser gems
+        var candidates = normalGemCandidates(on: board)
         candidates.shuffle()
         let count = min(3, candidates.count)
         for i in 0..<count {

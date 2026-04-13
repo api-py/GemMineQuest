@@ -178,7 +178,11 @@ class AnimationController {
         case .wormAppeared(let pos):
             return animateWorm(at: pos)
 
-        default:
+        case .tntWarning:
+            return 0
+        case .tntExploded:
+            return 0
+        case .boosterUsed:
             return 0
         }
     }

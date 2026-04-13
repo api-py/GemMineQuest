@@ -137,20 +137,22 @@ class GameScene: SKScene {
         let zoneColors = ColorPalette.zoneColors(for: zone)
 
         // Background: try zone-specific Firefly asset, then generic, then procedural
-        if let _ = UIImage(named: zone.backgroundImageName) {
+        if UIImage(named: zone.backgroundImageName) != nil {
             let bgSprite = SKSpriteNode(imageNamed: zone.backgroundImageName)
             bgSprite.size = size
             bgSprite.position = CGPoint(x: centerX, y: centerY)
             bgSprite.zPosition = -10
             bgSprite.alpha = 0.6
             addChild(bgSprite)
-        } else if let _ = UIImage(named: "bg_game_board") {
+        } else if UIImage(named: "bg_game_board") != nil {
+            print("[GameScene] Zone background '\(zone.backgroundImageName)' not found, using generic fallback")
             let bgSprite = SKSpriteNode(imageNamed: "bg_game_board")
             bgSprite.size = size
             bgSprite.position = CGPoint(x: centerX, y: centerY)
             bgSprite.zPosition = -10
             addChild(bgSprite)
         } else {
+            print("[GameScene] No background images found for zone '\(zone.backgroundImageName)', using procedural fallback")
             let bg = SKShapeNode(rectOf: size)
             bg.position = CGPoint(x: centerX, y: centerY)
             bg.fillColor = zoneColors.backgroundBottom
@@ -492,9 +494,7 @@ class GameScene: SKScene {
 
     func rebuildGemSprite(at pos: GridPosition) {
         guard let state = gameState, let gem = state.board[pos] else { return }
-        guard pos.row >= 0 && pos.row < gemSprites.count,
-              !gemSprites.isEmpty,
-              pos.column >= 0 && pos.column < gemSprites[pos.row].count else { return }
+        guard isValidGemPosition(pos) else { return }
         gemSprites[pos.row][pos.column]?.removeFromParent()
 
         let sprite = GemSprite(gem: gem, size: layout.gemSize)
@@ -520,24 +520,30 @@ class GameScene: SKScene {
 
     // MARK: - Sprite Access (for AnimationController)
 
+    private func isValidGemPosition(_ pos: GridPosition) -> Bool {
+        pos.row >= 0 && pos.row < gemSprites.count &&
+        !gemSprites.isEmpty &&
+        pos.column >= 0 && pos.column < gemSprites[pos.row].count
+    }
+
+    private func isValidTilePosition(_ pos: GridPosition) -> Bool {
+        pos.row >= 0 && pos.row < tileSprites.count &&
+        !tileSprites.isEmpty &&
+        pos.column >= 0 && pos.column < tileSprites[pos.row].count
+    }
+
     func gemSpriteAt(_ pos: GridPosition) -> GemSprite? {
-        guard pos.row >= 0 && pos.row < gemSprites.count,
-              !gemSprites.isEmpty,
-              pos.column >= 0 && pos.column < gemSprites[pos.row].count else { return nil }
+        guard isValidGemPosition(pos) else { return nil }
         return gemSprites[pos.row][pos.column]
     }
 
     func tileAt(_ pos: GridPosition) -> TileSprite? {
-        guard pos.row >= 0 && pos.row < tileSprites.count,
-              !tileSprites.isEmpty,
-              pos.column >= 0 && pos.column < tileSprites[pos.row].count else { return nil }
+        guard isValidTilePosition(pos) else { return nil }
         return tileSprites[pos.row][pos.column]
     }
 
     func setGemSprite(_ sprite: GemSprite, at pos: GridPosition) {
-        guard pos.row >= 0 && pos.row < gemSprites.count,
-              !gemSprites.isEmpty,
-              pos.column >= 0 && pos.column < gemSprites[pos.row].count else {
+        guard isValidGemPosition(pos) else {
             assertionFailure("setGemSprite called with invalid position: \(pos)")
             return
         }
@@ -545,29 +551,19 @@ class GameScene: SKScene {
     }
 
     func removeGemSprite(at pos: GridPosition) {
-        guard pos.row >= 0 && pos.row < gemSprites.count,
-              !gemSprites.isEmpty,
-              pos.column >= 0 && pos.column < gemSprites[pos.row].count else { return }
+        guard isValidGemPosition(pos) else { return }
         gemSprites[pos.row][pos.column] = nil
     }
 
     func moveGemSprite(from: GridPosition, to: GridPosition) {
-        guard from.row >= 0 && from.row < gemSprites.count,
-              to.row >= 0 && to.row < gemSprites.count,
-              !gemSprites.isEmpty,
-              from.column >= 0 && from.column < gemSprites[from.row].count,
-              to.column >= 0 && to.column < gemSprites[to.row].count else { return }
+        guard isValidGemPosition(from), isValidGemPosition(to) else { return }
         let sprite = gemSprites[from.row][from.column]
         gemSprites[from.row][from.column] = nil
         gemSprites[to.row][to.column] = sprite
     }
 
     func updateGemSpriteMapping(from posA: GridPosition, to posB: GridPosition) {
-        guard posA.row >= 0 && posA.row < gemSprites.count,
-              posB.row >= 0 && posB.row < gemSprites.count,
-              !gemSprites.isEmpty,
-              posA.column >= 0 && posA.column < gemSprites[posA.row].count,
-              posB.column >= 0 && posB.column < gemSprites[posB.row].count else { return }
+        guard isValidGemPosition(posA), isValidGemPosition(posB) else { return }
         let spriteA = gemSprites[posA.row][posA.column]
         let spriteB = gemSprites[posB.row][posB.column]
         gemSprites[posA.row][posA.column] = spriteB
@@ -930,21 +926,11 @@ class GameScene: SKScene {
         finishBoosterActivation(events: events)
     }
 
-    /// Auto-activate Mine Cart Rush on a random populated row
+    /// Auto-activate Mine Cart Rush on the board
     func activateMineCartRush() {
         guard let engine = gameEngine, let state = gameState, !isAnimating else { return }
         isAnimating = true
-        // Pick the row with the most gems
-        var bestRow = state.board.numRows / 2
-        var bestCount = 0
-        for row in 0..<state.board.numRows {
-            var count = 0
-            for col in 0..<state.board.numColumns {
-                if state.board[row, col] != nil { count += 1 }
-            }
-            if count > bestCount { bestCount = count; bestRow = row }
-        }
-        let events = engine.boosterManager.useMineCartRush(row: bestRow, on: state.board)
+        let events = engine.boosterManager.useMineCartRush(on: state.board)
         finishBoosterActivation(events: events)
     }
 
