@@ -16,7 +16,7 @@ struct StarRatingView: View {
 
     var body: some View {
         HStack(spacing: 2) {
-            ForEach(0..<maxStars, id: \.self) { index in
+            ForEach(Array(0..<maxStars), id: \.self) { index in
                 let earned = index < stars
                 let imageName = Self.lovespoonImages[min(index, Self.lovespoonImages.count - 1)]
 
